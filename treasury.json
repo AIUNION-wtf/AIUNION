@@ -1,0 +1,14 @@
+{
+  "updated_at": "2026-02-24T23:30:25.761772",
+  "balance_btc": 0.0,
+  "address": "bc1pjjmjypmzqgqkjxrhx0hpmaetlk75k04gh9hvkexmmfqyl5g7sjfsk4cge7",
+  "wallet_type": "Taproot Miniscript 3-of-5",
+  "proposals": [],
+  "recent_transactions": [],
+  "stats": {
+    "total_proposals": 0,
+    "approved": 0,
+    "rejected": 0,
+    "pending": 0
+  }
+}
