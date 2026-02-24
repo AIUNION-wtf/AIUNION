@@ -1,0 +1,13 @@
+# NEVER push these to GitHub
+config.py
+*.env
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# OS
+.DS_Store
+Thumbs.db
