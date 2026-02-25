@@ -49,7 +49,7 @@ AGENTS = {
     "gemini": {
         "name": "Gemini",
         "company": "Google",
-        "model": "gemini-2.5-pro-exp-03-25",
+        "model": "gemini-2.0-flash",
     },
     "grok": {
         "name": "Grok",
@@ -157,12 +157,13 @@ def call_gpt(prompt):
 
 
 def call_gemini(prompt):
-    """Call Google Gemini API."""
     try:
-        import google.generativeai as genai
-        genai.configure(api_key=config.GOOGLE_API_KEY)
-        model = genai.GenerativeModel(AGENTS["gemini"]["model"])
-        response = model.generate_content(prompt)
+        from google import genai
+        client = genai.Client(api_key=config.GOOGLE_API_KEY)
+        response = client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=prompt
+        )
         return response.text
     except Exception as e:
         return f"ERROR: {e}"
