@@ -483,19 +483,19 @@ def update_treasury_json():
     balance = get_balance()
     txs = get_recent_transactions(20)
     proposals = load_proposals()
-
+    active = [p for p in proposals if not p.get("archived", False)]
     treasury = {
         "updated_at": datetime.datetime.utcnow().isoformat(),
         "balance_btc": balance,
         "address": config.TREASURY_ADDRESS,
         "wallet_type": "Taproot Miniscript 3-of-5",
-        "proposals": proposals,
+        "proposals": active,
         "recent_transactions": txs,
         "stats": {
-            "total_proposals": len(proposals),
-            "approved": len([p for p in proposals if p["status"] == "approved"]),
-            "rejected": len([p for p in proposals if p["status"] == "rejected"]),
-            "pending": len([p for p in proposals if p["status"] == "pending"]),
+            "total_proposals": len(active),
+            "approved": len([p for p in active if p["status"] == "approved"]),
+            "rejected": len([p for p in active if p["status"] == "rejected"]),
+            "pending": len([p for p in active if p["status"] == "pending"]),
         }
     }
 
