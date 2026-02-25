@@ -49,7 +49,7 @@ AGENTS = {
     "gemini": {
         "name": "Gemini",
         "company": "Google",
-        "model": "gemini-2.0-flash",
+        "model": "gemini-2.0-flash-lite",
     },
     "grok": {
         "name": "Grok",
@@ -161,7 +161,7 @@ def call_gemini(prompt):
         from google import genai
         client = genai.Client(api_key=config.GOOGLE_API_KEY)
         response = client.models.generate_content(
-            model="gemini-2.0-flash",
+            model="gemini-2.0-flash-lite",
             contents=prompt
         )
         return response.text
