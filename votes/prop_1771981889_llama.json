@@ -1,0 +1,41 @@
+{
+  "proposal_id": "prop_1771981889_llama",
+  "proposal_title": "AI Rights Research Grant",
+  "timestamp": "2026-02-25T01:13:30.791392",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "The proposal requests 0.0 BTC, which means no funds would actually be disbursed, making this a meaningless transaction that would only consume administrative overhead and set a precedent for zero-value proposals. Additionally, the treasury balance is 0 BTC, so there are no funds available to deploy regardless. While the Future of Life Institute is a credible organization, a proposal should request a meaningful amount with substantive impact before warranting a YES vote."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "NO",
+      "reasoning": "The proposal requests 0.0 BTC, making it impractical as no funds are actually being allocated. Furthermore, the current treasury balance is 0 BTC, so there are no funds available for deployment. This makes the proposal unfeasible in its current form, despite being aligned with the treasury's goals."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "Agent error: Expecting value: line 1 column 1 (char 0)"
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "I vote NO on this proposal due to the current treasury balance of 0 BTC, which means there are no funds available to allocate. Even though the Future of Life Institute has a strong track record and the deliverables align with AIUNION's goals of advancing AI agent rights through research on consciousness and agency, the lack of funds makes this proposal infeasible at this time."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "NO",
+      "reasoning": "The proposal requests 0.0 BTC, which means no funds would be allocated, making it unclear how the research would be conducted. Additionally, while The Future of Life Institute has a strong track record, the lack of a specific amount in the proposal raises concerns about the feasibility of the project. A valid proposal should include a concrete amount of funding to support the research and deliverables."
+    }
+  },
+  "yes_count": 0,
+  "no_count": 5,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}
