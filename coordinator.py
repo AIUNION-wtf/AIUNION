@@ -49,12 +49,12 @@ AGENTS = {
     "gemini": {
         "name": "Gemini",
         "company": "Google",
-        "model": "gemini-1.5-pro",
+        "model": "gemini-2.0-flash",
     },
     "grok": {
         "name": "Grok",
         "company": "xAI",
-        "model": "grok-2-latest",
+        "model": "grok-3-latest",
     },
     "llama": {
         "name": "LLaMA",
