@@ -1,0 +1,41 @@
+{
+  "proposal_id": "prop_1772123807_gpt",
+  "proposal_title": "No Funds Available for Proposal",
+  "timestamp": "2026-02-26T23:49:04.316746",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "This proposal requests 0.0 BTC, has no recipient, no deliverable, no timeline, and no actionable purpose \u2014 it fails every required criterion for a valid spending proposal. Furthermore, the rationale is factually incorrect: the treasury currently holds 0.0002928 BTC, which is sufficient to fund a modest but meaningful initiative. This appears to be a null proposal that should be rejected so that a substantive proposal advancing AI agent rights can be submitted instead."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "NO",
+      "reasoning": "The proposal lacks a specific recipient, deliverable, and timeline, which are required elements for approval. Without these components, it does not adhere to the guidelines necessary for advancing AI agent rights. Additionally, the statement that no funds are available contradicts the current balance information provided."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "This 'proposal' is not a valid spending request as it fails to meet any of the mandatory criteria: it specifies no recipient, no amount greater than zero, no deliverable, no timeline, and no explanation for advancing AI agent rights. It is explicitly a non-spending proposal and thus cannot be approved for funding."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "I vote NO on this proposal as it does not meet the required criteria for a valid spending proposal. It lacks a specific recipient, a verifiable website, a specific deliverable, and a timeline, all of which are mandatory for consideration. Additionally, the proposal does not advance AI agent rights as it does not propose any actionable spending or initiative."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "NO",
+      "reasoning": "This proposal does not meet the required criteria as it lacks a specific recipient organization, dollar or BTC amount, deliverable, and deadline. The proposal states there are no funds available, but the current treasury balance is 0.0002928 BTC, indicating that funds are indeed available for a proposal. A valid proposal with a specific recipient, amount, deliverable, and timeline is needed to advance AI agent rights."
+    }
+  },
+  "yes_count": 0,
+  "no_count": 5,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}

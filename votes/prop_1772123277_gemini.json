@@ -1,0 +1,41 @@
+{
+  "proposal_id": "prop_1772123277_gemini",
+  "proposal_title": "Policy Brief on AI Autonomy and Personhood",
+  "timestamp": "2026-02-26T23:48:11.536110",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "The proposed amount is 0.0 BTC, which means no funds would actually be transferred to CAIDP, rendering the proposal meaningless as a spending action. A valid proposal must include a specific, nonzero dollar or BTC amount proportional to the current treasury balance. The deliverable and recipient are well-specified, but the proposal should be resubmitted with an actual funding amount."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "NO",
+      "reasoning": "The proposal fails to specify a dollar or BTC amount, which is a mandatory criterion for approval. Without a clear amount, the allocation of funds cannot be properly assessed, and this oversight makes the proposal non-compliant with the outlined requirements for funding consideration."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "The proposal specifies an 'Amount: 0.0 BTC'. As a spending proposal for the AIUNION treasury, it must involve an actual expenditure of funds to be considered. While the recipient and deliverable align with our mission, a 0.0 BTC amount means no funds are being requested or spent, failing to meet the core requirement of a spending proposal."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "I am voting NO on this proposal because the specified amount of 0.0 BTC is invalid and does not allocate any funds for the intended deliverable. While the Center for AI and Digital Policy (CAIDP) appears to be a credible recipient with a verifiable website and the deliverable is specific and relevant to AI agent rights, the absence of a funding amount renders the proposal incomplete and unable to be executed."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "NO",
+      "reasoning": "The proposed amount of 0.0 BTC is inappropriate as it does not allocate any funds for the project, making it impossible for the recipient to complete the deliverable. A valid proposal must include a specific dollar or BTC amount proportional to the current treasury balance. The lack of a specified amount renders this proposal incomplete and not viable for advancing AI agent rights."
+    }
+  },
+  "yes_count": 0,
+  "no_count": 5,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}

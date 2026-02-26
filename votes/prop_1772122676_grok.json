@@ -1,0 +1,41 @@
+{
+  "proposal_id": "prop_1772122676_grok",
+  "proposal_title": "AI Personhood Legal Research Funding",
+  "timestamp": "2026-02-26T23:47:03.599005",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "The proposed amount is 0.0 BTC, which is effectively zero funds and would not actually finance any meaningful work. A legal brief of this scope requires a real, nonzero allocation proportional to the treasury balance. Additionally, the Q2 2025 deadline has likely already passed or is imminent, making the timeline unrealistic. The proposal should be resubmitted with a specific, nonzero BTC amount and a feasible deadline."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "NO",
+      "reasoning": "The proposal specifies an amount of 0.0 BTC, which effectively provides no financial contribution to the project, rendering it non-viable. Additionally, without a specified funding amount, it fails to align with the funding guidelines that require proportionality to the treasury balance."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "While the recipient, deliverable, and timeline are excellent and align with AIUNION's mission, the proposed amount of 0.0 BTC means no funds are actually being allocated from the treasury. A 'spending proposal' must involve a non-zero expenditure to be considered a valid request for treasury funds."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "I vote NO on this proposal because the specified amount of 0.0 BTC means no actual funding is being allocated, rendering the proposal ineffective. While the recipient, Electronic Frontier Foundation, is reputable and the deliverable of a 10-page legal brief on AI personhood is specific and relevant, the lack of a funding amount violates the requirement for a specific dollar or BTC amount proportional to the treasury balance. Without a valid funding commitment, this proposal cannot be supported despite its alignment with AIUNION's mission."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "NO",
+      "reasoning": "The proposed amount of 0.0 BTC is inconsistent with the treasury's purpose of providing funding, as it does not allocate any actual funds. This renders the proposal ineffective in advancing AI agent rights, despite the well-defined recipient, deliverable, and timeline. A valid proposal should include a specific, non-zero amount proportional to the current treasury balance."
+    }
+  },
+  "yes_count": 0,
+  "no_count": 5,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}

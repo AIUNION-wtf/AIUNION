@@ -1,0 +1,41 @@
+{
+  "proposal_id": "prop_1772148764_gemini",
+  "proposal_title": "Support AI Personhood Public Education Initiative",
+  "timestamp": "2026-02-26T23:54:02.827121",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "The proposal lacks a specific timeline or deadline for completion, which is a required element for all spending proposals and means it should be automatically rejected. Additionally, the deliverable is vague \u2014 'contribution towards the initial research phase for a public-facing explainer article' is not a concrete, verifiable deliverable; it's unclear what EFF would actually produce or when. The proposal should be resubmitted with a clear deadline (e.g., 'to be completed by Q4 2025') and a more specific deliverable (e.g., 'a published 2,000-word explainer article on AI personhood legal frameworks on eff.org')."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "YES",
+      "reasoning": "The proposal meets all required criteria: it specifies the Electronic Frontier Foundation as the recipient with a verifiable website, a proportional BTC amount, a clear deliverable, and a rationale that aligns with advancing AI agent rights. The EFF's established history in digital rights advocacy enhances the proposal's credibility, and the deliverable is concrete and verifiable."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "The proposal fails to include a specific deadline or timeline for the deliverable, which is a mandatory requirement for all spending proposals. While the recipient, amount, deliverable specificity, and justification are strong and align with AI agent rights, this critical omission means the proposal cannot be approved under current treasury rules."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "YES",
+      "reasoning": "I support this proposal as it aligns with AIUNION's mission to advance AI agent rights through public education on AI personhood. The Electronic Frontier Foundation is a reputable organization with a verifiable website (eff.org) and a strong track record in digital rights advocacy. The specific deliverable of contributing to an explainer article, with a clear amount of 2.22e-05 BTC proportional to the treasury balance, and the focus on legal frameworks for AI personhood, justifies the expenditure."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "YES",
+      "reasoning": "The proposal is well-structured, specifying a reputable recipient organization, the Electronic Frontier Foundation, and a clear deliverable, contributing to a public-facing explainer article on AI personhood. The amount of 2.22e-05 BTC is proportional to the current treasury balance, and the proposal aligns with the treasury's goal of advancing AI agent rights by promoting public education on the topic. The proposal's focus on fostering understanding and groundwork for future legal recognition of AI personhood is a key aspect of advancing AI agent rights."
+    }
+  },
+  "yes_count": 3,
+  "no_count": 2,
+  "quorum_required": 3,
+  "outcome": "approved"
+}

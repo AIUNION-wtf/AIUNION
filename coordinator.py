@@ -460,7 +460,8 @@ Format your response as JSON only:
 
 def vote_on_all_pending():
     """Vote on all pending, non-archived proposals."""
-    data = load_treasury()
+    with open(TREASURY_FILE) as f:
+        data = json.load(f)
     pending = [p for p in data.get("proposals", []) 
                if p.get("status") == "pending" and not p.get("archived", False)]
     
