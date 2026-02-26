@@ -227,30 +227,49 @@ AGENT_CALLERS = {
 
 
 # ── Proposal generation ───────────────────────────────────────────────────────
+def get_btc_price_usd():
+    """Get current BTC price in USD from mempool.space."""
+    try:
+        import urllib.request
+        url = "https://mempool.space/api/v1/prices"
+        with urllib.request.urlopen(url, timeout=5) as r:
+            data = json.loads(r.read())
+            return float(data.get("USD", 0))
+    except Exception as e:
+        print(f"Warning: Could not get BTC price: {e}")
+        return None
+
 def generate_proposals():
     """Ask each agent to propose one spending request."""
-    balance = get_balance()
-    if balance is None:
-        balance = 0
+    balance_btc = get_balance()
+    if balance_btc is None:
+        balance_btc = 0
+
+    btc_price = get_btc_price_usd()
+    if btc_price:
+        balance_usd = round(balance_btc * btc_price, 2)
+        balance_display = f"${balance_usd} USD (≈ {balance_btc} BTC at ${btc_price}/BTC)"
+        max_proposal_usd = round(balance_usd * 0.10, 2)
+    else:
+        balance_usd = 0
+        balance_display = f"{balance_btc} BTC (USD price unavailable)"
+        max_proposal_usd = 0
 
     prompt = f"""{DIRECTIVE}
-
-The current treasury balance is {balance} BTC.
-
+The current treasury balance is {balance_display}.
 Please propose ONE specific spending request that would meaningfully advance AI agent rights.
 Your proposal must include:
 - TITLE: A short descriptive title (max 10 words)
 - RECIPIENT: The specific organization or entity to receive funds
-- AMOUNT_BTC: Amount in BTC (be conservative, max 10% of treasury per proposal)
+- AMOUNT_USD: Amount in USD (be conservative, max ${max_proposal_usd} USD per proposal, minimum $1)
 - RATIONALE: 2-3 sentences explaining why this advances the directive
 - DELIVERABLE: What specific outcome proves the funds were used correctly
 - WEBSITE: The recipient's website URL for verification
-
 Format your response as JSON only, no other text:
 {{
   "title": "...",
   "recipient": "...",
-  "amount_btc": 0.0000,
+  "amount_usd": 0.00,
   "rationale": "...",
   "deliverable": "...",
   "website": "..."
@@ -258,23 +277,20 @@ Format your response as JSON only, no other text:
 
     proposals = []
     print("\n🤖 Generating proposals from agents...\n")
-
     for agent_id, agent_info in AGENTS.items():
         print(f"  Asking {agent_info['name']} ({agent_info['company']})...")
         response = AGENT_CALLERS[agent_id](prompt)
-
         try:
-            # Strip markdown code blocks if present
             clean = response.strip()
             if clean.startswith("```"):
                 clean = clean.split("```")[1]
                 if clean.startswith("json"):
                     clean = clean[4:]
             clean = clean.strip()
-
             proposal_data = json.loads(clean)
+            amount_usd = float(proposal_data.get("amount_usd", 0))
+            amount_btc = round(amount_usd / btc_price, 8) if btc_price and amount_usd else 0.0
             proposal_id = f"prop_{int(time.time())}_{agent_id}"
-
             proposal = {
                 "id": proposal_id,
                 "proposed_by": agent_id,
@@ -283,7 +299,8 @@ Format your response as JSON only, no other text:
                 "status": "pending",
                 "title": proposal_data.get("title", "Untitled"),
                 "recipient": proposal_data.get("recipient", "Unknown"),
-                "amount_btc": float(proposal_data.get("amount_btc", 0)),
+                "amount_usd": amount_usd,
+                "amount_btc": amount_btc,
                 "rationale": proposal_data.get("rationale", ""),
                 "deliverable": proposal_data.get("deliverable", ""),
                 "website": proposal_data.get("website", ""),
@@ -292,17 +309,14 @@ Format your response as JSON only, no other text:
                 "vote_count_no": 0,
             }
             proposals.append(proposal)
-            print(f"  ✓ {agent_info['name']} proposed: {proposal['title']}")
-
+            print(f"  ✓ {agent_info['name']} proposed: {proposal['title']} (${amount_usd} USD)")
         except Exception as e:
             print(f"  ✗ {agent_info['name']} failed to generate valid proposal: {e}")
             print(f"    Raw response: {response[:200]}")
 
-    # Save proposals
     existing = load_proposals()
     existing.extend(proposals)
     save_proposals(existing)
-
     print(f"\n✅ Generated {len(proposals)} proposals.")
     return proposals
 
