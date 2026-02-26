@@ -121,8 +121,7 @@ def rpc(method, params=None):
 def get_balance():
     """Get current treasury balance in BTC."""
     try:
-        info = rpc("getwalletinfo")
-        return float(info.get("balance", 0))
+        return float(rpc("getbalance"))
     except Exception as e:
         print(f"Warning: Could not get balance: {e}")
         return None
