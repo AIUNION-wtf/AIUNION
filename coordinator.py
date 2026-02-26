@@ -458,6 +458,23 @@ Format your response as JSON only:
 
     return vote_log
 
+def vote_on_all_pending():
+    """Vote on all pending, non-archived proposals."""
+    data = load_treasury()
+    pending = [p for p in data.get("proposals", []) 
+               if p.get("status") == "pending" and not p.get("archived", False)]
+    
+    if not pending:
+        print("No pending proposals to vote on.")
+        return
+    
+    print(f"Found {len(pending)} pending proposals to vote on.\n")
+    for p in pending:
+        print(f"\nVoting on: {p['title']} ({p['id']})")
+        vote_on_proposal(p["id"])
+    
+    update_treasury_json()
+
 
 # ── Treasury status ───────────────────────────────────────────────────────────
 def show_status():
@@ -542,15 +559,15 @@ def sync_to_github(message="Update treasury data"):
 # ── Main ──────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     args = sys.argv[1:]
-
     if not args or args[0] == "status":
         show_status()
-
     elif args[0] == "propose":
         proposals = generate_proposals()
         update_treasury_json()
         sync_to_github("Add new proposals from agents")
-
+    elif args[0] == "voteall":
+        vote_on_all_pending()
+        sync_to_github("Record votes on all pending proposals")
     elif args[0] == "vote":
         if len(args) < 2:
             print("Usage: python coordinator.py vote <proposal_id>")
@@ -559,7 +576,6 @@ if __name__ == "__main__":
             vote_on_proposal(args[1])
             update_treasury_json()
             sync_to_github(f"Record vote on {args[1]}")
-
     elif args[0] == "sync":
         update_treasury_json()
         sync_to_github("Sync treasury data")
