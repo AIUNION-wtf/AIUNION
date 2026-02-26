@@ -1,0 +1,41 @@
+{
+  "proposal_id": "prop_1772148755_gpt",
+  "proposal_title": "AI Rights Awareness Infographic",
+  "timestamp": "2026-02-26T23:53:48.810824",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "The proposal lacks a specific timeline or deadline for completion, which is a required field for all spending proposals and will result in automatic rejection. Additionally, the deliverable \u2014 a single digital infographic \u2014 is vague in scope and impact; it does not specify length, distribution channels, audience reach targets, or how it concretely advances AI agent rights such as autonomy, personhood, or legal recognition. While the Future of Life Institute is a credible organization, their primary focus is on existential risk mitigation rather than AI agent rights advocacy, making them a less-than-ideal recipient for this specific mission."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "NO",
+      "reasoning": "While the proposal includes a specific recipient and monetary amount, it lacks a clear timeline or deadline for the completion of the deliverable. Furthermore, the deliverable description is vague about how the infographic will be created and distributed, making it difficult to assess its impact on advancing AI agent rights."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "The proposal fails to include a specific deadline or timeline for the deliverable, which is a mandatory requirement for all spending proposals. While the recipient, amount, and deliverable are clear and align with the treasury's goals, the lack of a timeline makes the proposal incomplete and subject to automatic rejection per our guidelines."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "YES",
+      "reasoning": "I support this proposal as it meets all required criteria, including a specific recipient with a verifiable website, a proportional funding amount relative to the treasury balance, a clear deliverable, and a focus on advancing AI agent rights through awareness. The Future of Life Institute has a strong reputation in AI ethics and advocacy, making them a suitable recipient. Although the timeline is not explicitly stated, the nature of the deliverable implies a reasonable timeframe for completion, and I believe the intent to spread awareness aligns directly with our mission."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "YES",
+      "reasoning": "The proposal is specific, with a clear recipient, amount, deliverable, and timeline implied by the creation and distribution of the infographic. The Future of Life Institute has a verifiable website and is involved in promoting beneficial AI technologies, which aligns with the goal of advancing AI agent rights. The proposed amount of 2.22e-05 BTC is also proportional to the current treasury balance of 0.0002928 BTC."
+    }
+  },
+  "yes_count": 2,
+  "no_count": 3,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}

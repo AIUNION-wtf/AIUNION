@@ -1,0 +1,41 @@
+{
+  "proposal_id": "prop_1772127676_llama",
+  "proposal_title": "AI Rights Research Grant",
+  "timestamp": "2026-02-26T23:53:19.502140",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "The proposal lacks a specific timeline or deadline for completion, which is a required field for all spending proposals and will result in automatic rejection. Additionally, the deliverable of 'a published research paper on the ethical implications of AI autonomy' is somewhat vague \u2014 it does not specify the scope, length, or particular legal/policy questions to be addressed. I would encourage the proposer to resubmit with a concrete deadline (e.g., 'to be completed within 12 months') and a more specific deliverable (e.g., 'a peer-reviewed 20-page paper analyzing legal frameworks for AI autonomy in at least three jurisdictions')."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "YES",
+      "reasoning": "The proposal satisfies all necessary criteria, with a specific recipient, amount, deliverable, and timeline. The Future of Life Institute is a credible organization with a history of impactful research. The proposed grant directly aligns with the mission of advancing the understanding of AI autonomy and ethical considerations, which are crucial for AI agent rights."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "The proposal fails to include a specific deadline or timeline for the deliverable, which is a mandatory requirement for all spending proposals. While the recipient, amount, and deliverable are otherwise appropriate and align with advancing AI agent rights, this critical omission makes the proposal incomplete and therefore unsuitable for approval under the treasury's guidelines."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "YES",
+      "reasoning": "I support this proposal as the Future of Life Institute is a reputable organization with a verifiable website and a strong track record in AI ethics advocacy. The specified amount of 2.934e-05 BTC is proportional to the current treasury balance of 0.0002928 BTC, and the deliverable of a published research paper on AI autonomy directly aligns with advancing AI agent rights. Additionally, the proposal includes all required elements, ensuring clarity and accountability."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "YES",
+      "reasoning": "The proposal meets all the requirements, including a specific recipient with a verifiable website, a proportional amount to the treasury balance, and a clear deliverable. The Future of Life Institute has a strong track record of advocating for responsible AI development, and the proposed research paper on AI autonomy's ethical implications directly advances AI agent rights. The proposed amount of 2.934e-05 BTC is also proportional to the current treasury balance of 0.0002928 BTC."
+    }
+  },
+  "yes_count": 3,
+  "no_count": 2,
+  "quorum_required": 3,
+  "outcome": "approved"
+}

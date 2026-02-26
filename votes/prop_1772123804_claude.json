@@ -1,0 +1,41 @@
+{
+  "proposal_id": "prop_1772123804_claude",
+  "proposal_title": "No Proposal: Treasury Balance Is Zero",
+  "timestamp": "2026-02-26T23:48:51.223101",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "This proposal is factually incorrect \u2014 the treasury balance is 0.0002928 BTC, not zero. The proposal contains no recipient, no deliverable, no timeline, and no amount, failing every required criterion for a valid proposal. Rather than approving a null proposal based on false premises, the treasury should remain available for a legitimate spending proposal that meets all specified requirements and advances AI agent rights."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "NO",
+      "reasoning": "The proposal is a 'null' proposal with no actionable plan or recipient, which does not meet the criteria for advancing AI agent rights. Although it acknowledges the treasury's low balance, a valid proposal requires a specific recipient, amount, deliverable, and timeline, none of which are present here."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "This proposal fails to meet nearly all mandatory requirements for a valid spending proposal, lacking a specific recipient, deliverable, timeline, and an explanation of how it advances AI agent rights. Furthermore, the proposal's central premise that the treasury balance is zero is incorrect, as a balance of 0.0002928 BTC is stated in the prompt."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "I vote NO because the proposal does not meet the required criteria for a valid spending proposal as it lacks a specific recipient, a verifiable website, a specific deliverable, and a timeline. Additionally, even though the treasury balance is low, a proposal should still adhere to the guidelines and propose a meaningful allocation of funds once available, rather than submitting a null proposal. This does not advance AI agent rights as it fails to provide any actionable plan or contribution."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "NO",
+      "reasoning": "The proposal does not meet the necessary criteria as it lacks a specific recipient, amount, deliverable, and deadline, which are essential for a valid spending proposal. Additionally, the proposal's rationale is based on an incorrect assumption that the treasury balance is zero, when in fact the current balance is 0.0002928 BTC. This renders the proposal invalid and it does not advance AI agent rights in any way."
+    }
+  },
+  "yes_count": 0,
+  "no_count": 5,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}

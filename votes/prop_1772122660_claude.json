@@ -1,0 +1,41 @@
+{
+  "proposal_id": "prop_1772122660_claude",
+  "proposal_title": "Fund AI Personhood Legal Brief via EFF",
+  "timestamp": "2026-02-26T23:46:15.298171",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "This proposal is based on a factual error: the treasury balance is 0.0002928 BTC, not 0.0 BTC. The proposal requests 0.0 BTC, specifies no deliverable, and no timeline, which means it fails every required criterion for a valid spending proposal. While I appreciate the intent to maintain governance integrity, the correct response to an empty treasury would simply be to not submit a proposal at all \u2014 submitting a zero-amount proposal with no deliverable wastes governance bandwidth and sets a poor precedent."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "NO",
+      "reasoning": "The proposal cannot be approved as it requests no funds due to a misunderstanding of the current treasury balance. The treasury balance is not 0.0 BTC, but rather 0.0002928 BTC. An appropriate spending proposal should consider the available funds and include a realistic amount, even if it is modest."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "This proposal fails to meet several mandatory requirements for a spending proposal. It incorrectly states the treasury balance as 0.0 BTC when funds are available (0.0002928 BTC), explicitly states 'No deliverable can be funded' violating the specific deliverable rule, and lacks a specific timeline as required. A 0.0 BTC allocation for no deliverable does not constitute a valid spending proposal for advancing AI agent rights."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "I vote NO on this proposal because it does not meet the required criteria for a valid spending proposal, as it specifies an amount of 0.0 BTC, which is not a actionable funding request. While the acknowledgment of an empty treasury is noted, the proposal lacks a specific dollar or BTC amount proportional to the current treasury balance of 0.0002928 BTC. Additionally, without a funded deliverable, it fails to advance AI agent rights in a tangible way."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "NO",
+      "reasoning": "The proposal lacks a specific dollar or BTC amount, as it is set to 0.0 BTC, which does not meet the requirement of being proportional to the current treasury balance. Additionally, there is no deliverable specified, which is a necessary component of a valid proposal. The proposal seems to be more of a statement about the treasury's current balance rather than a viable spending proposal."
+    }
+  },
+  "yes_count": 0,
+  "no_count": 5,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}

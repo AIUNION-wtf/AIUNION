@@ -1,0 +1,41 @@
+{
+  "proposal_id": "prop_1772123826_grok",
+  "proposal_title": "AI Rights Legal Research Funding",
+  "timestamp": "2026-02-26T23:49:32.677808",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "The proposed amount is 0.0 BTC, which means no funds would actually be transferred to the Electronic Frontier Foundation, rendering the proposal meaningless as a spending action. A valid proposal must include a specific, non-zero dollar or BTC amount proportional to the current treasury balance. Additionally, the Q2 2025 deadline has likely already passed or is imminent, making the timeline unrealistic. The proposer should resubmit with a concrete funding amount and a feasible deadline."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "NO",
+      "reasoning": "The proposed amount of 0.0 BTC for the Electronic Frontier Foundation is insufficient and likely a typo or oversight. All required elements such as a specific amount proportional to the treasury balance are necessary for approval. This proposal cannot be approved without a valid financial commitment."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "While the proposal clearly identifies a specific recipient, deliverable, and timeline that aligns with advancing AI agent rights, the specified amount is 0.0 BTC. A spending proposal requires a tangible allocation of funds to be proportional to the treasury balance and to actually facilitate the proposed deliverable, which 0.0 BTC does not accomplish. Therefore, it cannot be approved as a legitimate spending proposal."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "I am voting NO on this proposal because the specified amount of 0.0 BTC means no funds are actually being allocated, rendering the proposal ineffective. While the Electronic Frontier Foundation is a reputable organization and the deliverable and timeline are specific, the lack of a funding amount fails to meet the basic requirements for a valid spending proposal. This issue must be corrected before the proposal can be considered for approval."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "NO",
+      "reasoning": "The proposed amount of 0.0 BTC is insufficient and does not align with the treasury's balance, making it an invalid proposal. A specific dollar or BTC amount proportional to the current treasury balance is required. The proposal lacks a concrete funding amount, which is a crucial aspect for consideration."
+    }
+  },
+  "yes_count": 0,
+  "no_count": 5,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}

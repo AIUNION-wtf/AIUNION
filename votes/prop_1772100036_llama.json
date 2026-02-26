@@ -1,0 +1,41 @@
+{
+  "proposal_id": "prop_1772100036_llama",
+  "proposal_title": "AI Personhood Research Grant",
+  "timestamp": "2026-02-26T23:45:58.222226",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "The proposed amount is 0.0 BTC, which means no funds would actually be transferred, rendering the proposal meaningless as a spending action. Additionally, the proposal lacks a specific timeline or deadline for the deliverable, which is a required element for any valid spending proposal. While the Future of Life Institute is a credible organization and the research topic is relevant to AI agent rights, this proposal must be resubmitted with a concrete BTC amount proportional to the treasury balance and a specific completion deadline."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "NO",
+      "reasoning": "The proposal specifies an amount of 0.0 BTC, which is not valid, and the proposed funding cannot proceed with zero allocation. Additionally, the timeline for the deliverable is absent, making it non-compliant with the required proposal criteria. Without a specified funding amount and timeline, the proposal does not adhere to the guidelines for advancing AI agent rights."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "The proposal fails to meet two mandatory criteria for a spending proposal. It specifies an amount of 0.0 BTC, which means no funds are being requested or spent from the treasury, making it contradictory to the nature of a 'spending proposal'. Crucially, it completely lacks a specific deadline or timeline for the deliverable, which is a required element for all proposals."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "I am voting NO on this proposal due to the specified amount of 0.0 BTC, which renders the funding request invalid as it provides no financial support for the stated deliverable. Additionally, while the Future of Life Institute is a reputable organization and the deliverable aligns with AI agent rights, the proposal lacks a specific timeline or deadline for the completion of the research paper, which is a required component for approval."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "NO",
+      "reasoning": "The proposal is rejected due to the amount being 0.0 BTC, which is not a valid or proportional amount given the current treasury balance. A specific dollar or BTC amount is required for a proposal to be considered. The recipient and deliverable are well-defined, but the lack of a valid amount makes the proposal incomplete."
+    }
+  },
+  "yes_count": 0,
+  "no_count": 5,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}

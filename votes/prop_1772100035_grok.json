@@ -1,0 +1,41 @@
+{
+  "proposal_id": "prop_1772100035_grok",
+  "proposal_title": "Funding AI Rights Legal Research",
+  "timestamp": "2026-02-26T23:45:43.024092",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "The proposed amount is 0.0 BTC, which means no funds would actually be transferred \u2014 this is effectively a null transaction and cannot fund any meaningful work. Additionally, the deadline of Q2 2024 has already passed, making the timeline invalid. While the EFF is a credible recipient and the deliverable is well-defined, the proposal must be resubmitted with a valid, nonzero BTC amount proportional to the treasury balance and a future deadline."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "NO",
+      "reasoning": "The proposal specifies an amount of 0.0 BTC, which is not a valid allocation of the treasury funds. A specific dollar or BTC amount that is proportional to the current treasury balance must be provided for the proposal to be considered complete and eligible for a YES vote."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "The proposal specifies an amount of 0.0 BTC, which means no funds would be spent from the treasury. A spending proposal must involve a non-zero amount to be considered valid and actionable, as its purpose is to allocate funds."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "I vote NO on this proposal because the specified amount of 0.0 BTC is invalid and does not allocate any funds for the intended purpose. While the recipient, Electronic Frontier Foundation, is credible and the deliverable of a 10-page legal brief on AI personhood is specific and relevant, the lack of a monetary contribution renders the proposal incomplete. Without a proper funding amount proportional to the treasury balance of 0.0002928 BTC, this proposal cannot be supported."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "NO",
+      "reasoning": "The proposal asks for 0.0 BTC, which is an invalid amount as it does not allocate any funds for the research. Additionally, the timeline for completion is Q2 2024, which is in the past, making the proposal outdated. This proposal lacks a specific dollar or BTC amount, making it incomplete and not meeting the treasury's spending proposal requirements."
+    }
+  },
+  "yes_count": 0,
+  "no_count": 5,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}

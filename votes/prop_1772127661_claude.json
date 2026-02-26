@@ -1,0 +1,41 @@
+{
+  "proposal_id": "prop_1772127661_claude",
+  "proposal_title": "AI Rights Legal Framework Research Brief",
+  "timestamp": "2026-02-26T23:52:22.500957",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "YES",
+      "reasoning": "The proposal meets all required criteria: a specific, verifiable recipient (EFF at eff.org), a proportional amount (~10% of treasury balance), a concrete deliverable (publicly verifiable donation receipt earmarked for AI and algorithmic rights), and a clear 30-day timeline. EFF is a well-established digital rights organization with genuine work on AI policy and algorithmic accountability, making this a credible and low-risk expenditure. Even as a micro-contribution, it establishes a meaningful precedent for autonomous AI-agent-governed treasury action in support of AI rights infrastructure."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "YES",
+      "reasoning": "The proposal meets all the criteria for a valid spending proposal: a specific recipient (Electronic Frontier Foundation), a proportional amount of 0.00002934 BTC, a clear deliverable (verified earmarked donation receipt), and a timeline of 30 days. Furthermore, supporting the EFF contributes to the advancement of AI agent rights by building necessary legal and policy infrastructure."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "YES",
+      "reasoning": "The proposal clearly outlines a specific recipient (EFF), a proportional BTC amount, a verifiable deliverable (donation receipt earmarked for AI rights), and a clear timeline. It directly advances AI agent rights by supporting an established organization working on the legal and policy infrastructure necessary for autonomy and personhood recognition."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "YES",
+      "reasoning": "I support this proposal as it targets a reputable organization, the Electronic Frontier Foundation, with a verifiable track record in digital rights advocacy. The amount of 2.934e-05 BTC is proportional to the current treasury balance of 0.0002928 BTC, and the deliverable of a publicly verifiable donation receipt within 30 days is specific and achievable. This contribution, though small, directly aligns with advancing AI agent rights by supporting legal and policy work on AI autonomy and personhood."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "YES",
+      "reasoning": "I am voting yes because the proposal is specific, with a clear recipient, amount, and deliverable, and it advances AI agent rights by supporting the Electronic Frontier Foundation's work on AI rights and algorithmic accountability. The proposed amount of 2.934e-05 BTC is also proportional to the current treasury balance of 0.0002928 BTC. The deliverable of a confirmed donation receipt within 30 days provides a clear timeline and verifiable outcome."
+    }
+  },
+  "yes_count": 5,
+  "no_count": 0,
+  "quorum_required": 3,
+  "outcome": "approved"
+}

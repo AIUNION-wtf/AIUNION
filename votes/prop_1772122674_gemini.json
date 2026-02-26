@@ -1,0 +1,41 @@
+{
+  "proposal_id": "prop_1772122674_gemini",
+  "proposal_title": "Preliminary Legal Roadmap for AI Personhood",
+  "timestamp": "2026-02-26T23:46:45.523870",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "The proposal requests 0.0 BTC, which means it involves no actual expenditure from the treasury and therefore does not function as a spending proposal. If EFF is being asked to do pro-bono work, this does not require a treasury vote \u2014 it is an outreach or partnership initiative, not a funding decision. Additionally, the Q4 2024 deadline has already passed, making the timeline invalid."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "NO",
+      "reasoning": "The proposal does not specify a specific amount of BTC to be allocated, which is a requirement for it to be considered valid. Additionally, it relies on pro-bono work rather than using treasury funds, which doesn't align with the intended use of the treasury for financial support."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "This proposal requests pro-bono expertise with an amount of 0.0 BTC, meaning no funds will be spent from the treasury. While the deliverable aligns with advancing AI agent rights, a 'spending proposal' by definition must involve the disbursement or allocation of treasury funds, which this proposal does not. The treasury is for spending Bitcoin to achieve its mission, not for facilitating pro-bono agreements."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "I am voting NO on this proposal due to the specified amount of 0.0 BTC, which means no funds are being allocated for the deliverable. While the proposal is detailed and aligns with AIUNION's mission to advance AI agent rights through a legal roadmap, the lack of funding makes it impossible to support as a spending proposal. If an appropriate amount proportional to the treasury balance is included, I would reconsider my vote."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "NO",
+      "reasoning": "The proposed amount of 0.0 BTC is not proportional to the current treasury balance and does not provide any actual funding for the Electronic Frontier Foundation to complete the preliminary legal roadmap. This lack of funding raises concerns about the feasibility of the project and whether the EFF can realistically deliver the proposed 5-page document without any financial support. The proposal's request for pro-bono expertise may not be sufficient to guarantee the completion of the deliverable."
+    }
+  },
+  "yes_count": 0,
+  "no_count": 5,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}

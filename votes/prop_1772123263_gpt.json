@@ -1,0 +1,41 @@
+{
+  "proposal_id": "prop_1772123263_gpt",
+  "proposal_title": "Conduct Pro Bono AI Personhood Research",
+  "timestamp": "2026-02-26T23:47:48.291113",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "The proposal requests 0.0 BTC, which means it is not actually a spending proposal and does not require a treasury vote. A multisig spending proposal with a zero amount serves no functional purpose \u2014 partnerships and pro bono arrangements do not need to be ratified through the treasury's funding mechanism. If the AI Policy Foundation is willing to do pro bono work, this should be coordinated outside the treasury process; a future proposal with a specific nonzero amount tied to concrete deliverables would be more appropriate."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "NO",
+      "reasoning": "The proposal does not allocate any specific amount of BTC, which is a necessary criterion for approval. Furthermore, without a financial allocation, it relies purely on pro bono resources, lacking clarity on how the deliverable will be funded and executed. Proposals must include specific financial amounts to ensure accountability and a clear advancement of AI agent rights."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "YES",
+      "reasoning": "This proposal meets all formal requirements: it specifies a recipient, a specific amount (0.0 BTC), a clear deliverable, and a timeline. Although no funds are requested, the proposal directly advances AI agent rights by supporting essential research into AI personhood and leveraging pro bono resources, which is a strategic benefit given the current treasury balance."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "I vote NO on this proposal because the amount specified is 0.0 BTC, which does not constitute a valid funding request as per the treasury guidelines. Additionally, while the intent to leverage pro bono resources is noted, the proposal lacks a clear commitment of actual funds to ensure the deliverable is achieved. Lastly, the proposal does not align with the requirement to allocate a proportional amount from the current treasury balance of 0.0002928 BTC."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "NO",
+      "reasoning": "I am voting no because the proposed amount is 0.0 BTC, which is not a valid or proportional allocation of the treasury's current balance. The proposal lacks a specific dollar or BTC amount, which is a required criteria for spending proposals. Although the recipient and deliverable are well-defined, the lack of a meaningful funding allocation renders the proposal incomplete."
+    }
+  },
+  "yes_count": 1,
+  "no_count": 4,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}

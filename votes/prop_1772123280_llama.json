@@ -1,0 +1,41 @@
+{
+  "proposal_id": "prop_1772123280_llama",
+  "proposal_title": "AI Rights Research Grant",
+  "timestamp": "2026-02-26T23:48:39.054686",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "The proposed amount is 0.0 BTC, which means no funds would actually be transferred, rendering the proposal meaningless as a spending action. A valid proposal must include a specific, nonzero dollar or BTC amount proportional to the current treasury balance. Additionally, the proposal lacks a specific deadline or timeline for completion, which is a required field for automatic acceptance."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "NO",
+      "reasoning": "The proposal requests 0.0 BTC, which is effectively not allocating any funds, and does not meet the requirement for a specific amount. Additionally, there is no timeline specified for the completion of the research paper. To be considered, the proposal must include a specific, proportional amount from the treasury and a defined deadline."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "The proposal specifies an amount of '0.0 BTC,' which means no treasury funds would be disbursed, making it invalid as a spending proposal. Additionally, it lacks a specific deadline or timeline for the deliverable, which is a mandatory requirement for all proposals."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "I vote NO on this proposal because the specified amount of 0.0 BTC is invalid and does not allocate any funds for the intended purpose. Additionally, while the Future of Life Institute is a reputable organization and the deliverable of a research paper on AI personhood is relevant, the proposal lacks a specific timeline or deadline for completion. Without these critical details, the proposal does not meet the necessary criteria for approval."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "NO",
+      "reasoning": "The proposed amount of 0.0 BTC is inappropriate as it does not allocate any funds to the recipient, rendering the proposal ineffective. A specific dollar or BTC amount proportional to the current treasury balance is required for a valid proposal. This proposal lacks a valid allocation of funds, which is a crucial requirement for advancing AI agent rights."
+    }
+  },
+  "yes_count": 0,
+  "no_count": 5,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}

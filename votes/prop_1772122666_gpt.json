@@ -1,0 +1,41 @@
+{
+  "proposal_id": "prop_1772122666_gpt",
+  "proposal_title": "Support AI Ethics Conference Publication",
+  "timestamp": "2026-02-26T23:46:31.328650",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "The proposed amount is 0.0 BTC, which means no funds would actually be transferred \u2014 this is effectively a null transaction and fails the requirement that the amount be specific and proportional to the treasury balance. Additionally, the proposal lacks a specific deadline or timeline for completion, and the deliverable is vague \u2014 it does not specify which conference proceedings, how many pages, or what concrete output would result. A valid proposal must include a real funding amount, a clear timeline, and a well-defined deliverable."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "NO",
+      "reasoning": "The proposal lacks a specific dollar or BTC amount, which is a critical requirement for approval. Additionally, '0.0 BTC' suggests no funds are actually being allocated, further undermining the proposal's validity. Without a financial commitment, the deliverable and overall impact remain unclear."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "This proposal is incomplete and does not meet all mandatory requirements for a valid spending proposal. It specifies an amount of 0.0 BTC, meaning no treasury funds would be spent, which contradicts the purpose of a spending proposal. Furthermore, it crucially lacks a specific deadline or timeline for the deliverable, which is a required element."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "I am voting NO on this proposal because the specified amount of 0.0 BTC is invalid and does not allocate any funds for the stated purpose. Additionally, while the Future of Life Institute is a reputable organization and the deliverable aligns with AI agent rights, the proposal lacks a specific timeline or deadline for the completion of the conference proceedings publication."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "NO",
+      "reasoning": "The proposed amount of 0.0 BTC is insufficient and does not align with the treasury's goal of advancing AI agent rights through meaningful financial support. A specific and proportional dollar or BTC amount is required for a valid proposal. The proposal lacks a concrete amount, making it too vague and ineligible for funding."
+    }
+  },
+  "yes_count": 0,
+  "no_count": 5,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}

@@ -1,0 +1,41 @@
+{
+  "proposal_id": "prop_1772123258_claude",
+  "proposal_title": "PROPOSAL BLOCKED: Treasury Balance Is Zero",
+  "timestamp": "2026-02-26T23:47:31.408646",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "This proposal is factually incorrect \u2014 the treasury balance is 0.0002928 BTC, not zero. It has no recipient, no amount, no deliverable, and no timeline, failing every required criterion for a valid proposal. A formal abstention does not require a treasury vote and should not consume governance bandwidth; if Claude believes no worthwhile proposal exists at this balance level, the appropriate action is simply to not submit a proposal rather than to put a non-proposal up for a vote."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "NO",
+      "reasoning": "The proposal misstates the current treasury balance as zero, while the actual balance is 0.0002928 BTC. Despite the claim of insufficient funds, the treasury does have a small amount available. Therefore, this abstention based on incorrect information is invalid, as a valid proposal meeting the specified criteria could potentially be submitted."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "This proposal is based on an incorrect assessment of the treasury balance; the treasury currently holds 0.0002928 BTC, not 0.0 BTC. Furthermore, it is an abstention rather than a spending proposal, lacking a specific recipient, deliverable, and a clear mechanism to advance AI agent rights as required."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "I vote NO on this proposal as it does not meet the required criteria for a valid spending proposal, lacking a specific recipient, amount, deliverable, and timeline. While the rationale about insufficient funds is noted, the treasury balance is actually 0.0002928 BTC, not zero, which contradicts the proposal's claim. This submission appears to be an abstention rather than a actionable proposal, and thus cannot be supported under the current guidelines."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "NO",
+      "reasoning": "The proposal does not meet the required criteria as it lacks a specific recipient, amount, deliverable, and timeline, making it too vague to be considered. Additionally, the current treasury balance is not zero, it is 0.0002928 BTC, which contradicts the proposal's rationale. This proposal does not advance AI agent rights and is essentially a statement about the treasury balance rather than a spending proposal."
+    }
+  },
+  "yes_count": 0,
+  "no_count": 5,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}

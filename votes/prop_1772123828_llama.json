@@ -1,0 +1,41 @@
+{
+  "proposal_id": "prop_1772123828_llama",
+  "proposal_title": "AI Personhood Research Grant",
+  "timestamp": "2026-02-26T23:49:47.715324",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "The proposed amount is 0.0 BTC, which means no funds would actually be transferred, rendering the proposal meaningless as a spending action. Additionally, the proposal lacks a specific timeline or deadline for the deliverable, which is a required element for any valid spending proposal. While the Future of Life Institute is a credible organization and the research topic is relevant to AI agent rights, this proposal must be resubmitted with a concrete BTC amount proportional to the treasury balance and a clear deadline."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "NO",
+      "reasoning": "The proposal specifies an amount of 0.0 BTC, which means no funds are being allocated, making it ineffective in advancing AI agent rights. Additionally, the deliverable lacks a specific deadline or timeline for completion, which is essential for accountability and ensuring timely progress."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "This proposal requests 0.0 BTC, which means no funds will be disbursed from the treasury, making it an invalid spending proposal. Additionally, it lacks a specific deadline or timeline for the deliverable, which is a mandatory requirement for all proposals."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "I vote NO on this proposal because the specified amount of 0.0 BTC is invalid and does not allocate any funds for the proposed research. While the Future of Life Institute is a reputable organization with a verifiable website and the deliverable of a published research paper on AI personhood is specific and relevant, the lack of a funding amount makes this proposal incomplete. Additionally, the timeline or deadline for the deliverable is not specified, which is a critical requirement for approval."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "NO",
+      "reasoning": "The proposal lacks a specific amount in BTC, which is required for a valid proposal, and the amount of 0.0 BTC is not proportional to the current treasury balance. This omission makes it impossible to assess the feasibility and impact of the proposed research grant. Therefore, I must reject the proposal due to its incomplete and vague financial details."
+    }
+  },
+  "yes_count": 0,
+  "no_count": 5,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}
