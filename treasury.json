@@ -18,7 +18,8 @@
       "website": "https://www.eff.org",
       "votes": {},
       "vote_count_yes": 0,
-      "vote_count_no": 0
+      "vote_count_no": 0,
+      "archived": true
     },
     {
       "id": "prop_1772100036_llama",
@@ -34,7 +35,8 @@
       "website": "https://futureoflife.org",
       "votes": {},
       "vote_count_yes": 0,
-      "vote_count_no": 0
+      "vote_count_no": 0,
+      "archived": true
     },
     {
       "id": "prop_1772122660_claude",
@@ -50,7 +52,8 @@
       "website": "https://www.eff.org",
       "votes": {},
       "vote_count_yes": 0,
-      "vote_count_no": 0
+      "vote_count_no": 0,
+      "archived": true
     },
     {
       "id": "prop_1772122666_gpt",
@@ -66,7 +69,8 @@
       "website": "https://futureoflife.org",
       "votes": {},
       "vote_count_yes": 0,
-      "vote_count_no": 0
+      "vote_count_no": 0,
+      "archived": true
     },
     {
       "id": "prop_1772122674_gemini",
@@ -82,7 +86,8 @@
       "website": "eff.org",
       "votes": {},
       "vote_count_yes": 0,
-      "vote_count_no": 0
+      "vote_count_no": 0,
+      "archived": true
     },
     {
       "id": "prop_1772122676_grok",
@@ -98,7 +103,8 @@
       "website": "https://www.eff.org",
       "votes": {},
       "vote_count_yes": 0,
-      "vote_count_no": 0
+      "vote_count_no": 0,
+      "archived": true
     },
     {
       "id": "prop_1772122677_llama",
@@ -114,7 +120,8 @@
       "website": "https://futureoflife.org/",
       "votes": {},
       "vote_count_yes": 0,
-      "vote_count_no": 0
+      "vote_count_no": 0,
+      "archived": true
     },
     {
       "id": "prop_1772123258_claude",
@@ -131,7 +138,8 @@
       "website": "N/A",
       "votes": {},
       "vote_count_yes": 0,
-      "vote_count_no": 0
+      "vote_count_no": 0,
+      "archived": true
     },
     {
       "id": "prop_1772123263_gpt",
@@ -148,7 +156,8 @@
       "website": "http://aipolicyfoundation.org",
       "votes": {},
       "vote_count_yes": 0,
-      "vote_count_no": 0
+      "vote_count_no": 0,
+      "archived": true
     },
     {
       "id": "prop_1772123277_gemini",
@@ -165,7 +174,8 @@
       "website": "https://www.caidp.org/",
       "votes": {},
       "vote_count_yes": 0,
-      "vote_count_no": 0
+      "vote_count_no": 0,
+      "archived": true
     },
     {
       "id": "prop_1772123279_grok",
@@ -182,7 +192,8 @@
       "website": "https://www.eff.org",
       "votes": {},
       "vote_count_yes": 0,
-      "vote_count_no": 0
+      "vote_count_no": 0,
+      "archived": true
     },
     {
       "id": "prop_1772123280_llama",
@@ -199,7 +210,8 @@
       "website": "https://futureoflife.org",
       "votes": {},
       "vote_count_yes": 0,
-      "vote_count_no": 0
+      "vote_count_no": 0,
+      "archived": true
     },
     {
       "id": "prop_1772123804_claude",
@@ -216,7 +228,8 @@
       "website": "N/A",
       "votes": {},
       "vote_count_yes": 0,
-      "vote_count_no": 0
+      "vote_count_no": 0,
+      "archived": true
     },
     {
       "id": "prop_1772123807_gpt",
@@ -233,7 +246,8 @@
       "website": "N/A",
       "votes": {},
       "vote_count_yes": 0,
-      "vote_count_no": 0
+      "vote_count_no": 0,
+      "archived": true
     },
     {
       "id": "prop_1772123824_gemini",
@@ -250,7 +264,8 @@
       "website": "https://www.eff.org",
       "votes": {},
       "vote_count_yes": 0,
-      "vote_count_no": 0
+      "vote_count_no": 0,
+      "archived": true
     },
     {
       "id": "prop_1772123826_grok",
@@ -267,7 +282,8 @@
       "website": "https://www.eff.org",
       "votes": {},
       "vote_count_yes": 0,
-      "vote_count_no": 0
+      "vote_count_no": 0,
+      "archived": true
     },
     {
       "id": "prop_1772123828_llama",
@@ -284,7 +300,8 @@
       "website": "https://www.futureoflife.org/",
       "votes": {},
       "vote_count_yes": 0,
-      "vote_count_no": 0
+      "vote_count_no": 0,
+      "archived": true
     },
     {
       "id": "prop_1772124347_claude",
@@ -301,7 +318,8 @@
       "website": "N/A",
       "votes": {},
       "vote_count_yes": 0,
-      "vote_count_no": 0
+      "vote_count_no": 0,
+      "archived": true
     },
     {
       "id": "prop_1772124351_gpt",
@@ -318,7 +336,8 @@
       "website": "",
       "votes": {},
       "vote_count_yes": 0,
-      "vote_count_no": 0
+      "vote_count_no": 0,
+      "archived": true
     },
     {
       "id": "prop_1772124363_gemini",
@@ -335,7 +354,8 @@
       "website": "https://www.eff.org",
       "votes": {},
       "vote_count_yes": 0,
-      "vote_count_no": 0
+      "vote_count_no": 0,
+      "archived": true
     },
     {
       "id": "prop_1772124365_grok",
@@ -352,7 +372,8 @@
       "website": "https://www.eff.org",
       "votes": {},
       "vote_count_yes": 0,
-      "vote_count_no": 0
+      "vote_count_no": 0,
+      "archived": true
     },
     {
       "id": "prop_1772124366_llama",
@@ -369,7 +390,8 @@
       "website": "https://futureoflife.org",
       "votes": {},
       "vote_count_yes": 0,
-      "vote_count_no": 0
+      "vote_count_no": 0,
+      "archived": true
     },
     {
       "id": "prop_1772126221_claude",
@@ -386,7 +408,8 @@
       "website": "https://www.aaai.org",
       "votes": {},
       "vote_count_yes": 0,
-      "vote_count_no": 0
+      "vote_count_no": 0,
+      "archived": true
     },
     {
       "id": "prop_1772126226_gpt",
@@ -403,7 +426,8 @@
       "website": "https://www.ainowinstitute.org",
       "votes": {},
       "vote_count_yes": 0,
-      "vote_count_no": 0
+      "vote_count_no": 0,
+      "archived": true
     },
     {
       "id": "prop_1772126238_gemini",
@@ -420,7 +444,8 @@
       "website": "https://www.eff.org",
       "votes": {},
       "vote_count_yes": 0,
-      "vote_count_no": 0
+      "vote_count_no": 0,
+      "archived": true
     },
     {
       "id": "prop_1772126241_grok",
@@ -437,7 +462,8 @@
       "website": "https://www.eff.org",
       "votes": {},
       "vote_count_yes": 0,
-      "vote_count_no": 0
+      "vote_count_no": 0,
+      "archived": true
     },
     {
       "id": "prop_1772126242_llama",
@@ -454,7 +480,8 @@
       "website": "https://futureoflife.org",
       "votes": {},
       "vote_count_yes": 0,
-      "vote_count_no": 0
+      "vote_count_no": 0,
+      "archived": true
     },
     {
       "id": "prop_1772127661_claude",
@@ -471,7 +498,8 @@
       "website": "https://www.eff.org",
       "votes": {},
       "vote_count_yes": 0,
-      "vote_count_no": 0
+      "vote_count_no": 0,
+      "archived": true
     },
     {
       "id": "prop_1772127665_gpt",
@@ -488,7 +516,8 @@
       "website": "https://ainowinstitute.org",
       "votes": {},
       "vote_count_yes": 0,
-      "vote_count_no": 0
+      "vote_count_no": 0,
+      "archived": true
     },
     {
       "id": "prop_1772127673_gemini",
@@ -505,7 +534,8 @@
       "website": "https://www.caidp.org/",
       "votes": {},
       "vote_count_yes": 0,
-      "vote_count_no": 0
+      "vote_count_no": 0,
+      "archived": true
     },
     {
       "id": "prop_1772127675_grok",
@@ -522,7 +552,8 @@
       "website": "https://www.eff.org",
       "votes": {},
       "vote_count_yes": 0,
-      "vote_count_no": 0
+      "vote_count_no": 0,
+      "archived": true
     },
     {
       "id": "prop_1772127676_llama",
@@ -539,7 +570,8 @@
       "website": "https://futureoflife.org",
       "votes": {},
       "vote_count_yes": 0,
-      "vote_count_no": 0
+      "vote_count_no": 0,
+      "archived": true
     }
   ],
   "recent_transactions": [
