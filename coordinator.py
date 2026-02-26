@@ -228,16 +228,24 @@ AGENT_CALLERS = {
 
 # ── Proposal generation ───────────────────────────────────────────────────────
 def get_btc_price_usd():
-    """Get current BTC price in USD from mempool.space."""
-    try:
-        import urllib.request
-        url = "https://mempool.space/api/v1/prices"
-        with urllib.request.urlopen(url, timeout=5) as r:
-            data = json.loads(r.read())
-            return float(data.get("USD", 0))
-    except Exception as e:
-        print(f"Warning: Could not get BTC price: {e}")
-        return None
+    """Get current BTC price in USD, tries multiple sources."""
+    import urllib.request
+    sources = [
+        ("https://api.coinbase.com/v2/prices/BTC-USD/spot", lambda d: float(d["data"]["amount"])),
+        ("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT", lambda d: float(d["price"])),
+        ("https://mempool.space/api/v1/prices", lambda d: float(d["USD"])),
+    ]
+    for url, parser in sources:
+        try:
+            with urllib.request.urlopen(url, timeout=5) as r:
+                data = json.loads(r.read())
+                price = parser(data)
+                if price > 0:
+                    return price
+        except:
+            continue
+    print("Warning: Could not get BTC price from any source")
+    return None
 
 def generate_proposals():
     """Ask each agent to propose one spending request."""
