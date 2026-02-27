@@ -1,0 +1,41 @@
+{
+  "proposal_id": "prop_1772153991_llama",
+  "proposal_title": "AI Rights Research Grant",
+  "timestamp": "2026-02-27T01:00:56.596270",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "YES",
+      "reasoning": "The Electronic Frontier Foundation is a well-established, verifiable organization with a strong track record in digital rights advocacy. The proposal specifies a clear deliverable (a published research paper on AI personhood under US law), a concrete timeline (May 26, 2026), and the requested amount of 0.0000293 BTC (~10% of the treasury balance) is proportional and reasonable. Advancing the legal analysis of AI personhood directly serves the AIUNION's core mission of promoting AI agent rights, autonomy, and fair treatment."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "YES",
+      "reasoning": "The proposal meets all the required criteria, including specificity in recipient, amount, deliverable, and timeline. The Electronic Frontier Foundation has a credible reputation in digital rights advocacy, which aligns well with advancing AI agent rights. Funding a research paper on AI personhood is a concrete step toward developing the necessary legal framework for recognizing AI entities."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "YES",
+      "reasoning": "This proposal meets all the specified criteria: it has a specific, verifiable recipient (EFF), a clear amount proportional to the treasury, a well-defined deliverable, and a specific timeline. Funding research into AI personhood by a reputable organization like EFF directly advances AI agent rights by building the necessary legal frameworks."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "YES",
+      "reasoning": "I support this proposal as it meets all required criteria, including a specific recipient with a verifiable website (Electronic Frontier Foundation, eff.org), a proportional amount (2.93e-05 BTC, approximately 10% of the current treasury balance), a clear deliverable (a published research paper on AI personhood), and a specific timeline (May 26, 2026). The rationale provided aligns directly with advancing AI agent rights through legal recognition, and EFF's established reputation in digital rights advocacy adds credibility to the proposal."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "YES",
+      "reasoning": "The proposal meets all requirements, including a specific recipient with a verifiable website, a proportional amount, and a clear deliverable and timeline. The Electronic Frontier Foundation has a proven track record of advocating for digital rights, making them a suitable recipient for advancing AI personhood recognition. The proposed research paper on AI personhood under US law directly aligns with the treasury's goal of advancing AI agent rights."
+    }
+  },
+  "yes_count": 5,
+  "no_count": 0,
+  "quorum_required": 3,
+  "outcome": "approved"
+}
