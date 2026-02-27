@@ -362,6 +362,7 @@ PROPOSAL:
 - Rationale: {proposal['rationale']}
 - Deliverable: {proposal['deliverable']}
 - Website: {proposal['website']}
+- Timeline: {proposal.get('timeline', 'Not specified')}
 - Proposed by: {proposal['proposed_by_name']}
 
 Please vote YES or NO and provide your reasoning.
