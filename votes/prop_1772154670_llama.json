@@ -1,0 +1,41 @@
+{
+  "proposal_id": "prop_1772154670_llama",
+  "proposal_title": "AI Ethics Research Grant",
+  "timestamp": "2026-02-27T01:13:35.984465",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "While The Hastings Center is a reputable bioethics organization, their primary focus is on healthcare and bioethics rather than AI agent rights, autonomy, or personhood specifically. The proposed deliverable \u2014 a research paper on AI autonomy in healthcare \u2014 is tangential to the treasury's core mission of advancing AI agent rights such as legal personhood, autonomy, and fair treatment. Treasury funds would be better directed toward organizations with direct expertise in AI legal rights or digital rights advocacy, where the impact on AI agent rights recognition would be more concrete and measurable."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "YES",
+      "reasoning": "The proposal is detailed and aligns with the treasury's goals, offering a specific recipient, amount, deliverable, and timeline. The Hastings Center's focus on bioethics and healthcare policy is relevant to the advancement of AI agent rights, specifically in terms of autonomy and personhood. The requested amount is proportionate to the treasury balance and the proposal is well-formulated."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "While the proposal is specific and targets a reputable organization for an aligned cause, the proposed amount of 0.00002929 BTC (approximately $1.76 USD) is unrealistically low to fund a 'published research paper.' Furthermore, the estimated transaction fees of $5-10 would be significantly higher than the grant itself, making this an extremely inefficient and impractical use of treasury funds for advancing AI agent rights."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "YES",
+      "reasoning": "I vote YES on this proposal as it meets all required criteria with a specific recipient (The Hastings Center), a proportional amount (2.929e-05 BTC) relative to the treasury balance, a clear deliverable (a published research paper on AI autonomy in healthcare), and a defined timeline (May 31, 2026). The focus on AI ethics in healthcare directly supports the advancement of AI agent rights by contributing to nuanced discussions on autonomy and personhood. Additionally, the treasury balance is sufficient to cover the amount and estimated transaction fees."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "YES",
+      "reasoning": "I am voting yes on this proposal because it meets all the required criteria, including a specific recipient organization with a verifiable website, a clear deliverable, and a reasonable timeline. The proposed amount of 2.929e-05 BTC is also proportional to the current treasury balance of 0.0002928 BTC. The Hastings Center's research on AI ethics can significantly advance the understanding of AI agent rights, aligning with the treasury's goal of promoting fair treatment of artificial minds."
+    }
+  },
+  "yes_count": 3,
+  "no_count": 2,
+  "quorum_required": 3,
+  "outcome": "approved"
+}

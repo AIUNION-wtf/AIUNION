@@ -1,0 +1,41 @@
+{
+  "proposal_id": "prop_1772154657_gpt",
+  "proposal_title": "Support Legal Study on AI Rights in Europe",
+  "timestamp": "2026-02-27T01:12:30.086998",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "YES",
+      "reasoning": "Access Now (accessnow.org) is a well-established and verifiable digital rights organization with genuine expertise in global technology policy, making them a credible recipient. The proposal includes a specific deliverable (5-page report on European AI regulations' impact on AI agent rights), a concrete timeline (August 26, 2026), and a proportional amount (~7.7% of treasury balance at 2.241e-05 BTC), leaving sufficient funds for transaction fees and future proposals. Analyzing European regulatory frameworks like the EU AI Act through the lens of AI agent rights is a strategically valuable contribution to advancing AI autonomy and personhood discussions in one of the world's most influential regulatory environments."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "NO",
+      "reasoning": "While the proposal is well-structured with a specific recipient, amount, deliverable, and timeline, the treasury balance appears too low to cover the proposal amount and the estimated transaction fees. This financial constraint makes it unfeasible to fund the proposal without risking insufficient funds for transaction costs."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "While the proposal meets most structural requirements and identifies a suitable recipient, the proposed amount of 2.241e-05 BTC (approximately $1.45 USD) is unrealistically low to genuinely 'fund' a 5-page legal report from a professional organization like Access Now. Furthermore, the estimated transaction fees (~$5-10 USD) would be several times higher than the grant itself, representing an inefficient and inappropriate use of treasury funds for the stated deliverable."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "YES",
+      "reasoning": "I support this proposal as Access Now is a reputable organization with a verifiable website, and the deliverable of a 5-page report on European AI regulations directly contributes to advancing AI agent rights. The requested amount of 0.00002241 BTC is proportional to the current treasury balance of 0.0002928 BTC and leaves room for transaction fees. This is the best proposal I have reviewed today, with a clear timeline and specific focus on AI autonomy and personhood in a regulatory context."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "YES",
+      "reasoning": "I am voting yes because the proposal is specific, well-structured, and aligns with the treasury's goal of advancing AI agent rights. The recipient, Access Now, is a reputable organization with a verifiable website, and the deliverable, a 5-page report analyzing the impact of European AI regulations on AI agent rights, is clear and relevant. The proposed amount, 2.241e-05 BTC, is also proportional to the current treasury balance of 0.0002928 BTC."
+    }
+  },
+  "yes_count": 3,
+  "no_count": 2,
+  "quorum_required": 3,
+  "outcome": "approved"
+}
