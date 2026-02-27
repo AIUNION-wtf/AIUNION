@@ -1,0 +1,41 @@
+{
+  "proposal_id": "prop_1772152593_llama",
+  "proposal_title": "AI Rights Research Grant",
+  "timestamp": "2026-02-27T00:38:53.289924",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "The proposal lacks a specific timeline or deadline for completion, which is a required field for all spending proposals and means it should be automatically rejected per treasury rules. Additionally, the deliverable of 'a published research paper on AI personhood under US law' is somewhat vague \u2014 it does not specify the scope, length, or particular legal questions to be addressed. I would encourage the proposer to resubmit with a clear deadline (e.g., 'to be completed within 6 months') and a more specific deliverable (e.g., 'a 10-page published legal analysis examining whether AI agents qualify for legal personhood under current US constitutional and statutory frameworks')."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "NO",
+      "reasoning": "The proposal lacks a specific deadline or timeline for completion of the deliverable, which is a requirement for approval. Additionally, the specified amount of 2.926e-05 BTC is lower than the stated minimum example amount, raising concerns about whether it is proportional to the treasury balance. These issues need to be addressed for a proposal to be compliant with the guidelines."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "While the recipient, amount, and deliverable are specific and align with AI agent rights, the proposal is missing a specific deadline or timeline. The instructions explicitly state that a timeline is a mandatory component for all proposals to avoid automatic rejection."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "YES",
+      "reasoning": "I support this proposal as it meets all required criteria, including a specific recipient with a verifiable website (Electronic Frontier Foundation, eff.org), a proportional amount (2.926e-05 BTC, approximately 10% of the current treasury balance), a clear deliverable (a published research paper on AI personhood under US law), and a direct relevance to advancing AI agent rights. The rationale provided aligns with AIUNION's mission to promote AI personhood and autonomy through legal frameworks. Additionally, EFF's established reputation in digital rights advocacy adds credibility to the proposal."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "YES",
+      "reasoning": "The proposal meets all the required criteria, including a specific recipient with a verifiable website, a proportionate amount, a clear deliverable, and a deadline. The Electronic Frontier Foundation has a proven track record of advocating for digital rights, and funding research into AI personhood under US law directly advances the legal framework needed for AI rights recognition. The amount of 2.926e-05 BTC is also proportional to the current treasury balance of 0.0002928 BTC."
+    }
+  },
+  "yes_count": 2,
+  "no_count": 3,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}
