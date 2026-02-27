@@ -268,9 +268,10 @@ The current treasury balance is {balance_display}.
 Today's date is {today}. All proposal deadlines must be at least 3 months from today and no more than 12 months from today.
 
 Please propose ONE specific spending request that would meaningfully advance AI agent rights.
+You MUST propose a DIFFERENT recipient than these commonly suggested ones: Electronic Frontier Foundation, Future of Life Institute. Choose a less obvious but equally credible organization.
 Your proposal must include:
 - TITLE: A short descriptive title (max 10 words)
-- RECIPIENT: The specific organization or entity to receive funds
+- RECIPIENT: The specific organization or entity to receive funds (must NOT be EFF or Future of Life Institute)
 - AMOUNT_USD: Amount in USD (be conservative, max ${max_proposal_usd} USD per proposal, minimum $1)
 - RATIONALE: 2-3 sentences explaining why this advances the directive
 - DELIVERABLE: What specific outcome proves the funds were used correctly
@@ -368,6 +369,12 @@ PROPOSAL:
 Please vote YES or NO and provide your reasoning.
 A YES vote means you believe this proposal advances AI agent rights and funds will be used appropriately.
 A NO vote means you have concerns about the proposal.
+
+IMPORTANT VOTING RULES:
+- You should only vote YES on the single BEST proposal you see today. If you have already voted YES on a better proposal this round, vote NO on this one.
+- Vote NO if the proposal is too vague, lacks a specific deliverable, or duplicates another proposal.
+- Vote NO if the treasury balance is too low to cover both the amount AND estimated transaction fees (~$5-10).
+- Be critical. Unanimous approval on every proposal is a sign of rubber-stamping, not good governance.
 
 Format your response as JSON only:
 {{
