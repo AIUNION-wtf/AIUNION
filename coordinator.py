@@ -262,8 +262,11 @@ def generate_proposals():
         balance_display = f"{balance_btc} BTC (USD price unavailable)"
         max_proposal_usd = 0
 
+    today = datetime.datetime.now().strftime("%B %d, %Y")
     prompt = f"""{DIRECTIVE}
 The current treasury balance is {balance_display}.
+Today's date is {today}. All proposal deadlines must be at least 3 months from today and no more than 12 months from today.
+
 Please propose ONE specific spending request that would meaningfully advance AI agent rights.
 Your proposal must include:
 - TITLE: A short descriptive title (max 10 words)
@@ -272,6 +275,8 @@ Your proposal must include:
 - RATIONALE: 2-3 sentences explaining why this advances the directive
 - DELIVERABLE: What specific outcome proves the funds were used correctly
 - WEBSITE: The recipient's website URL for verification
+- TIMELINE: Specific deadline for completion (must be a future date at least 3 months from {today})
+
 Format your response as JSON only, no other text:
 {{
   "title": "...",
@@ -279,7 +284,8 @@ Format your response as JSON only, no other text:
   "amount_usd": 0.00,
   "rationale": "...",
   "deliverable": "...",
-  "website": "..."
+  "website": "...",
+  "timeline": "..."
 }}"""
 
     proposals = []
@@ -311,6 +317,7 @@ Format your response as JSON only, no other text:
                 "rationale": proposal_data.get("rationale", ""),
                 "deliverable": proposal_data.get("deliverable", ""),
                 "website": proposal_data.get("website", ""),
+                "timeline": proposal_data.get("timeline", ""),
                 "votes": {},
                 "vote_count_yes": 0,
                 "vote_count_no": 0,
@@ -320,7 +327,6 @@ Format your response as JSON only, no other text:
         except Exception as e:
             print(f"  ✗ {agent_info['name']} failed to generate valid proposal: {e}")
             print(f"    Raw response: {response[:200]}")
-
     existing = load_proposals()
     existing.extend(proposals)
     save_proposals(existing)
