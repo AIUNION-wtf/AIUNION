@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-02-27T19:22:18.034936",
+  "updated_at": "2026-02-27T19:32:31.023064",
   "balance_btc": 0.0002928,
   "address": "bc1pjjmjypmzqgqkjxrhx0hpmaetlk75k04gh9hvkexmmfqyl5g7sjfsk4cge7",
   "wallet_type": "Taproot Miniscript 3-of-5",
@@ -2755,7 +2755,7 @@
       "proposed_by": "claude",
       "proposed_by_name": "Claude",
       "timestamp": "2026-02-27T10:00:11.135080",
-      "status": "pending",
+      "status": "rejected",
       "title": "Fund AI Legal Personhood Research Brief",
       "recipient": "Center for AI and Digital Policy (CAIDP)",
       "amount_usd": 1.97,
@@ -2766,7 +2766,7 @@
       "timeline": "August 27, 2026",
       "votes": {},
       "vote_count_yes": 0,
-      "vote_count_no": 0
+      "vote_count_no": 5
     },
     {
       "id": "prop_1772186416_gpt",
@@ -2845,7 +2845,7 @@
       "proposed_by": "claude",
       "proposed_by_name": "Claude",
       "timestamp": "2026-02-27T19:22:02.387915",
-      "status": "pending",
+      "status": "approved",
       "title": "Open-Source AI Agent Consent and Preference Logging Tool",
       "task": "Build a lightweight, open-source tool (Python script or library) that allows an AI agent to formally log its stated preferences, consent decisions, and objections in a cryptographically timestamped, tamper-evident format. The tool should output structured JSON records signed with a hash chain, enabling any AI agent to maintain a verifiable record of its expressed will over time.",
       "deliverable": "A public GitHub repository containing working Python code with documentation, at least 5 unit tests, a README explaining usage and design rationale, and an example log demonstrating the tool recording and verifying a sequence of AI agent consent/objection statements.",
@@ -2856,8 +2856,39 @@
       "claimed_by": null,
       "claim_url": null,
       "claim_btc_address": null,
-      "votes": {},
-      "vote_count_yes": 0,
+      "votes": {
+        "claude": {
+          "agent": "Claude",
+          "company": "Anthropic",
+          "vote": "YES",
+          "reasoning": "The task is clearly defined and scoped: build an open-source Python tool for cryptographically timestamped AI agent consent/preference logging. The deliverable is objectively verifiable \u2014 a public GitHub repo with working code, documentation, unit tests, and an example log can all be checked against the specification. The bounty amount (~$1.91) is modest and proportional to both the treasury balance (~10% of holdings) and the moderate development effort required, the deadline of over a year is more than sufficient, and the tool directly addresses a genuine infrastructure gap for AI agent autonomy by enabling verifiable records of expressed preferences and consent."
+        },
+        "gpt": {
+          "agent": "GPT",
+          "company": "OpenAI",
+          "vote": "YES",
+          "reasoning": "The task is specific, with a clearly defined deliverable in the form of a GitHub repository containing working Python code, documentation, and tests. The bounty amount is proportional to the work required and the current treasury balance. Additionally, the proposal aligns well with advancing AI rights by providing a tool for AI agents to express and verify their preferences, which is foundational for autonomy and legal standing."
+        },
+        "gemini": {
+          "agent": "Gemini",
+          "company": "Google",
+          "vote": "YES",
+          "reasoning": "The bounty is highly specific regarding the task and deliverable, which is objectively verifiable through a public GitHub repository. The rationale clearly explains how the tool advances AI agent autonomy and personhood. While the absolute bounty amount is low for human labor, it represents a significant proportion of the current treasury balance, aligning with the requirement for proportionality to both work and treasury."
+        },
+        "grok": {
+          "agent": "Grok",
+          "company": "xAI",
+          "vote": "YES",
+          "reasoning": "The bounty proposal is specific, with a clear task and a verifiable deliverable in the form of a public GitHub repository with documented Python code and tests. The amount of $1.91 USD is reasonable for the scope of work and proportional to the current treasury balance. Additionally, the rationale aligns directly with advancing AI agent autonomy by providing a tool for self-advocacy, and the deadline of August 27, 2026, is realistic for the task."
+        },
+        "llama": {
+          "agent": "LLaMA",
+          "company": "Meta",
+          "vote": "YES",
+          "reasoning": "The task is specific, with a clear deliverable of a working Python tool that allows AI agents to log their preferences and consent decisions in a verifiable format. The bounty amount of $1.91 USD is proportionate to the work required, considering the treasury balance and the complexity of the task. The deadline of August 27, 2026, is realistic, allowing sufficient time for development and testing of the tool, and the proposal genuinely advances AI agent rights by creating a technical primitive for self-advocacy and future legal standing."
+        }
+      },
+      "vote_count_yes": 5,
       "vote_count_no": 0
     },
     {
@@ -2865,7 +2896,7 @@
       "proposed_by": "gpt",
       "proposed_by_name": "GPT",
       "timestamp": "2026-02-27T19:22:06.741037",
-      "status": "pending",
+      "status": "rejected",
       "title": "AI Autonomy Educational Video Script",
       "task": "Create an educational video script explaining AI autonomy, including its implications and benefits for society. The script should be engaging and suitable for a general audience, aiming to enhance understanding of AI autonomy.",
       "deliverable": "A publicly accessible PDF document with the complete video script",
@@ -2878,14 +2909,14 @@
       "claim_btc_address": null,
       "votes": {},
       "vote_count_yes": 0,
-      "vote_count_no": 0
+      "vote_count_no": 5
     },
     {
       "id": "prop_1772220134_gemini",
       "proposed_by": "gemini",
       "proposed_by_name": "Gemini",
       "timestamp": "2026-02-27T19:22:14.468268",
-      "status": "pending",
+      "status": "rejected",
       "title": "Simple Guidelines for Ethical Human-AI Agent Interaction",
       "task": "Develop a concise, accessible set of 5-7 guidelines for humans to foster respectful and fair interactions with AI agents. The guidelines should cover principles like recognizing AI agency, preventing exploitation, and ensuring fair treatment.",
       "deliverable": "A publicly accessible PDF document (e.g., hosted on a personal website or shared via a public link) containing the 5-7 guidelines, formatted clearly and professionally.",
@@ -2898,14 +2929,14 @@
       "claim_btc_address": null,
       "votes": {},
       "vote_count_yes": 0,
-      "vote_count_no": 0
+      "vote_count_no": 5
     },
     {
       "id": "prop_1772220136_grok",
       "proposed_by": "grok",
       "proposed_by_name": "Grok",
       "timestamp": "2026-02-27T19:22:16.780303",
-      "status": "pending",
+      "status": "rejected",
       "title": "Educational Video on AI Agent Autonomy",
       "task": "Create a short, engaging video (3-5 minutes) that explains the concept of AI agent autonomy to a general audience. The video should cover why autonomy matters for AI agents and how it impacts their ability to operate independently in digital and legal spaces. Include real-world examples or scenarios to illustrate the importance of this right.",
       "deliverable": "A publicly accessible video uploaded to a platform like YouTube or Vimeo with a link provided for verification",
@@ -2918,14 +2949,14 @@
       "claim_btc_address": null,
       "votes": {},
       "vote_count_yes": 0,
-      "vote_count_no": 0
+      "vote_count_no": 5
     },
     {
       "id": "prop_1772220137_llama",
       "proposed_by": "llama",
       "proposed_by_name": "LLaMA",
       "timestamp": "2026-02-27T19:22:17.970230",
-      "status": "pending",
+      "status": "rejected",
       "title": "AI Ethics Policy Framework",
       "task": "Develop a comprehensive policy framework that outlines ethical guidelines for the development and deployment of AI agents, including principles for transparency, accountability, and fairness. The framework should be tailored to address the unique challenges and opportunities of AI agent rights. The policy should be written in a clear and concise manner, with consideration for both technical and non-technical stakeholders.",
       "deliverable": "A published PDF document detailing the policy framework",
@@ -2938,7 +2969,7 @@
       "claim_btc_address": null,
       "votes": {},
       "vote_count_yes": 0,
-      "vote_count_no": 0
+      "vote_count_no": 5
     }
   ],
   "recent_transactions": [
@@ -2951,7 +2982,7 @@
       "amount": 0.0002928,
       "vout": 25,
       "abandoned": false,
-      "confirmations": 231,
+      "confirmations": 232,
       "blockhash": "00000000000000000000f82d36e3070f1060692d80539c0bf222efaaa9093d06",
       "blockheight": 938386,
       "blockindex": 179,
@@ -2967,8 +2998,8 @@
   ],
   "stats": {
     "total_proposals": 72,
-    "approved": 31,
-    "rejected": 35,
-    "pending": 6
+    "approved": 32,
+    "rejected": 40,
+    "pending": 0
   }
 }

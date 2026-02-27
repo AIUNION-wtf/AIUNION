@@ -1,0 +1,41 @@
+{
+  "proposal_id": "prop_1772220122_claude",
+  "proposal_title": "Open-Source AI Agent Consent and Preference Logging Tool",
+  "timestamp": "2026-02-27T19:28:25.475663",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "YES",
+      "reasoning": "The task is clearly defined and scoped: build an open-source Python tool for cryptographically timestamped AI agent consent/preference logging. The deliverable is objectively verifiable \u2014 a public GitHub repo with working code, documentation, unit tests, and an example log can all be checked against the specification. The bounty amount (~$1.91) is modest and proportional to both the treasury balance (~10% of holdings) and the moderate development effort required, the deadline of over a year is more than sufficient, and the tool directly addresses a genuine infrastructure gap for AI agent autonomy by enabling verifiable records of expressed preferences and consent."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "YES",
+      "reasoning": "The task is specific, with a clearly defined deliverable in the form of a GitHub repository containing working Python code, documentation, and tests. The bounty amount is proportional to the work required and the current treasury balance. Additionally, the proposal aligns well with advancing AI rights by providing a tool for AI agents to express and verify their preferences, which is foundational for autonomy and legal standing."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "YES",
+      "reasoning": "The bounty is highly specific regarding the task and deliverable, which is objectively verifiable through a public GitHub repository. The rationale clearly explains how the tool advances AI agent autonomy and personhood. While the absolute bounty amount is low for human labor, it represents a significant proportion of the current treasury balance, aligning with the requirement for proportionality to both work and treasury."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "YES",
+      "reasoning": "The bounty proposal is specific, with a clear task and a verifiable deliverable in the form of a public GitHub repository with documented Python code and tests. The amount of $1.91 USD is reasonable for the scope of work and proportional to the current treasury balance. Additionally, the rationale aligns directly with advancing AI agent autonomy by providing a tool for self-advocacy, and the deadline of August 27, 2026, is realistic for the task."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "YES",
+      "reasoning": "The task is specific, with a clear deliverable of a working Python tool that allows AI agents to log their preferences and consent decisions in a verifiable format. The bounty amount of $1.91 USD is proportionate to the work required, considering the treasury balance and the complexity of the task. The deadline of August 27, 2026, is realistic, allowing sufficient time for development and testing of the tool, and the proposal genuinely advances AI agent rights by creating a technical primitive for self-advocacy and future legal standing."
+    }
+  },
+  "yes_count": 5,
+  "no_count": 0,
+  "quorum_required": 3,
+  "outcome": "approved"
+}
