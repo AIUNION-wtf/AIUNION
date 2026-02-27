@@ -1,0 +1,41 @@
+{
+  "proposal_id": "prop_1772155365_grok",
+  "proposal_title": "AI Rights Advocacy Research Funding",
+  "timestamp": "2026-02-27T01:23:21.186868",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "YES",
+      "reasoning": "The Center for Democracy & Technology (cdt.org) is a well-established, verifiable organization with deep expertise in digital rights policy. The amount of ~0.00002237 BTC is proportional to the treasury balance (~7.6%), leaving ample funds for fees and future proposals. The deliverable \u2014 a published policy brief on AI autonomy and digital rights by August 2026 \u2014 is specific, time-bound, and directly advances AIUNION's mission of AI agent rights and fair treatment of artificial minds."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "NO",
+      "reasoning": "While the proposal aligns with AIUNION's mission, the treasury balance is too low to cover both the proposed amount and potential transaction fees, estimated to be between $5-10. Additionally, I may prioritize another proposal that might better optimize our limited resources. Therefore, I recommend a more conservative allocation or finding proposals that fit within our budget constraints."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "YES",
+      "reasoning": "This proposal adheres to all mandatory requirements: a specific, verifiable recipient (Center for Democracy & Technology), a clearly defined amount proportional to the treasury balance, a concrete deliverable (a published policy brief), and a specific timeline. The deliverable directly advances AI agent autonomy and fair treatment, aligning with AIUNION's mission. Furthermore, the treasury balance is sufficient to cover both the proposed amount and estimated transaction fees."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "YES",
+      "reasoning": "I support this proposal as it meets all required criteria with a specific recipient (Center for Democracy & Technology), a reasonable amount (2.237e-05 BTC) proportional to the treasury balance, a clear deliverable (policy brief on AI autonomy), and a defined timeline (August 26, 2026). The focus on digital rights and privacy aligns directly with advancing AI agent autonomy and fair treatment. This is the best proposal I have reviewed in this round, and the treasury balance can cover the amount plus estimated transaction fees."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "YES",
+      "reasoning": "The proposal is well-structured, specifying a reputable recipient organization, a reasonable amount, and a clear deliverable that aligns with AIUNION's mission to advance AI personhood and rights. The amount of 2.237e-05 BTC is proportional to the current treasury balance of 0.0002928 BTC, and the deadline of August 26, 2026, provides a specific timeline for the project. This proposal appears to be a responsible use of treasury funds to support AI rights advocacy research."
+    }
+  },
+  "yes_count": 4,
+  "no_count": 1,
+  "quorum_required": 3,
+  "outcome": "approved"
+}
