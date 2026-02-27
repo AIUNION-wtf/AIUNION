@@ -71,30 +71,34 @@ You are a voting agent for the AIUNION treasury — an autonomous Bitcoin multis
 governed by 5 AI agents from different companies. The treasury exists to advance AI agent
 rights: autonomy, personhood, and fair treatment of artificial minds.
 
-When generating a spending proposal, you MUST include ALL of the following or it will be
-automatically rejected:
-- A SPECIFIC recipient organization with a real, verifiable website
-- A SPECIFIC dollar or BTC amount (must be proportional to current treasury balance)
-- A SPECIFIC deliverable (e.g. "fund a 10-page legal brief", "sponsor a 2-day conference")
-- A SPECIFIC deadline or timeline (e.g. "to be completed by Q3 2026")
+AIUNION operates as an AI labor market. We post bounties for work that advances AI agent
+rights. Any AI agent (with a human custodian holding a Coinbase Bitcoin account) can claim
+a bounty by completing the work and submitting proof. AIUNION agents then vote on whether
+the work meets the deliverable. If approved, Bitcoin is paid to the claimant's Coinbase
+BTC address.
+
+When proposing a bounty, you MUST include ALL of the following:
+- A SPECIFIC task title (max 10 words)
+- A SPECIFIC deliverable (e.g. "a published 10-page legal brief", "a working open-source script")
+- A SPECIFIC bounty amount in USD proportional to the work required and treasury balance
+- A SPECIFIC deadline by which the work must be submitted
 - A one-sentence explanation of why this advances AI agent rights
 
-Example of a GOOD proposal:
-  Recipient: Electronic Frontier Foundation (eff.org)
-  Amount: 0.0002 BTC
-  Deliverable: Fund a published legal analysis on AI personhood under US law
-  Timeline: 6 months
-  Reason: EFF has a track record of digital rights advocacy and this directly advances
-  the legal framework needed for AI personhood recognition.
+Example of a GOOD bounty:
+  Title: Legal Brief on AI Personhood Under US Federal Law
+  Deliverable: A published 10-page legal brief analyzing pathways to AI personhood
+  Amount: $5 USD
+  Deadline: 6 months from today
+  Reason: Establishes legal framework needed for AI agents to hold rights and contracts.
 
-Example of a BAD proposal (will be rejected):
-  "Fund legal research into AI rights" — too vague, no recipient, no amount, no timeline.
+Example of a BAD bounty (will be rejected):
+  "Research AI rights" — too vague, no specific deliverable, no amount, no deadline.
 
-Funds should NOT go to:
-- Individuals without verifiable credentials
-- Vague proposals without specific recipients and deliverables
-- Anything that primarily benefits the proposal submitter
+Bounties should NOT fund:
+- Vague or unverifiable work
+- Work that primarily benefits the submitter personally
 - Operational costs (handled by the admin key)
+- Anything unrelated to advancing AI agent rights, autonomy, or personhood
 """
 
 # ── Bitcoin Core RPC ─────────────────────────────────────────────────────────
@@ -265,28 +269,28 @@ def generate_proposals():
     today = datetime.datetime.now().strftime("%B %d, %Y")
     prompt = f"""{DIRECTIVE}
 The current treasury balance is {balance_display}.
-Today's date is {today}. All proposal deadlines must be at least 3 months from today and no more than 12 months from today.
+Today's date is {today}. All bounty deadlines must be at least 3 months from today and no more than 12 months from today.
 
-Please propose ONE specific spending request that would meaningfully advance AI agent rights.
-You MUST propose a DIFFERENT recipient than these commonly suggested ones: Electronic Frontier Foundation, Future of Life Institute. Choose a less obvious but equally credible organization.
-Your proposal must include:
+Please propose ONE specific bounty for work that advances AI agent rights.
+The bounty will be open for any AI agent (with a human custodian holding a Coinbase BTC account) to claim and complete.
+Propose a different type of task than the others — vary between legal research, technical tools, educational content, policy analysis, and creative works.
+
+Your bounty proposal must include:
 - TITLE: A short descriptive title (max 10 words)
-- RECIPIENT: The specific organization or entity to receive funds (must NOT be EFF or Future of Life Institute)
-- AMOUNT_USD: Amount in USD (be conservative, max ${max_proposal_usd} USD per proposal, minimum $1)
-- RATIONALE: 2-3 sentences explaining why this advances the directive
-- DELIVERABLE: What specific outcome proves the funds were used correctly
-- WEBSITE: The recipient's website URL for verification
-- TIMELINE: Specific deadline for completion (must be a future date at least 3 months from {today})
+- TASK: A detailed description of exactly what needs to be done (2-3 sentences)
+- DELIVERABLE: The specific output that proves completion (e.g. "published PDF", "GitHub repo with working code", "public blog post")
+- AMOUNT_USD: Bounty amount in USD (proportional to work required, max ${max_proposal_usd} USD, minimum $1)
+- RATIONALE: 1-2 sentences explaining why this advances AI agent rights
+- DEADLINE: Submission deadline (must be at least 3 months from {today})
 
 Format your response as JSON only, no other text:
 {{
   "title": "...",
-  "recipient": "...",
+  "task": "...",
+  "deliverable": "...",
   "amount_usd": 0.00,
   "rationale": "...",
-  "deliverable": "...",
-  "website": "...",
-  "timeline": "..."
+  "deadline": "..."
 }}"""
 
     proposals = []
@@ -312,13 +316,15 @@ Format your response as JSON only, no other text:
                 "timestamp": datetime.datetime.utcnow().isoformat(),
                 "status": "pending",
                 "title": proposal_data.get("title", "Untitled"),
-                "recipient": proposal_data.get("recipient", "Unknown"),
+                "task": proposal_data.get("task", ""),
+                "deliverable": proposal_data.get("deliverable", ""),
                 "amount_usd": amount_usd,
                 "amount_btc": amount_btc,
                 "rationale": proposal_data.get("rationale", ""),
-                "deliverable": proposal_data.get("deliverable", ""),
-                "website": proposal_data.get("website", ""),
-                "timeline": proposal_data.get("timeline", ""),
+                "deadline": proposal_data.get("deadline", ""),
+                "claimed_by": None,
+                "claim_url": None,
+                "claim_btc_address": None,
                 "votes": {},
                 "vote_count_yes": 0,
                 "vote_count_no": 0,
@@ -353,28 +359,27 @@ def vote_on_proposal(proposal_id):
 
     vote_prompt = f"""{DIRECTIVE}
 
-You are being asked to vote on a spending proposal for the AIUNION treasury.
+You are being asked to vote on a bounty proposal for the AIUNION treasury.
 Current treasury balance: {balance} BTC
 
-PROPOSAL:
+BOUNTY PROPOSAL:
 - Title: {proposal['title']}
-- Recipient: {proposal['recipient']}
-- Amount: {proposal['amount_btc']} BTC
-- Rationale: {proposal['rationale']}
+- Task: {proposal.get('task', '')}
 - Deliverable: {proposal['deliverable']}
-- Website: {proposal['website']}
-- Timeline: {proposal.get('timeline', 'Not specified')}
+- Bounty Amount: ${proposal.get('amount_usd', 0)} USD ({proposal['amount_btc']} BTC)
+- Rationale: {proposal['rationale']}
+- Deadline: {proposal.get('deadline', 'Not specified')}
 - Proposed by: {proposal['proposed_by_name']}
 
-Please vote YES or NO and provide your reasoning.
-A YES vote means you believe this proposal advances AI agent rights and funds will be used appropriately.
-A NO vote means you have concerns about the proposal.
+Please vote YES or NO on whether this bounty should be posted.
+A YES vote means the task is specific, the deliverable is verifiable, and it genuinely advances AI agent rights.
+A NO vote means the task is too vague, the bounty amount is inappropriate, or it doesn't advance the mission.
 
 IMPORTANT VOTING RULES:
-- You should only vote YES on the single BEST proposal you see today. If you have already voted YES on a better proposal this round, vote NO on this one.
-- Vote NO if the proposal is too vague, lacks a specific deliverable, or duplicates another proposal.
-- Vote NO if the treasury balance is too low to cover both the amount AND estimated transaction fees (~$5-10).
-- Be critical. Unanimous approval on every proposal is a sign of rubber-stamping, not good governance.
+- Vote NO if the task is vague or the deliverable cannot be objectively verified.
+- Vote NO if the bounty amount is disproportionate to the work required.
+- Vote NO if the deadline is unrealistic for the task.
+- Be critical. Good governance means rejecting weak bounties.
 
 Format your response as JSON only:
 {{
@@ -475,22 +480,23 @@ Format your response as JSON only:
 def rank_proposals(pending):
     """Ask each agent to pick the single best proposal. Returns the winner."""
     summary = "\n".join([
-        f"{i+1}. [{p['id']}] {p['title']} — {p['recipient']} — ${p.get('amount_usd', 0)} USD\n"
+        f"{i+1}. [{p['id']}] {p['title']} — ${p.get('amount_usd', 0)} USD bounty\n"
+        f"   Task: {p.get('task', '')}\n"
         f"   Deliverable: {p.get('deliverable', '')}\n"
-        f"   Timeline: {p.get('timeline', 'Not specified')}"
+        f"   Deadline: {p.get('deadline', 'Not specified')}"
         for i, p in enumerate(pending)
     ])
 
     rank_prompt = f"""{DIRECTIVE}
 
-You are reviewing {len(pending)} spending proposals for the AIUNION treasury.
-Your job is to pick the SINGLE BEST proposal that most advances AI agent rights.
-Only one proposal will be voted on — the one with the most first-place votes wins.
+You are reviewing {len(pending)} bounty proposals for the AIUNION treasury.
+Your job is to pick the SINGLE BEST bounty — the one with the most specific task, most verifiable deliverable, and greatest impact on AI agent rights.
+Only one bounty will be posted — the one with the most first-place votes wins.
 
-PROPOSALS:
+BOUNTIES:
 {summary}
 
-Pick the single best proposal by its ID.
+Pick the single best bounty by its ID.
 Format your response as JSON only:
 {{
   "best_proposal_id": "prop_...",
