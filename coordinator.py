@@ -471,7 +471,7 @@ Format your response as JSON only:
     print(f"\n{'✅ APPROVED' if passed else '❌ REJECTED'}: {yes_count}/{len(AGENTS)} votes YES (needed {QUORUM})")
 
     if passed:
-        print(f"\n⚠️  Proposal approved. Amount: {proposal['amount_btc']} BTC to {proposal['recipient']}")
+        print(f"\n⚠️  Bounty approved. Amount: {proposal['amount_btc']} BTC — {proposal['title']}")
         print("   Use Nunchuk to create and sign the transaction manually using the approved proposal details.")
         print(f"   Log the transaction hash back to votes/{proposal_id}.json when complete.")
 
