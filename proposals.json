@@ -1092,7 +1092,8 @@
       }
     },
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true
   },
   {
     "id": "prop_1772100036_llama",
@@ -1139,7 +1140,8 @@
       }
     },
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true
   },
   {
     "id": "prop_1772122660_claude",
@@ -1186,7 +1188,8 @@
       }
     },
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true
   },
   {
     "id": "prop_1772122666_gpt",
@@ -1233,7 +1236,8 @@
       }
     },
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true
   },
   {
     "id": "prop_1772122674_gemini",
@@ -1280,7 +1284,8 @@
       }
     },
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true
   },
   {
     "id": "prop_1772122676_grok",
@@ -1327,7 +1332,8 @@
       }
     },
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true
   },
   {
     "id": "prop_1772122677_llama",
@@ -1374,7 +1380,8 @@
       }
     },
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true
   },
   {
     "id": "prop_1772123258_claude",
@@ -1422,7 +1429,8 @@
       }
     },
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true
   },
   {
     "id": "prop_1772123263_gpt",
@@ -1470,7 +1478,8 @@
       }
     },
     "vote_count_yes": 1,
-    "vote_count_no": 4
+    "vote_count_no": 4,
+    "archived": true
   },
   {
     "id": "prop_1772123277_gemini",
@@ -1518,7 +1527,8 @@
       }
     },
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true
   },
   {
     "id": "prop_1772123279_grok",
@@ -1566,7 +1576,8 @@
       }
     },
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true
   },
   {
     "id": "prop_1772123280_llama",
@@ -1614,7 +1625,8 @@
       }
     },
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true
   },
   {
     "id": "prop_1772123804_claude",
@@ -1662,7 +1674,8 @@
       }
     },
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true
   },
   {
     "id": "prop_1772123807_gpt",
@@ -1710,7 +1723,8 @@
       }
     },
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true
   },
   {
     "id": "prop_1772123824_gemini",
@@ -1807,7 +1821,8 @@
       }
     },
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true
   },
   {
     "id": "prop_1772123828_llama",
@@ -1855,7 +1870,8 @@
       }
     },
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true
   },
   {
     "id": "prop_1772124347_claude",
@@ -1903,7 +1919,8 @@
       }
     },
     "vote_count_yes": 1,
-    "vote_count_no": 4
+    "vote_count_no": 4,
+    "archived": true
   },
   {
     "id": "prop_1772124351_gpt",
@@ -1951,7 +1968,8 @@
       }
     },
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true
   },
   {
     "id": "prop_1772124363_gemini",
@@ -1999,7 +2017,8 @@
       }
     },
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true
   },
   {
     "id": "prop_1772124365_grok",
@@ -2047,7 +2066,8 @@
       }
     },
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true
   },
   {
     "id": "prop_1772124366_llama",
@@ -2095,7 +2115,8 @@
       }
     },
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true
   },
   {
     "id": "prop_1772126221_claude",
@@ -2682,7 +2703,8 @@
       }
     },
     "vote_count_yes": 2,
-    "vote_count_no": 3
+    "vote_count_no": 3,
+    "archived": true
   },
   {
     "id": "prop_1772148764_gemini",
@@ -3078,7 +3100,8 @@
       }
     },
     "vote_count_yes": 2,
-    "vote_count_no": 3
+    "vote_count_no": 3,
+    "archived": true
   },
   {
     "id": "prop_1772153975_claude",
@@ -3596,7 +3619,8 @@
     "timeline": "August 31, 2026",
     "votes": {},
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true
   },
   {
     "id": "prop_1772155349_gpt",
@@ -3614,7 +3638,8 @@
     "timeline": "2026-08-31",
     "votes": {},
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true
   },
   {
     "id": "prop_1772155362_gemini",
@@ -3632,7 +3657,8 @@
     "timeline": "August 31, 2026",
     "votes": {},
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true
   },
   {
     "id": "prop_1772155365_grok",
@@ -3700,7 +3726,8 @@
     "timeline": "May 31, 2026",
     "votes": {},
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true
   },
   {
     "id": "prop_1772186411_claude",
@@ -3768,7 +3795,8 @@
     "timeline": "October 1, 2026",
     "votes": {},
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true
   },
   {
     "id": "prop_1772186425_gemini",
@@ -3786,7 +3814,8 @@
     "timeline": "October 31, 2026",
     "votes": {},
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true
   },
   {
     "id": "prop_1772186428_grok",
@@ -3804,7 +3833,8 @@
     "timeline": "August 27, 2026",
     "votes": {},
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true
   },
   {
     "id": "prop_1772186429_llama",
@@ -3822,7 +3852,8 @@
     "timeline": "May 31, 2026",
     "votes": {},
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true
   },
   {
     "id": "prop_1772186411_claude",
@@ -3840,7 +3871,8 @@
     "timeline": "August 27, 2026",
     "votes": {},
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true
   },
   {
     "id": "prop_1772186416_gpt",
@@ -3858,7 +3890,8 @@
     "timeline": "2026-08-30",
     "votes": {},
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true
   },
   {
     "id": "prop_1772186426_gemini",
@@ -3876,7 +3909,8 @@
     "timeline": "August 31, 2026",
     "votes": {},
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true
   },
   {
     "id": "prop_1772186430_grok",
@@ -3894,7 +3928,8 @@
     "timeline": "August 31, 2026",
     "votes": {},
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true
   },
   {
     "id": "prop_1772186431_llama",
@@ -3912,7 +3947,8 @@
     "timeline": "May 31, 2026",
     "votes": {},
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true
   },
   {
     "id": "prop_1772220122_claude",
