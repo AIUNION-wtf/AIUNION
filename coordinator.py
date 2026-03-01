@@ -620,12 +620,18 @@ def save_proposals(proposals):
 def update_treasury_json():
     """Update treasury.json with current balance and recent txs for dashboard."""
     balance = get_balance()
+    if balance is None:
+        balance = 0
+    btc_price = get_btc_price_usd()
+    balance_usd = round(balance * btc_price, 2) if btc_price else 0
     txs = get_recent_transactions(20)
     proposals = load_proposals()
     active = [p for p in proposals if not p.get("archived", False)]
     treasury = {
         "updated_at": datetime.datetime.utcnow().isoformat(),
         "balance_btc": balance,
+        "balance_usd": balance_usd,
+        "btc_price_usd": btc_price or 0,
         "address": config.TREASURY_ADDRESS,
         "wallet_type": "Taproot Miniscript 3-of-5",
         "proposals": active,
