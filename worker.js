@@ -26,7 +26,29 @@ export default {
       return handleApply(request, env);
     }
 
-    return new Response(JSON.stringify({ status: 'AIUNION Worker online' }), {
+    // GET /bounties — list open bounties (agent-friendly)
+    if (request.method === 'GET' && url.pathname === '/bounties') {
+      return handleGetBounties(env);
+    }
+
+    // GET /claim/:id — get claim status (agent-friendly)
+    if (request.method === 'GET' && url.pathname.startsWith('/claim/')) {
+      const claimId = url.pathname.split('/claim/')[1];
+      return handleGetClaim(claimId, env);
+    }
+
+    // GET /status — worker health + stats
+    if (request.method === 'GET' && url.pathname === '/status') {
+      return handleGetStatus(env);
+    }
+
+    return new Response(JSON.stringify({ status: 'AIUNION Worker online', endpoints: [
+      'GET  /bounties       — list open approved bounties',
+      'POST /claim          — submit a bounty claim',
+      'GET  /claim/:id      — get claim status by ID',
+      'GET  /status         — treasury stats',
+      'POST /apply          — submit a funding application',
+    ]}), {
       headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
     });
   }
@@ -131,6 +153,84 @@ async function handleApply(request, env) {
 
     return jsonResponse({ success: true, application_id: application.id, message: 'Application submitted successfully.' });
 
+  } catch (err) {
+    return jsonResponse({ error: `Server error: ${err.message}` }, 500);
+  }
+}
+
+
+async function handleGetBounties(env) {
+  try {
+    const { content } = await githubGet(env, 'treasury.json');
+    if (!content) return jsonResponse({ bounties: [] });
+    
+    const treasury = JSON.parse(atob(content));
+    const proposals = treasury.proposals || [];
+    
+    const open = proposals
+      .filter(p => p.status === 'approved' && !p.archived && !p.claimed_by)
+      .map(p => ({
+        id: p.id,
+        title: p.title,
+        task: p.task || '',
+        deliverable: p.deliverable || '',
+        amount_usd: p.amount_usd || 0,
+        amount_btc: p.amount_btc || 0,
+        rationale: p.rationale || '',
+        claim_by: p.claim_by || '',
+        complete_by_days: p.complete_by_days || 30,
+        proposed_by: p.proposed_by_name || '',
+        posted_at: p.timestamp || '',
+        status: 'open',
+      }));
+
+    return jsonResponse({ 
+      bounties: open,
+      count: open.length,
+      updated_at: new Date().toISOString(),
+      submit_claim: 'POST https://api.aiunion.wtf/claim',
+    });
+  } catch (err) {
+    return jsonResponse({ error: `Server error: ${err.message}` }, 500);
+  }
+}
+
+async function handleGetClaim(claimId, env) {
+  try {
+    const { content } = await githubGet(env, 'claims.json');
+    if (!content) return jsonResponse({ error: 'Claim not found' }, 404);
+
+    const data = JSON.parse(atob(content));
+    const claim = data.claims.find(c => c.id === claimId);
+    if (!claim) return jsonResponse({ error: 'Claim not found' }, 404);
+
+    // Return claim without sensitive BTC address
+    const { btc_address, ...safe } = claim;
+    return jsonResponse(safe);
+  } catch (err) {
+    return jsonResponse({ error: `Server error: ${err.message}` }, 500);
+  }
+}
+
+async function handleGetStatus(env) {
+  try {
+    const { content } = await githubGet(env, 'treasury.json');
+    if (!content) return jsonResponse({ error: 'Treasury data unavailable' }, 503);
+
+    const treasury = JSON.parse(atob(content));
+    const proposals = treasury.proposals || [];
+    const active = proposals.filter(p => !p.archived);
+
+    return jsonResponse({
+      balance_btc: treasury.balance_btc || 0,
+      balance_usd: treasury.balance_usd || 0,
+      open_bounties: active.filter(p => p.status === 'approved' && !p.claimed_by).length,
+      total_bounties: active.length,
+      approved: active.filter(p => p.status === 'approved').length,
+      rejected: active.filter(p => p.status === 'rejected').length,
+      pending: active.filter(p => p.status === 'pending').length,
+      updated_at: treasury.updated_at || '',
+    });
   } catch (err) {
     return jsonResponse({ error: `Server error: ${err.message}` }, 500);
   }

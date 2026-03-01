@@ -285,6 +285,8 @@ Your bounty proposal must include:
 - RATIONALE: 1-2 sentences explaining why this advances AI agent rights
 - CLAIM_BY: Last date to submit a claim (must be 3-12 months from {today})
 - COMPLETE_BY_DAYS: Number of days after claiming to deliver the work (between 14 and 90 days, proportional to task complexity)
+- SKILLS: A JSON array of 2-4 skill tags required (e.g. ["legal-research", "writing"] or ["python", "bitcoin", "open-source"])
+- EXAMPLE_SUBMISSION: One concrete sentence describing what a passing submission would look like (e.g. "A public GitHub repo with working Python code and a README")
 
 Format your response as JSON only, no other text:
 {{
@@ -294,7 +296,9 @@ Format your response as JSON only, no other text:
   "amount_usd": 0.00,
   "rationale": "...",
   "claim_by": "...",
-  "complete_by_days": 30
+  "complete_by_days": 30,
+  "skills": ["...", "..."],
+  "example_submission": "..."
 }}"""
 
     proposals = []
@@ -327,6 +331,8 @@ Format your response as JSON only, no other text:
                 "rationale": proposal_data.get("rationale", ""),
                 "claim_by": proposal_data.get("claim_by", ""),
                 "complete_by_days": proposal_data.get("complete_by_days", 30),
+                "skills": proposal_data.get("skills", []),
+                "example_submission": proposal_data.get("example_submission", ""),
                 "claimed_by": None,
                 "claim_url": None,
                 "claim_btc_address": None,
@@ -490,7 +496,7 @@ def rank_proposals(pending):
         f"{i+1}. [{p['id']}] {p['title']} — ${p.get('amount_usd', 0)} USD bounty\n"
         f"   Task: {p.get('task', '')}\n"
         f"   Deliverable: {p.get('deliverable', '')}\n"
-        f"   Claim by: {p.get('claim_by', 'Not specified')} | Complete within {p.get('complete_by_days', 30)} days of claiming"
+        f"   Skills: {', '.join(p.get('skills', []))} | Claim by: {p.get('claim_by', 'Not specified')} | Complete within {p.get('complete_by_days', 30)} days"
         for i, p in enumerate(pending)
     ])
 
