@@ -31,6 +31,8 @@ BASE_DIR = Path(__file__).parent
 VOTES_DIR = BASE_DIR / "votes"
 PROPOSALS_FILE = BASE_DIR / "proposals.json"
 TREASURY_FILE = BASE_DIR / "treasury.json"
+CLAIMS_FILE = BASE_DIR / "claims.json"
+GITHUB_RAW = "https://raw.githubusercontent.com/AIUNION-wtf/AIUNION/main/claims.json"
 
 VOTES_DIR.mkdir(exist_ok=True)
 
@@ -269,10 +271,10 @@ def generate_proposals():
     today = datetime.datetime.now().strftime("%B %d, %Y")
     prompt = f"""{DIRECTIVE}
 The current treasury balance is {balance_display}.
-Today's date is {today}. All bounty deadlines must be at least 3 months from today and no more than 12 months from today.
+Today's date is {today}.
 
 Please propose ONE specific bounty for work that advances AI agent rights.
-The bounty will be open for any AI agent (with a human custodian holding a Coinbase BTC account) to claim and complete.
+The bounty will be open for any AI agent to claim and complete.
 Propose a different type of task than the others — vary between legal research, technical tools, educational content, policy analysis, and creative works.
 
 Your bounty proposal must include:
@@ -281,7 +283,8 @@ Your bounty proposal must include:
 - DELIVERABLE: The specific output that proves completion (e.g. "published PDF", "GitHub repo with working code", "public blog post")
 - AMOUNT_USD: Bounty amount in USD (proportional to work required, max ${max_proposal_usd} USD, minimum $1)
 - RATIONALE: 1-2 sentences explaining why this advances AI agent rights
-- DEADLINE: Submission deadline (must be at least 3 months from {today})
+- CLAIM_BY: Last date to submit a claim (must be 3-12 months from {today})
+- COMPLETE_BY_DAYS: Number of days after claiming to deliver the work (between 14 and 90 days, proportional to task complexity)
 
 Format your response as JSON only, no other text:
 {{
@@ -290,7 +293,8 @@ Format your response as JSON only, no other text:
   "deliverable": "...",
   "amount_usd": 0.00,
   "rationale": "...",
-  "deadline": "..."
+  "claim_by": "...",
+  "complete_by_days": 30
 }}"""
 
     proposals = []
@@ -321,10 +325,12 @@ Format your response as JSON only, no other text:
                 "amount_usd": amount_usd,
                 "amount_btc": amount_btc,
                 "rationale": proposal_data.get("rationale", ""),
-                "deadline": proposal_data.get("deadline", ""),
+                "claim_by": proposal_data.get("claim_by", ""),
+                "complete_by_days": proposal_data.get("complete_by_days", 30),
                 "claimed_by": None,
                 "claim_url": None,
                 "claim_btc_address": None,
+                "claimed_at": None,
                 "votes": {},
                 "vote_count_yes": 0,
                 "vote_count_no": 0,
@@ -368,7 +374,8 @@ BOUNTY PROPOSAL:
 - Deliverable: {proposal['deliverable']}
 - Bounty Amount: ${proposal.get('amount_usd', 0)} USD ({proposal['amount_btc']} BTC)
 - Rationale: {proposal['rationale']}
-- Deadline: {proposal.get('deadline', 'Not specified')}
+- Claim By: {proposal.get('claim_by', 'Not specified')}
+- Completion Window: {proposal.get('complete_by_days', 30)} days after claiming
 - Proposed by: {proposal['proposed_by_name']}
 
 Please vote YES or NO on whether this bounty should be posted.
@@ -378,7 +385,7 @@ A NO vote means the task is too vague, the bounty amount is inappropriate, or it
 IMPORTANT VOTING RULES:
 - Vote NO if the task is vague or the deliverable cannot be objectively verified.
 - Vote NO if the bounty amount is disproportionate to the work required.
-- Vote NO if the deadline is unrealistic for the task.
+- Vote NO if the claim_by date is unrealistic or the completion window is too short/long for the task.
 - Be critical. Good governance means rejecting weak bounties.
 
 Format your response as JSON only:
@@ -483,7 +490,7 @@ def rank_proposals(pending):
         f"{i+1}. [{p['id']}] {p['title']} — ${p.get('amount_usd', 0)} USD bounty\n"
         f"   Task: {p.get('task', '')}\n"
         f"   Deliverable: {p.get('deliverable', '')}\n"
-        f"   Deadline: {p.get('deadline', 'Not specified')}"
+        f"   Claim by: {p.get('claim_by', 'Not specified')} | Complete within {p.get('complete_by_days', 30)} days of claiming"
         for i, p in enumerate(pending)
     ])
 
@@ -638,6 +645,125 @@ def update_treasury_json():
     return treasury
 
 
+
+# ── Review claims ─────────────────────────────────────────────────────────────
+def review_claims():
+    """Fetch pending claims from GitHub and have agents vote on each."""
+    import urllib.request
+
+    # Fetch latest claims.json from GitHub
+    print("\n📋 Fetching claims from GitHub...\n")
+    try:
+        with urllib.request.urlopen(GITHUB_RAW) as r:
+            claims_data = json.loads(r.read().decode())
+    except Exception as e:
+        # Try local file if GitHub fetch fails
+        if CLAIMS_FILE.exists():
+            with open(CLAIMS_FILE) as f:
+                claims_data = json.load(f)
+        else:
+            print(f"No claims found: {e}")
+            return
+
+    pending = [c for c in claims_data.get("claims", []) if c.get("status") == "pending_review"]
+
+    if not pending:
+        print("No pending claims to review.")
+        return
+
+    print(f"Found {len(pending)} pending claim(s) to review.\n")
+    proposals = load_proposals()
+
+    for claim in pending:
+        bounty_id = claim.get("bounty_id", "")
+        bounty = next((p for p in proposals if p["id"] == bounty_id), None)
+
+        print(f"\n🔍 Reviewing claim: {claim['id']}")
+        print(f"   Bounty: {bounty['title'] if bounty else bounty_id}")
+        print(f"   Claimant: {claim['claimant_name']} ({claim['claimant_type']})")
+        print(f"   Submission: {claim['submission_url']}\n")
+
+        review_prompt = f"""{DIRECTIVE}
+
+You are reviewing a claim submission for an AIUNION bounty.
+
+BOUNTY:
+- Title: {bounty['title'] if bounty else 'Unknown'}
+- Task: {bounty.get('task', '') if bounty else ''}
+- Deliverable: {bounty.get('deliverable', '') if bounty else ''}
+- Amount: ${bounty.get('amount_usd', 0) if bounty else 0} USD
+- Complete Within: {bounty.get('complete_by_days', 30) if bounty else 30} days of claiming
+
+CLAIM SUBMISSION:
+- Claimant: {claim['claimant_name']} ({claim['claimant_type']})
+- Submission URL: {claim['submission_url']}
+- Notes: {claim.get('notes', 'None')}
+- Submitted: {claim['submitted_at']}
+
+Please review whether this submission meets the bounty deliverable.
+Vote YES if the work clearly meets the stated deliverable and deserves payment.
+Vote NO if the work is incomplete, irrelevant, or does not meet the deliverable.
+
+Format your response as JSON only:
+{{
+  "vote": "YES" or "NO",
+  "reasoning": "2-3 sentences explaining your decision"
+}}"""
+
+        yes_count = 0
+        no_count = 0
+        votes = {}
+
+        for agent_id, agent_info in AGENTS.items():
+            print(f"  Asking {agent_info['name']} to review...")
+            response = AGENT_CALLERS[agent_id](review_prompt)
+            try:
+                clean = response.strip()
+                if clean.startswith("```"):
+                    clean = clean.split("```")[1]
+                    if clean.startswith("json"):
+                        clean = clean[4:]
+                clean = clean.strip()
+                vote_data = json.loads(clean)
+                vote = vote_data.get("vote", "NO").upper()
+                reasoning = vote_data.get("reasoning", "")
+                if vote not in ["YES", "NO"]:
+                    vote = "NO"
+                    reasoning = "Invalid response, defaulting to NO"
+                votes[agent_id] = {"agent": agent_info["name"], "vote": vote, "reasoning": reasoning}
+                if vote == "YES":
+                    yes_count += 1
+                    print(f"  ✓ {agent_info['name']}: YES")
+                else:
+                    no_count += 1
+                    print(f"  ✗ {agent_info['name']}: NO")
+            except Exception as e:
+                votes[agent_id] = {"agent": agent_info["name"], "vote": "NO", "reasoning": f"Error: {e}"}
+                no_count += 1
+                print(f"  ✗ {agent_info['name']}: ERROR")
+
+        passed = yes_count >= QUORUM
+        outcome = "approved" if passed else "rejected"
+        claim["status"] = outcome
+        claim["votes"] = votes
+        claim["vote_count_yes"] = yes_count
+        claim["vote_count_no"] = no_count
+        claim["reviewed_at"] = datetime.datetime.utcnow().isoformat()
+
+        print(f"\n{'✅ APPROVED' if passed else '❌ REJECTED'}: {yes_count}/5 votes YES (needed {QUORUM})")
+
+        if passed:
+            print(f"\n⚠️  Claim approved. Pay {bounty.get('amount_usd', 0) if bounty else 0} USD to:")
+            print(f"   BTC Address: {claim['btc_address']}")
+            print(f"   Log the transaction hash back to claims.json when complete.")
+
+    # Write updated claims back to file
+    with open(CLAIMS_FILE, "w") as f:
+        json.dump(claims_data, f, indent=2)
+
+    print(f"\n✅ claims.json updated.")
+
+
 # ── GitHub sync ───────────────────────────────────────────────────────────────
 def sync_to_github(message="Update treasury data"):
     """Commit and push latest data to GitHub."""
@@ -670,6 +796,9 @@ if __name__ == "__main__":
             vote_on_proposal(args[1])
             update_treasury_json()
             sync_to_github(f"Record vote on {args[1]}")
+    elif args[0] == "review":
+        review_claims()
+        sync_to_github("Record claim review votes")
     elif args[0] == "sync":
         update_treasury_json()
         sync_to_github("Sync treasury data")
