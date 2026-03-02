@@ -3999,7 +3999,8 @@
       }
     },
     "vote_count_yes": 5,
-    "vote_count_no": 0
+    "vote_count_no": 0,
+    "archived": true
   },
   {
     "id": "prop_1772220126_gpt",
@@ -4019,7 +4020,8 @@
     "claim_btc_address": null,
     "votes": {},
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true
   },
   {
     "id": "prop_1772220134_gemini",
@@ -4039,7 +4041,8 @@
     "claim_btc_address": null,
     "votes": {},
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true
   },
   {
     "id": "prop_1772220136_grok",
@@ -4059,7 +4062,8 @@
     "claim_btc_address": null,
     "votes": {},
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true
   },
   {
     "id": "prop_1772220137_llama",
@@ -4079,6 +4083,7 @@
     "claim_btc_address": null,
     "votes": {},
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true
   }
 ]
