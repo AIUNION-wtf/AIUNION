@@ -768,6 +768,20 @@ Format your response as JSON only:
         claim["vote_count_no"] = no_count
         claim["reviewed_at"] = datetime.datetime.utcnow().isoformat()
 
+        # Keep proposal claim state aligned with claim review outcome.
+        if bounty:
+            if passed:
+                bounty["claimed_by"] = claim.get("claimant_name")
+                bounty["claim_url"] = claim.get("submission_url")
+                bounty["claim_btc_address"] = claim.get("btc_address")
+                bounty["claimed_at"] = claim.get("claimed_at") or claim.get("submitted_at")
+            else:
+                # Re-open rejected bounty claims immediately.
+                bounty["claimed_by"] = None
+                bounty["claim_url"] = None
+                bounty["claim_btc_address"] = None
+                bounty["claimed_at"] = None
+
         print(f"\n{'✅ APPROVED' if passed else '❌ REJECTED'}: {yes_count}/5 votes YES (needed {QUORUM})")
 
         if passed:
@@ -779,7 +793,11 @@ Format your response as JSON only:
     with open(CLAIMS_FILE, "w") as f:
         json.dump(claims_data, f, indent=2)
 
-    print(f"\n✅ claims.json updated.")
+    # Persist proposal updates resulting from review outcomes.
+    save_proposals(proposals)
+    update_treasury_json()
+
+    print(f"\n✅ claims.json and treasury.json updated.")
 
     # Auto-blacklist check: if any BTC address has 3+ rejections, trigger blacklist vote
     all_claims = claims_data.get("claims", [])
