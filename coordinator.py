@@ -6,7 +6,11 @@ records votes to GitHub, and triggers Bitcoin signing when quorum is reached.
 
 Usage:
     python coordinator.py propose    # Generate new proposals from AI agents
+    python coordinator.py voteall    # Rank pending proposals and vote winner
     python coordinator.py vote <id>  # Run a vote on a specific proposal
+    python coordinator.py review     # Review pending claim submissions
+    python coordinator.py expire     # Expire overdue claims and reopen bounties
+    python coordinator.py blacklist  # Run blacklist vote for an address/name
     python coordinator.py status     # Show current treasury status
     python coordinator.py sync       # Push latest data to GitHub
 """
@@ -808,6 +812,95 @@ Format your response as JSON only:
 
 
 
+def expire_claims():
+    """Expire overdue active claims and reopen their bounties."""
+    import urllib.request
+
+    print("\n⏰ Checking for expired claims...\n")
+
+    # Fetch latest claims.json from GitHub
+    try:
+        with urllib.request.urlopen(GITHUB_RAW) as r:
+            claims_data = json.loads(r.read().decode())
+    except Exception as e:
+        # Try local file if GitHub fetch fails
+        if CLAIMS_FILE.exists():
+            with open(CLAIMS_FILE) as f:
+                claims_data = json.load(f)
+        else:
+            print(f"No claims found: {e}")
+            return
+
+    proposals = load_proposals()
+    proposal_index = {p.get("id"): p for p in proposals}
+    now_utc = datetime.datetime.now(datetime.timezone.utc)
+
+    expired_count = 0
+    reopened_count = 0
+
+    for claim in claims_data.get("claims", []):
+        # Only active claims are eligible for timeout expiration.
+        if claim.get("status") != "active":
+            continue
+
+        bounty_id = claim.get("bounty_id")
+        bounty = proposal_index.get(bounty_id)
+        if not bounty:
+            continue
+
+        claimed_at_raw = claim.get("claimed_at") or claim.get("submitted_at")
+        if not claimed_at_raw:
+            continue
+
+        try:
+            claimed_at = datetime.datetime.fromisoformat(claimed_at_raw.replace("Z", "+00:00"))
+            if claimed_at.tzinfo is None:
+                claimed_at = claimed_at.replace(tzinfo=datetime.timezone.utc)
+        except Exception:
+            continue
+
+        complete_by_days = bounty.get("complete_by_days", 30)
+        try:
+            complete_by_days = int(complete_by_days)
+        except (TypeError, ValueError):
+            complete_by_days = 30
+        if complete_by_days <= 0:
+            complete_by_days = 30
+
+        expires_at = claimed_at + datetime.timedelta(days=complete_by_days)
+        if now_utc < expires_at:
+            continue
+
+        # Mark claim expired.
+        claim["status"] = "expired"
+        claim["expired_at"] = datetime.datetime.utcnow().isoformat()
+        claim["expiration_reason"] = (
+            f"No completion submitted within {complete_by_days} days of claim."
+        )
+        expired_count += 1
+
+        # Reopen bounty so others can claim it.
+        bounty["status"] = "approved"
+        bounty["claimed_by"] = None
+        bounty["claim_url"] = None
+        bounty["claim_btc_address"] = None
+        bounty["claimed_at"] = None
+        reopened_count += 1
+
+    if expired_count == 0:
+        print("No expired claims found.")
+        return
+
+    with open(CLAIMS_FILE, "w") as f:
+        json.dump(claims_data, f, indent=2)
+
+    save_proposals(proposals)
+    update_treasury_json()
+
+    print(f"✅ Expired {expired_count} claim(s).")
+    print(f"✅ Reopened {reopened_count} bounty/bounties.")
+
+
 # ── Blacklist ─────────────────────────────────────────────────────────────────
 def blacklist_agent(btc_address=None, claimant_name=None, reason=None):
     """Have agents vote on whether to blacklist a BTC address or agent name."""
@@ -952,6 +1045,9 @@ if __name__ == "__main__":
     elif args[0] == "review":
         review_claims()
         sync_to_github("Record claim review votes")
+    elif args[0] == "expire":
+        expire_claims()
+        sync_to_github("Expire stale claims and reopen bounties")
     elif args[0] == "blacklist":
         addr = None
         name = None
