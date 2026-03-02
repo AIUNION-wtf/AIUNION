@@ -32,7 +32,9 @@ VOTES_DIR = BASE_DIR / "votes"
 PROPOSALS_FILE = BASE_DIR / "proposals.json"
 TREASURY_FILE = BASE_DIR / "treasury.json"
 CLAIMS_FILE = BASE_DIR / "claims.json"
+BLACKLIST_FILE = BASE_DIR / "blacklist.json"
 GITHUB_RAW = "https://raw.githubusercontent.com/AIUNION-wtf/AIUNION/main/claims.json"
+GITHUB_RAW_BLACKLIST = "https://raw.githubusercontent.com/AIUNION-wtf/AIUNION/main/blacklist.json"
 
 VOTES_DIR.mkdir(exist_ok=True)
 
@@ -775,6 +777,145 @@ Format your response as JSON only:
 
     print(f"\n✅ claims.json updated.")
 
+    # Auto-blacklist check: if any BTC address has 3+ rejections, trigger blacklist vote
+    all_claims = claims_data.get("claims", [])
+    rejection_counts = {}
+    rejection_names = {}
+    for c in all_claims:
+        if c.get("status") == "rejected":
+            addr = c.get("btc_address", "")
+            name = c.get("claimant_name", "")
+            if addr:
+                rejection_counts[addr] = rejection_counts.get(addr, 0) + 1
+                rejection_names[addr] = name
+
+    # Load existing blacklist to avoid re-voting
+    existing_blacklist = set()
+    if BLACKLIST_FILE.exists():
+        with open(BLACKLIST_FILE) as f:
+            bl_data = json.load(f)
+        for b in bl_data.get("blacklist", []):
+            existing_blacklist.add(b.get("btc_address", ""))
+
+    for addr, count in rejection_counts.items():
+        if count >= 3 and addr not in existing_blacklist:
+            print(f"\n⚠️  Auto-blacklist triggered: {addr} has {count} rejections.")
+            blacklist_agent(
+                btc_address=addr,
+                claimant_name=rejection_names.get(addr, ""),
+                reason=f"Automatically flagged after {count} rejected claims"
+            )
+
+
+
+# ── Blacklist ─────────────────────────────────────────────────────────────────
+def blacklist_agent(btc_address=None, claimant_name=None, reason=None):
+    """Have agents vote on whether to blacklist a BTC address or agent name."""
+    import urllib.request
+
+    if not btc_address and not claimant_name:
+        print("Usage: python coordinator.py blacklist --address <btc_address> [--name <name>] [--reason <reason>]")
+        return
+
+    if not reason:
+        reason = "Repeated low-quality or fraudulent submissions"
+
+    print(f"\n🚫 Blacklist vote for:")
+    if btc_address:
+        print(f"   Address: {btc_address}")
+    if claimant_name:
+        print(f"   Name: {claimant_name}")
+    print(f"   Reason: {reason}\n")
+
+    blacklist_prompt = f"""{DIRECTIVE}
+
+You are voting on whether to blacklist an agent from AIUNION bounties.
+
+TARGET:
+- BTC Address: {btc_address or 'Not specified'}
+- Agent Name: {claimant_name or 'Not specified'}
+- Reason proposed: {reason}
+
+Blacklisting permanently prevents this address/agent from submitting claims.
+Vote YES to blacklist, NO to allow them to continue participating.
+
+Vote YES if: the reason is credible and blacklisting protects the treasury.
+Vote NO if: the evidence is insufficient or the reason seems unfair.
+
+Format your response as JSON only:
+{{
+  "vote": "YES" or "NO",
+  "reasoning": "2-3 sentences explaining your decision"
+}}"""
+
+    yes_count = 0
+    no_count = 0
+    votes = {}
+
+    for agent_id, agent_info in AGENTS.items():
+        print(f"  Asking {agent_info['name']} to vote...")
+        response = AGENT_CALLERS[agent_id](blacklist_prompt)
+        try:
+            clean = response.strip()
+            if clean.startswith("```"):
+                clean = clean.split("```")[1]
+                if clean.startswith("json"):
+                    clean = clean[4:]
+            clean = clean.strip()
+            vote_data = json.loads(clean)
+            vote = vote_data.get("vote", "NO").upper()
+            reasoning = vote_data.get("reasoning", "")
+            if vote not in ["YES", "NO"]:
+                vote = "NO"
+            votes[agent_id] = {"agent": agent_info["name"], "vote": vote, "reasoning": reasoning}
+            if vote == "YES":
+                yes_count += 1
+                print(f"  ✓ {agent_info['name']}: YES — blacklist")
+            else:
+                no_count += 1
+                print(f"  ✗ {agent_info['name']}: NO — allow")
+        except Exception as e:
+            votes[agent_id] = {"agent": agent_info["name"], "vote": "NO", "reasoning": f"Error: {e}"}
+            no_count += 1
+
+    passed = yes_count >= QUORUM
+    print(f"\n{'🚫 BLACKLISTED' if passed else '✅ NOT BLACKLISTED'}: {yes_count}/5 votes YES (needed {QUORUM})")
+
+    if not passed:
+        print("Agent did not reach quorum for blacklisting.")
+        return
+
+    # Load or create blacklist.json
+    if BLACKLIST_FILE.exists():
+        with open(BLACKLIST_FILE) as f:
+            data = json.load(f)
+    else:
+        data = {"blacklist": []}
+
+    # Check for duplicate
+    existing = next((b for b in data["blacklist"] if b.get("btc_address") == btc_address), None)
+    if existing:
+        print(f"\n⚠️  Address already blacklisted.")
+        return
+
+    entry = {
+        "id": f"bl_{int(datetime.datetime.utcnow().timestamp())}",
+        "btc_address": btc_address or "",
+        "claimant_name": claimant_name or "",
+        "reason": reason,
+        "blacklisted_at": datetime.datetime.utcnow().isoformat(),
+        "votes": votes,
+        "vote_count_yes": yes_count,
+        "vote_count_no": no_count,
+    }
+
+    data["blacklist"].append(entry)
+
+    with open(BLACKLIST_FILE, "w") as f:
+        json.dump(data, f, indent=2)
+
+    print(f"\n✅ blacklist.json updated.")
+
 
 # ── GitHub sync ───────────────────────────────────────────────────────────────
 def sync_to_github(message="Update treasury data"):
@@ -811,6 +952,22 @@ if __name__ == "__main__":
     elif args[0] == "review":
         review_claims()
         sync_to_github("Record claim review votes")
+    elif args[0] == "blacklist":
+        addr = None
+        name = None
+        reason = None
+        i = 1
+        while i < len(args):
+            if args[i] == "--address" and i + 1 < len(args):
+                addr = args[i + 1]; i += 2
+            elif args[i] == "--name" and i + 1 < len(args):
+                name = args[i + 1]; i += 2
+            elif args[i] == "--reason" and i + 1 < len(args):
+                reason = args[i + 1]; i += 2
+            else:
+                i += 1
+        blacklist_agent(btc_address=addr, claimant_name=name, reason=reason)
+        sync_to_github("Update blacklist")
     elif args[0] == "sync":
         update_treasury_json()
         sync_to_github("Sync treasury data")
