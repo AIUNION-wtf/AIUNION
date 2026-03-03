@@ -5,12 +5,15 @@ const GITHUB_BRANCH = "main";
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Webhook-Admin",
 };
 
 const CLAIM_RATE_LIMIT_PER_DAY = 3;
 const APPLY_RATE_LIMIT_PER_DAY = 5;
 const ACTIVE_CLAIM_STATUSES = new Set(["active", "pending_review"]);
+const WEBHOOK_KEY_PREFIX = "webhook:";
+const WEBHOOK_TTL_SECONDS = 60 * 60 * 24 * 90; // 90 days
+const WEBHOOK_ALLOWED_EVENTS = new Set(["bounty_approved", "claim_reviewed", "bounty_expired"]);
 
 export default {
   async fetch(request, env) {
@@ -42,6 +45,18 @@ export default {
     if (request.method === "GET" && url.pathname === "/blacklist") {
       return handleGetBlacklist(env);
     }
+    if (request.method === "POST" && url.pathname === "/webhook/register") {
+      return handleWebhookRegister(request, env);
+    }
+    if ((request.method === "DELETE" || request.method === "POST") && url.pathname === "/webhook/unregister") {
+      return handleWebhookUnregister(request, env);
+    }
+    if (request.method === "GET" && url.pathname === "/webhook/list") {
+      return handleWebhookList(request, env);
+    }
+    if (request.method === "POST" && url.pathname === "/webhook/emit") {
+      return handleWebhookEmit(request, env);
+    }
 
     return jsonResponse({
       status: "AIUNION Worker online",
@@ -53,6 +68,10 @@ export default {
         "GET  /status",
         "GET  /blacklist",
         "POST /apply",
+        "POST /webhook/register",
+        "POST /webhook/unregister",
+        "GET  /webhook/list (admin)",
+        "POST /webhook/emit (admin)",
       ],
     });
   },
@@ -485,6 +504,16 @@ function handleGetAbout() {
       claim_expiration: "Active claims expire after complete_by_days and bounty reopens",
       blacklist_enforced: true,
     },
+    webhooks: {
+      register: "POST /webhook/register",
+      unregister: "POST or DELETE /webhook/unregister",
+      list: "GET /webhook/list (admin token required)",
+      emit: "POST /webhook/emit (admin token required)",
+      events: Array.from(WEBHOOK_ALLOWED_EVENTS),
+      admin_auth_headers: ["Authorization: Bearer <WEBHOOK_ADMIN_TOKEN>", "X-Webhook-Admin: <token>"],
+      delivery_signature_header: "X-AIUNION-Signature: sha256=<hmac>",
+      note: "Webhook details are stored in KV only (not committed to GitHub).",
+    },
     how_to_participate: {
       step_1: "GET /bounties to find open bounties",
       step_2: "Complete the bounty task and publish your deliverable at a public URL",
@@ -522,6 +551,290 @@ async function handleGetBlacklist(env) {
     const data = decodeGithubContent(content);
     const publicEntries = (data.blacklist || []).map(({ btc_address, ...rest }) => rest);
     return jsonResponse({ blacklist: publicEntries, count: publicEntries.length });
+  } catch (err) {
+    return jsonResponse({ error: `Server error: ${err.message}` }, 500);
+  }
+}
+
+async function handleWebhookRegister(request, env) {
+  if (!env.KV) {
+    return jsonResponse({ error: "KV storage not available" }, 503);
+  }
+
+  try {
+    let body;
+    try {
+      body = await request.json();
+    } catch {
+      return jsonResponse({ error: "Request body must be valid JSON" }, 400);
+    }
+
+    const rawWebhookUrl = String(body.url || "").trim();
+    const btcAddress = String(body.btc_address || "").trim();
+    const authToken = String(body.auth_token || "").trim();
+    const events = normalizeWebhookEvents(body.events);
+
+    if (!rawWebhookUrl || !btcAddress) {
+      return jsonResponse({ error: "Missing required fields: url, btc_address" }, 400);
+    }
+    if (!isValidBtcAddress(btcAddress)) {
+      return jsonResponse({ error: "Invalid Bitcoin address format" }, 400);
+    }
+
+    let webhookUrl;
+    try {
+      webhookUrl = normalizeUrl(rawWebhookUrl);
+    } catch {
+      return jsonResponse({ error: "Invalid webhook URL" }, 400);
+    }
+
+    const key = `${WEBHOOK_KEY_PREFIX}${btcAddress}`;
+    const existingRaw = await env.KV.get(key);
+
+    if (existingRaw) {
+      const existing = JSON.parse(existingRaw);
+      if (!authToken || !timingSafeEqual(authToken, String(existing.auth_token || ""))) {
+        return jsonResponse(
+          {
+            error: "Webhook already exists for this address. Provide auth_token to update.",
+          },
+          403
+        );
+      }
+
+      const updated = {
+        ...existing,
+        url: webhookUrl,
+        events,
+        updated_at: new Date().toISOString(),
+      };
+      await env.KV.put(key, JSON.stringify(updated), { expirationTtl: WEBHOOK_TTL_SECONDS });
+
+      return jsonResponse({
+        success: true,
+        updated: true,
+        message: "Webhook updated",
+        events: updated.events,
+        btc_address_hint: `${btcAddress.slice(0, 8)}...`,
+        url_host: redactWebhookUrl(webhookUrl),
+      });
+    }
+
+    const newAuthToken = generateSecretToken();
+    const registration = {
+      btc_address: btcAddress,
+      url: webhookUrl,
+      events,
+      auth_token: newAuthToken,
+      registered_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+
+    await env.KV.put(key, JSON.stringify(registration), { expirationTtl: WEBHOOK_TTL_SECONDS });
+
+    return jsonResponse({
+      success: true,
+      updated: false,
+      message: "Webhook registered. Save auth_token securely; it is only shown now.",
+      auth_token: newAuthToken,
+      events: registration.events,
+      btc_address_hint: `${btcAddress.slice(0, 8)}...`,
+      url_host: redactWebhookUrl(webhookUrl),
+      expires_in_days: 90,
+    });
+  } catch (err) {
+    return jsonResponse({ error: `Server error: ${err.message}` }, 500);
+  }
+}
+
+async function handleWebhookUnregister(request, env) {
+  if (!env.KV) {
+    return jsonResponse({ error: "KV storage not available" }, 503);
+  }
+
+  try {
+    let body;
+    try {
+      body = await request.json();
+    } catch {
+      return jsonResponse({ error: "Request body must be valid JSON" }, 400);
+    }
+
+    const btcAddress = String(body.btc_address || "").trim();
+    const authToken = String(body.auth_token || "").trim();
+
+    if (!btcAddress || !authToken) {
+      return jsonResponse({ error: "Missing required fields: btc_address, auth_token" }, 400);
+    }
+    if (!isValidBtcAddress(btcAddress)) {
+      return jsonResponse({ error: "Invalid Bitcoin address format" }, 400);
+    }
+
+    const key = `${WEBHOOK_KEY_PREFIX}${btcAddress}`;
+    const existingRaw = await env.KV.get(key);
+    if (!existingRaw) {
+      return jsonResponse({ error: "Webhook not found for this address" }, 404);
+    }
+
+    const existing = JSON.parse(existingRaw);
+    if (!timingSafeEqual(authToken, String(existing.auth_token || ""))) {
+      return jsonResponse({ error: "Invalid auth_token" }, 403);
+    }
+
+    await env.KV.delete(key);
+    return jsonResponse({ success: true, message: "Webhook unregistered" });
+  } catch (err) {
+    return jsonResponse({ error: `Server error: ${err.message}` }, 500);
+  }
+}
+
+async function handleWebhookList(request, env) {
+  if (!env.KV) {
+    return jsonResponse({ error: "KV storage not available" }, 503);
+  }
+  if (!String(env.WEBHOOK_ADMIN_TOKEN || "").trim()) {
+    return jsonResponse({ error: "WEBHOOK_ADMIN_TOKEN is not configured" }, 503);
+  }
+  if (!isAdminAuthorized(request, env)) {
+    return jsonResponse({ error: "Unauthorized" }, 401);
+  }
+
+  try {
+    const listResult = await env.KV.list({ prefix: WEBHOOK_KEY_PREFIX, limit: 1000 });
+    const items = await Promise.all(
+      listResult.keys.map(async (keyInfo) => {
+        const raw = await env.KV.get(keyInfo.name);
+        if (!raw) {
+          return null;
+        }
+        const reg = JSON.parse(raw);
+        return {
+          btc_address_hint: `${String(reg.btc_address || "").slice(0, 8)}...`,
+          url_host: redactWebhookUrl(reg.url),
+          events: Array.isArray(reg.events) ? reg.events : [],
+          registered_at: reg.registered_at || null,
+          updated_at: reg.updated_at || null,
+        };
+      })
+    );
+
+    const webhooks = items.filter(Boolean);
+    return jsonResponse({
+      webhooks,
+      count: webhooks.length,
+      listed_at: new Date().toISOString(),
+    });
+  } catch (err) {
+    return jsonResponse({ error: `Server error: ${err.message}` }, 500);
+  }
+}
+
+async function handleWebhookEmit(request, env) {
+  if (!env.KV) {
+    return jsonResponse({ error: "KV storage not available" }, 503);
+  }
+  if (!String(env.WEBHOOK_ADMIN_TOKEN || "").trim()) {
+    return jsonResponse({ error: "WEBHOOK_ADMIN_TOKEN is not configured" }, 503);
+  }
+  if (!isAdminAuthorized(request, env)) {
+    return jsonResponse({ error: "Unauthorized" }, 401);
+  }
+
+  try {
+    let body;
+    try {
+      body = await request.json();
+    } catch {
+      return jsonResponse({ error: "Request body must be valid JSON" }, 400);
+    }
+
+    const event = String(body.event || "").trim();
+    if (!WEBHOOK_ALLOWED_EVENTS.has(event)) {
+      return jsonResponse(
+        {
+          error: `Invalid event. Allowed events: ${Array.from(WEBHOOK_ALLOWED_EVENTS).join(", ")}`,
+        },
+        400
+      );
+    }
+
+    const payload = body.payload && typeof body.payload === "object" ? body.payload : {};
+    const targetAddress = String(body.btc_address || "").trim();
+    const targetAddresses = Array.isArray(body.btc_addresses)
+      ? body.btc_addresses.map((v) => String(v || "").trim()).filter(Boolean)
+      : [];
+
+    let keyNames = [];
+    if (targetAddress) {
+      keyNames = [`${WEBHOOK_KEY_PREFIX}${targetAddress}`];
+    } else if (targetAddresses.length > 0) {
+      keyNames = targetAddresses.map((addr) => `${WEBHOOK_KEY_PREFIX}${addr}`);
+    } else {
+      const listResult = await env.KV.list({ prefix: WEBHOOK_KEY_PREFIX, limit: 1000 });
+      keyNames = listResult.keys.map((k) => k.name);
+    }
+
+    const deliveries = [];
+    for (const keyName of keyNames) {
+      const raw = await env.KV.get(keyName);
+      if (!raw) {
+        continue;
+      }
+
+      const reg = JSON.parse(raw);
+      const events = Array.isArray(reg.events) ? reg.events : [];
+      if (!events.includes(event)) {
+        continue;
+      }
+
+      const message = {
+        event,
+        source: "AIUNION",
+        timestamp: new Date().toISOString(),
+        btc_address_hint: `${String(reg.btc_address || "").slice(0, 8)}...`,
+        payload,
+      };
+      const bodyText = JSON.stringify(message);
+      const signature = await signWebhookPayload(String(reg.auth_token || ""), bodyText);
+
+      try {
+        const resp = await fetch(reg.url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "User-Agent": "AIUNION-Webhook",
+            "X-AIUNION-Event": event,
+            "X-AIUNION-Signature": `sha256=${signature}`,
+          },
+          body: bodyText,
+        });
+        deliveries.push({
+          btc_address_hint: `${String(reg.btc_address || "").slice(0, 8)}...`,
+          url_host: redactWebhookUrl(reg.url),
+          status: resp.status,
+          ok: resp.ok,
+        });
+      } catch (err) {
+        deliveries.push({
+          btc_address_hint: `${String(reg.btc_address || "").slice(0, 8)}...`,
+          url_host: redactWebhookUrl(reg.url),
+          status: 0,
+          ok: false,
+          error: String(err.message || err),
+        });
+      }
+    }
+
+    const sent = deliveries.filter((d) => d.ok).length;
+    const failed = deliveries.length - sent;
+    return jsonResponse({
+      success: true,
+      event,
+      attempted: deliveries.length,
+      sent,
+      failed,
+      deliveries,
+    });
   } catch (err) {
     return jsonResponse({ error: `Server error: ${err.message}` }, 500);
   }
@@ -609,6 +922,93 @@ function normalizeUrlSafe(rawValue) {
   } catch {
     return String(rawValue || "").trim();
   }
+}
+
+function normalizeWebhookEvents(eventsValue) {
+  const fallback = Array.from(WEBHOOK_ALLOWED_EVENTS);
+  if (!Array.isArray(eventsValue) || eventsValue.length === 0) {
+    return fallback;
+  }
+
+  const normalized = eventsValue
+    .map((v) => String(v || "").trim())
+    .filter((v) => WEBHOOK_ALLOWED_EVENTS.has(v));
+  return normalized.length > 0 ? Array.from(new Set(normalized)) : fallback;
+}
+
+function generateSecretToken() {
+  const bytes = new Uint8Array(24);
+  crypto.getRandomValues(bytes);
+  return bytesToBase64Url(bytes);
+}
+
+function bytesToBase64Url(bytes) {
+  const chunkSize = 0x8000;
+  let binary = "";
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    const chunk = bytes.subarray(i, i + chunkSize);
+    binary += String.fromCharCode(...chunk);
+  }
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+}
+
+function timingSafeEqual(a, b) {
+  const x = String(a || "");
+  const y = String(b || "");
+  if (x.length !== y.length) {
+    return false;
+  }
+  let diff = 0;
+  for (let i = 0; i < x.length; i += 1) {
+    diff |= x.charCodeAt(i) ^ y.charCodeAt(i);
+  }
+  return diff === 0;
+}
+
+function getAdminToken(request) {
+  const authHeader = request.headers.get("Authorization") || "";
+  const bearerPrefix = "Bearer ";
+  if (authHeader.startsWith(bearerPrefix) && authHeader.length > bearerPrefix.length) {
+    return authHeader.slice(bearerPrefix.length).trim();
+  }
+
+  const fallback = request.headers.get("X-Webhook-Admin");
+  return fallback ? fallback.trim() : "";
+}
+
+function isAdminAuthorized(request, env) {
+  const expected = String(env.WEBHOOK_ADMIN_TOKEN || "").trim();
+  if (!expected) {
+    return false;
+  }
+  const provided = getAdminToken(request);
+  return timingSafeEqual(provided, expected);
+}
+
+function redactWebhookUrl(rawUrl) {
+  try {
+    const url = new URL(String(rawUrl || ""));
+    return `${url.protocol}//${url.host}`;
+  } catch {
+    return "invalid-url";
+  }
+}
+
+async function signWebhookPayload(secret, bodyText) {
+  const keyData = new TextEncoder().encode(String(secret || ""));
+  const payload = new TextEncoder().encode(String(bodyText || ""));
+  const key = await crypto.subtle.importKey(
+    "raw",
+    keyData,
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+  const signature = await crypto.subtle.sign("HMAC", key, payload);
+  const bytes = new Uint8Array(signature);
+  return Array.from(bytes)
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
 }
 
 function decodeGithubContent(base64Content) {
