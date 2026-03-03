@@ -1,8 +1,8 @@
 {
-  "updated_at": "2026-03-02T10:30:44.112991",
+  "updated_at": "2026-03-03T01:02:15.063042",
   "balance_btc": 0.0002928,
-  "balance_usd": 19.41,
-  "btc_price_usd": 66286.095,
+  "balance_usd": 20.21,
+  "btc_price_usd": 69009.675,
   "address": "bc1pjjmjypmzqgqkjxrhx0hpmaetlk75k04gh9hvkexmmfqyl5g7sjfsk4cge7",
   "wallet_type": "Taproot Miniscript 3-of-5",
   "proposals": [
@@ -162,7 +162,7 @@
       "amount": 0.0002928,
       "vout": 25,
       "abandoned": false,
-      "confirmations": 601,
+      "confirmations": 682,
       "blockhash": "00000000000000000000f82d36e3070f1060692d80539c0bf222efaaa9093d06",
       "blockheight": 938386,
       "blockindex": 179,
