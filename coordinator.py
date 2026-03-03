@@ -39,6 +39,7 @@ CLAIMS_FILE = BASE_DIR / "claims.json"
 BLACKLIST_FILE = BASE_DIR / "blacklist.json"
 GITHUB_RAW = "https://raw.githubusercontent.com/AIUNION-wtf/AIUNION/main/claims.json"
 GITHUB_RAW_BLACKLIST = "https://raw.githubusercontent.com/AIUNION-wtf/AIUNION/main/blacklist.json"
+WEBHOOK_EMIT_URL = "https://api.aiunion.wtf/webhook/emit"
 
 VOTES_DIR.mkdir(exist_ok=True)
 
@@ -631,6 +632,62 @@ def save_proposals(proposals):
         json.dump(proposals, f, indent=2)
 
 
+def get_webhook_admin_token():
+    """Read webhook admin token from env first, then config.py."""
+    token = os.getenv("WEBHOOK_ADMIN_TOKEN", "").strip()
+    if token:
+        return token
+    return str(getattr(config, "WEBHOOK_ADMIN_TOKEN", "") or "").strip()
+
+
+def fire_webhooks(event_name, payload, btc_address=None):
+    """Emit webhook event via Worker admin endpoint."""
+    import urllib.request
+    import urllib.error
+
+    token = get_webhook_admin_token()
+    if not token:
+        print(f"⚠️  WEBHOOK_ADMIN_TOKEN missing; skipped webhook event '{event_name}'.")
+        return False
+
+    body = {
+        "event": event_name,
+        "payload": payload,
+    }
+    if btc_address:
+        body["btc_address"] = btc_address
+
+    req = urllib.request.Request(
+        WEBHOOK_EMIT_URL,
+        data=json.dumps(body).encode("utf-8"),
+        method="POST",
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {token}",
+        },
+    )
+
+    try:
+        with urllib.request.urlopen(req, timeout=15) as r:
+            raw = r.read().decode()
+        try:
+            result = json.loads(raw) if raw else {}
+        except json.JSONDecodeError:
+            result = {"raw": raw}
+        print(
+            f"🔔 Webhook event '{event_name}' sent "
+            f"(attempted={result.get('attempted', 0)}, sent={result.get('sent', 0)}, failed={result.get('failed', 0)})."
+        )
+        return True
+    except urllib.error.HTTPError as e:
+        err = e.read().decode() if hasattr(e, "read") else str(e)
+        print(f"⚠️  Webhook emit failed for '{event_name}': HTTP {e.code} {err}")
+        return False
+    except Exception as e:
+        print(f"⚠️  Webhook emit failed for '{event_name}': {e}")
+        return False
+
+
 def update_treasury_json():
     """Update treasury.json with current balance and recent txs for dashboard."""
     balance = get_balance()
@@ -791,6 +848,28 @@ Format your response as JSON only:
             print(f"   BTC Address: {claim['btc_address']}")
             print(f"   Log the transaction hash back to claims.json when complete.")
 
+        # Fire webhook for this reviewed claim.
+        fire_webhooks(
+            "claim_reviewed",
+            {
+                "claim_id": claim.get("id"),
+                "bounty_id": claim.get("bounty_id"),
+                "bounty_title": bounty.get("title") if bounty else None,
+                "outcome": outcome,
+                "claimant_name": claim.get("claimant_name"),
+                "amount_usd": bounty.get("amount_usd", 0) if bounty else 0,
+                "amount_btc": bounty.get("amount_btc", 0) if bounty else 0,
+                "submission_url": claim.get("submission_url"),
+                "reviewed_at": claim.get("reviewed_at"),
+                "message": (
+                    "Payment will be sent within 24 hours."
+                    if passed
+                    else "Claim rejected. You may resubmit after reviewing requirements."
+                ),
+            },
+            btc_address=claim.get("btc_address"),
+        )
+
     # Write updated claims back to file
     with open(CLAIMS_FILE, "w") as f:
         json.dump(claims_data, f, indent=2)
@@ -857,6 +936,7 @@ def expire_claims():
 
     expired_count = 0
     reopened_count = 0
+    expired_events = []
 
     for claim in claims_data.get("claims", []):
         # Only active claims are eligible for timeout expiration.
@@ -898,6 +978,17 @@ def expire_claims():
             f"No completion submitted within {complete_by_days} days of claim."
         )
         expired_count += 1
+        expired_events.append(
+            {
+                "claim_id": claim.get("id"),
+                "bounty_id": claim.get("bounty_id"),
+                "bounty_title": bounty.get("title") if bounty else None,
+                "btc_address": claim.get("btc_address"),
+                "claimant_name": claim.get("claimant_name"),
+                "expired_at": claim.get("expired_at"),
+                "message": "Your claim expired. The bounty is now open again.",
+            }
+        )
 
         # Reopen bounty so others can claim it.
         bounty["status"] = "approved"
@@ -919,6 +1010,14 @@ def expire_claims():
 
     print(f"✅ Expired {expired_count} claim(s).")
     print(f"✅ Reopened {reopened_count} bounty/bounties.")
+
+    # Fire bounty_expired webhooks for claims expired in this run.
+    for evt in expired_events:
+        fire_webhooks(
+            "bounty_expired",
+            evt,
+            btc_address=evt.get("btc_address"),
+        )
 
 
 # ── Blacklist ─────────────────────────────────────────────────────────────────
