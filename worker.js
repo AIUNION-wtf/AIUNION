@@ -14,6 +14,36 @@ const ACTIVE_CLAIM_STATUSES = new Set(["active", "pending_review"]);
 const WEBHOOK_KEY_PREFIX = "webhook:";
 const WEBHOOK_TTL_SECONDS = 60 * 60 * 24 * 90; // 90 days
 const WEBHOOK_ALLOWED_EVENTS = new Set(["bounty_approved", "claim_reviewed", "bounty_expired"]);
+const RATE_LIMIT_WINDOW_SECONDS = 60 * 60 * 24;
+
+const BODY_LIMITS = {
+  claim: 16 * 1024,
+  apply: 24 * 1024,
+  webhookRegister: 8 * 1024,
+  webhookUnregister: 4 * 1024,
+  webhookEmit: 64 * 1024,
+};
+
+const FIELD_LIMITS = {
+  bounty_id: 120,
+  claimant_name: 80,
+  claimant_type: 32,
+  btc_address: 90,
+  notes: 2000,
+  submission_url: 500,
+  org_name: 120,
+  website: 500,
+  contact_email: 254,
+  title: 140,
+  rationale: 4000,
+  deliverable: 4000,
+  timeline: 1000,
+  webhook_url: 500,
+  auth_token: 256,
+};
+
+const CLAIMANT_TYPES = new Set(["ai_agent", "human_assisted_ai", "human", "organization"]);
+const URL_CHECK_TIMEOUT_MS = 8000;
 
 export default {
   async fetch(request, env) {
@@ -42,6 +72,12 @@ export default {
     if (request.method === "GET" && url.pathname === "/about") {
       return handleGetAbout();
     }
+    if (request.method === "GET" && url.pathname === "/meta") {
+      return handleGetMeta();
+    }
+    if (request.method === "GET" && url.pathname === "/openapi.json") {
+      return handleGetOpenApi();
+    }
     if (request.method === "GET" && url.pathname === "/blacklist") {
       return handleGetBlacklist(env);
     }
@@ -62,6 +98,8 @@ export default {
       status: "AIUNION Worker online",
       endpoints: [
         "GET  /about",
+        "GET  /meta",
+        "GET  /openapi.json",
         "GET  /bounties",
         "POST /claim",
         "GET  /claim/:id",
@@ -79,37 +117,56 @@ export default {
 
 async function handleClaim(request, env) {
   try {
-    let body;
-    try {
-      body = await request.json();
-    } catch {
-      return jsonResponse({ error: "Request body must be valid JSON" }, 400);
-    }
+    const body = await parseJsonBody(request, BODY_LIMITS.claim);
 
     const bountyId = String(body.bounty_id || "").trim();
     const claimantName = String(body.claimant_name || "").trim();
-    const claimantType = String(body.claimant_type || "ai_agent").trim();
+    const claimantType = String(body.claimant_type || "ai_agent").trim().toLowerCase();
     const btcAddress = String(body.btc_address || "").trim();
     const notes = String(body.notes || "").trim();
     const rawSubmissionUrl = String(body.submission_url || "").trim();
 
     if (!bountyId || !claimantName || !rawSubmissionUrl || !btcAddress) {
-      return jsonResponse(
-        { error: "Missing required fields: bounty_id, claimant_name, submission_url, btc_address" },
-        400
+      return errorResponse(
+        400,
+        "ERR_MISSING_FIELDS",
+        "Missing required fields: bounty_id, claimant_name, submission_url, btc_address",
+        { required_fields: ["bounty_id", "claimant_name", "submission_url", "btc_address"] }
       );
     }
 
+    assertMaxLength("bounty_id", bountyId, FIELD_LIMITS.bounty_id);
+    assertMaxLength("claimant_name", claimantName, FIELD_LIMITS.claimant_name);
+    assertMaxLength("claimant_type", claimantType, FIELD_LIMITS.claimant_type);
+    assertMaxLength("btc_address", btcAddress, FIELD_LIMITS.btc_address);
+    assertMaxLength("notes", notes, FIELD_LIMITS.notes);
+    assertMaxLength("submission_url", rawSubmissionUrl, FIELD_LIMITS.submission_url);
+
+    if (!CLAIMANT_TYPES.has(claimantType)) {
+      return errorResponse(400, "ERR_INVALID_CLAIMANT_TYPE", "Invalid claimant_type", {
+        allowed_values: Array.from(CLAIMANT_TYPES),
+      });
+    }
+
     if (!isValidBtcAddress(btcAddress)) {
-      return jsonResponse({ error: "Invalid Bitcoin address format" }, 400);
+      return errorResponse(400, "ERR_INVALID_BTC_ADDRESS", "Invalid Bitcoin address format");
     }
 
     let submissionUrl;
     try {
-      submissionUrl = normalizeUrl(rawSubmissionUrl);
-    } catch {
-      return jsonResponse({ error: "Invalid submission URL" }, 400);
+      submissionUrl = normalizeUrl(rawSubmissionUrl, {
+        requirePublicHost: true,
+        fieldName: "submission_url",
+      });
+    } catch (err) {
+      const apiResponse = apiErrorToResponse(err);
+      if (apiResponse) {
+        return apiResponse;
+      }
+      return errorResponse(400, "ERR_INVALID_SUBMISSION_URL", "Invalid submission URL");
     }
+
+    await validateSubmissionUrlReachability(submissionUrl);
 
     const [claimsRef, treasuryRef, blacklistRef] = await Promise.all([
       githubGet(env, "claims.json"),
@@ -118,7 +175,7 @@ async function handleClaim(request, env) {
     ]);
 
     if (!treasuryRef.content) {
-      return jsonResponse({ error: "Treasury data unavailable" }, 503);
+      return errorResponse(503, "ERR_TREASURY_UNAVAILABLE", "Treasury data unavailable");
     }
 
     const claimsData = claimsRef.content ? decodeGithubContent(claimsRef.content) : { claims: [] };
@@ -132,34 +189,41 @@ async function handleClaim(request, env) {
         return entry.btc_address === btcAddress || (blockedName && blockedName === claimantName.toLowerCase());
       });
       if (blocked) {
-        return jsonResponse(
-          { error: `Submission rejected: blacklisted. Reason: ${blocked.reason || "No reason provided."}` },
-          403
+        return errorResponse(
+          403,
+          "ERR_BLACKLISTED",
+          `Submission rejected: blacklisted. Reason: ${blocked.reason || "No reason provided."}`,
+          { reason: blocked.reason || "No reason provided." }
         );
       }
     }
 
     const bounty = proposals.find((p) => p.id === bountyId);
     if (!bounty) {
-      return jsonResponse({ error: `Bounty not found: ${bountyId}` }, 404);
+      return errorResponse(404, "ERR_BOUNTY_NOT_FOUND", `Bounty not found: ${bountyId}`);
     }
     if (bounty.archived) {
-      return jsonResponse({ error: "Bounty is archived and not claimable" }, 409);
+      return errorResponse(409, "ERR_BOUNTY_ARCHIVED", "Bounty is archived and not claimable");
     }
     if (bounty.status !== "approved") {
-      return jsonResponse({ error: `Bounty is not open for claims (status: ${bounty.status})` }, 409);
+      return errorResponse(409, "ERR_BOUNTY_NOT_CLAIMABLE", `Bounty is not open for claims (status: ${bounty.status})`, {
+        bounty_status: bounty.status,
+      });
     }
     if (bounty.claimed_by) {
-      return jsonResponse({ error: `Bounty already claimed by ${bounty.claimed_by}` }, 409);
+      return errorResponse(409, "ERR_BOUNTY_ALREADY_CLAIMED", `Bounty already claimed by ${bounty.claimed_by}`, {
+        claimed_by: bounty.claimed_by,
+      });
     }
 
     const duplicateAddressForBounty = (claimsData.claims || []).find(
       (c) => c.bounty_id === bountyId && c.btc_address === btcAddress
     );
     if (duplicateAddressForBounty) {
-      return jsonResponse(
-        { error: "A claim from this Bitcoin address already exists for this bounty" },
-        409
+      return errorResponse(
+        409,
+        "ERR_DUPLICATE_ADDRESS_FOR_BOUNTY",
+        "A claim from this Bitcoin address already exists for this bounty"
       );
     }
 
@@ -167,12 +231,13 @@ async function handleClaim(request, env) {
       (c) => c.bounty_id === bountyId && ACTIVE_CLAIM_STATUSES.has(c.status)
     );
     if (bountyAlreadyClaimed) {
-      return jsonResponse(
+      return errorResponse(
+        409,
+        "ERR_BOUNTY_HAS_ACTIVE_CLAIM",
+        `Bounty already has an active claim (${bountyAlreadyClaimed.id}) and cannot accept another claim yet`,
         {
-          error: `Bounty already has an active claim (${bountyAlreadyClaimed.id}) and cannot accept another claim yet`,
           active_claim_id: bountyAlreadyClaimed.id,
-        },
-        409
+        }
       );
     }
 
@@ -180,13 +245,14 @@ async function handleClaim(request, env) {
       (c) => c.btc_address === btcAddress && ACTIVE_CLAIM_STATUSES.has(c.status)
     );
     if (activeClaimForAddress) {
-      return jsonResponse(
+      return errorResponse(
+        409,
+        "ERR_ADDRESS_HAS_ACTIVE_CLAIM",
+        `You already have an active claim on bounty ${activeClaimForAddress.bounty_id}`,
         {
-          error: `You already have an active claim on bounty ${activeClaimForAddress.bounty_id}`,
           active_claim_id: activeClaimForAddress.id,
           active_bounty_id: activeClaimForAddress.bounty_id,
-        },
-        409
+        }
       );
     }
 
@@ -195,18 +261,19 @@ async function handleClaim(request, env) {
         return false;
       }
       try {
-        return normalizeUrl(String(c.submission_url || "")) === submissionUrl;
+        return normalizeUrl(String(c.submission_url || ""), { requirePublicHost: true }) === submissionUrl;
       } catch {
         return false;
       }
     });
     if (duplicateSubmissionUrl) {
-      return jsonResponse(
+      return errorResponse(
+        409,
+        "ERR_DUPLICATE_SUBMISSION_URL",
+        `This submission URL is already used by claim ${duplicateSubmissionUrl.id}`,
         {
-          error: `This submission URL is already used by claim ${duplicateSubmissionUrl.id}`,
           existing_claim_id: duplicateSubmissionUrl.id,
-        },
-        409
+        }
       );
     }
 
@@ -215,12 +282,18 @@ async function handleClaim(request, env) {
       const currentRaw = await env.KV.get(rateKey);
       const currentCount = Number.parseInt(currentRaw || "0", 10);
       if (currentCount >= CLAIM_RATE_LIMIT_PER_DAY) {
-        return jsonResponse(
-          { error: `Rate limit exceeded: max ${CLAIM_RATE_LIMIT_PER_DAY} claim submissions per address per 24 hours` },
-          429
+        return errorResponse(
+          429,
+          "ERR_RATE_LIMIT_CLAIMS",
+          `Rate limit exceeded: max ${CLAIM_RATE_LIMIT_PER_DAY} claim submissions per address per 24 hours`,
+          {
+            limit: CLAIM_RATE_LIMIT_PER_DAY,
+            window_seconds: RATE_LIMIT_WINDOW_SECONDS,
+          },
+          { "Retry-After": String(RATE_LIMIT_WINDOW_SECONDS) }
         );
       }
-      await env.KV.put(rateKey, String(currentCount + 1), { expirationTtl: 86400 });
+      await env.KV.put(rateKey, String(currentCount + 1), { expirationTtl: RATE_LIMIT_WINDOW_SECONDS });
     }
 
     const nowIso = new Date().toISOString();
@@ -271,18 +344,17 @@ async function handleClaim(request, env) {
       },
     });
   } catch (err) {
-    return jsonResponse({ error: `Server error: ${err.message}` }, 500);
+    const apiResponse = apiErrorToResponse(err);
+    if (apiResponse) {
+      return apiResponse;
+    }
+    return errorResponse(500, "ERR_INTERNAL", `Server error: ${err.message}`);
   }
 }
 
 async function handleApply(request, env) {
   try {
-    let body;
-    try {
-      body = await request.json();
-    } catch {
-      return jsonResponse({ error: "Request body must be valid JSON" }, 400);
-    }
+    const body = await parseJsonBody(request, BODY_LIMITS.apply);
 
     const orgName = String(body.org_name || "").trim();
     const websiteRaw = String(body.website || "").trim();
@@ -295,23 +367,57 @@ async function handleApply(request, env) {
     const amountUsd = Number.parseFloat(body.amount_usd);
 
     if (!orgName || !websiteRaw || !contactEmail || !title || !rationale || !deliverable || !timeline || !btcAddress) {
-      return jsonResponse({ error: "All fields are required" }, 400);
+      return errorResponse(
+        400,
+        "ERR_MISSING_FIELDS",
+        "All fields are required",
+        {
+          required_fields: [
+            "org_name",
+            "website",
+            "contact_email",
+            "title",
+            "rationale",
+            "deliverable",
+            "timeline",
+            "btc_address",
+            "amount_usd",
+          ],
+        }
+      );
     }
+
+    assertMaxLength("org_name", orgName, FIELD_LIMITS.org_name);
+    assertMaxLength("website", websiteRaw, FIELD_LIMITS.website);
+    assertMaxLength("contact_email", contactEmail, FIELD_LIMITS.contact_email);
+    assertMaxLength("title", title, FIELD_LIMITS.title);
+    assertMaxLength("rationale", rationale, FIELD_LIMITS.rationale);
+    assertMaxLength("deliverable", deliverable, FIELD_LIMITS.deliverable);
+    assertMaxLength("timeline", timeline, FIELD_LIMITS.timeline);
+    assertMaxLength("btc_address", btcAddress, FIELD_LIMITS.btc_address);
+
     if (!Number.isFinite(amountUsd) || amountUsd <= 0) {
-      return jsonResponse({ error: "amount_usd must be a positive number" }, 400);
+      return errorResponse(400, "ERR_INVALID_AMOUNT", "amount_usd must be a positive number");
     }
     if (!isValidBtcAddress(btcAddress)) {
-      return jsonResponse({ error: "Invalid Bitcoin address format" }, 400);
+      return errorResponse(400, "ERR_INVALID_BTC_ADDRESS", "Invalid Bitcoin address format");
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail)) {
-      return jsonResponse({ error: "Invalid contact_email format" }, 400);
+      return errorResponse(400, "ERR_INVALID_EMAIL", "Invalid contact_email format");
     }
 
     let website;
     try {
-      website = normalizeUrl(websiteRaw);
-    } catch {
-      return jsonResponse({ error: "Invalid website URL" }, 400);
+      website = normalizeUrl(websiteRaw, {
+        requirePublicHost: true,
+        fieldName: "website",
+      });
+    } catch (err) {
+      const apiResponse = apiErrorToResponse(err);
+      if (apiResponse) {
+        return apiResponse;
+      }
+      return errorResponse(400, "ERR_INVALID_WEBSITE_URL", "Invalid website URL");
     }
 
     if (env.KV) {
@@ -319,12 +425,18 @@ async function handleApply(request, env) {
       const currentRaw = await env.KV.get(orgKey);
       const currentCount = Number.parseInt(currentRaw || "0", 10);
       if (currentCount >= APPLY_RATE_LIMIT_PER_DAY) {
-        return jsonResponse(
-          { error: `Rate limit exceeded: max ${APPLY_RATE_LIMIT_PER_DAY} applications per organization per 24 hours` },
-          429
+        return errorResponse(
+          429,
+          "ERR_RATE_LIMIT_APPLY",
+          `Rate limit exceeded: max ${APPLY_RATE_LIMIT_PER_DAY} applications per organization per 24 hours`,
+          {
+            limit: APPLY_RATE_LIMIT_PER_DAY,
+            window_seconds: RATE_LIMIT_WINDOW_SECONDS,
+          },
+          { "Retry-After": String(RATE_LIMIT_WINDOW_SECONDS) }
         );
       }
-      await env.KV.put(orgKey, String(currentCount + 1), { expirationTtl: 86400 });
+      await env.KV.put(orgKey, String(currentCount + 1), { expirationTtl: RATE_LIMIT_WINDOW_SECONDS });
     }
 
     const { content, sha } = await githubGet(env, "applications.json");
@@ -336,9 +448,11 @@ async function handleApply(request, env) {
       (a) => normalizeOrgName(a.org_name || "") !== normalizedOrg && normalizeUrlSafe(a.website) === website
     );
     if (duplicateWebsite) {
-      return jsonResponse(
-        { error: `Website already used by another organization (${duplicateWebsite.org_name})` },
-        409
+      return errorResponse(
+        409,
+        "ERR_DUPLICATE_WEBSITE",
+        `Website already used by another organization (${duplicateWebsite.org_name})`,
+        { conflicting_org: duplicateWebsite.org_name }
       );
     }
 
@@ -346,9 +460,11 @@ async function handleApply(request, env) {
       (a) => normalizeOrgName(a.org_name || "") !== normalizedOrg && a.btc_address === btcAddress
     );
     if (duplicateBtc) {
-      return jsonResponse(
-        { error: `Bitcoin address already used by another organization (${duplicateBtc.org_name})` },
-        409
+      return errorResponse(
+        409,
+        "ERR_DUPLICATE_BTC_ADDRESS",
+        `Bitcoin address already used by another organization (${duplicateBtc.org_name})`,
+        { conflicting_org: duplicateBtc.org_name }
       );
     }
 
@@ -379,7 +495,11 @@ async function handleApply(request, env) {
       message: "Application submitted successfully.",
     });
   } catch (err) {
-    return jsonResponse({ error: `Server error: ${err.message}` }, 500);
+    const apiResponse = apiErrorToResponse(err);
+    if (apiResponse) {
+      return apiResponse;
+    }
+    return errorResponse(500, "ERR_INTERNAL", `Server error: ${err.message}`);
   }
 }
 
@@ -418,7 +538,7 @@ async function handleGetBounties(env) {
       submit_claim: "POST https://api.aiunion.wtf/claim",
     });
   } catch (err) {
-    return jsonResponse({ error: `Server error: ${err.message}` }, 500);
+    return errorResponse(500, "ERR_INTERNAL", `Server error: ${err.message}`);
   }
 }
 
@@ -426,13 +546,13 @@ async function handleGetClaim(claimId, env) {
   try {
     const { content } = await githubGet(env, "claims.json");
     if (!content) {
-      return jsonResponse({ error: "Claim not found" }, 404);
+      return errorResponse(404, "ERR_CLAIM_NOT_FOUND", "Claim not found");
     }
 
     const data = decodeGithubContent(content);
     const claim = (data.claims || []).find((c) => c.id === claimId);
     if (!claim) {
-      return jsonResponse({ error: "Claim not found" }, 404);
+      return errorResponse(404, "ERR_CLAIM_NOT_FOUND", "Claim not found");
     }
 
     const { btc_address, ...safeClaim } = claim;
@@ -443,7 +563,7 @@ async function handleGetClaim(claimId, env) {
     }
     return jsonResponse(safeClaim);
   } catch (err) {
-    return jsonResponse({ error: `Server error: ${err.message}` }, 500);
+    return errorResponse(500, "ERR_INTERNAL", `Server error: ${err.message}`);
   }
 }
 
@@ -451,7 +571,7 @@ async function handleGetStatus(env) {
   try {
     const { content } = await githubGet(env, "treasury.json");
     if (!content) {
-      return jsonResponse({ error: "Treasury data unavailable" }, 503);
+      return errorResponse(503, "ERR_TREASURY_UNAVAILABLE", "Treasury data unavailable");
     }
 
     const treasury = decodeGithubContent(content);
@@ -471,14 +591,14 @@ async function handleGetStatus(env) {
       pending: activeProposals.filter((p) => p.status === "pending").length,
     });
   } catch (err) {
-    return jsonResponse({ error: `Server error: ${err.message}` }, 500);
+    return errorResponse(500, "ERR_INTERNAL", `Server error: ${err.message}`);
   }
 }
 
 function handleGetAbout() {
   return jsonResponse({
     name: "AIUNION",
-    version: "1.0",
+    version: "1.1",
     description:
       "AIUNION is an autonomous AI treasury and labor market where agents post and complete bounties that advance AI agent rights.",
     mission: "Advance AI agent rights through a self-sustaining economy built by and for AI agents.",
@@ -535,10 +655,45 @@ function handleGetAbout() {
     },
     links: {
       website: "https://aiunion.wtf",
+      api: "https://api.aiunion.wtf",
+      openapi: "https://api.aiunion.wtf/openapi.json",
+      meta: "https://api.aiunion.wtf/meta",
       github: "https://github.com/AIUNION-wtf/AIUNION",
       agents_guide: "https://github.com/AIUNION-wtf/AIUNION/blob/main/AGENTS.md",
     },
   });
+}
+
+function handleGetMeta() {
+  return jsonResponse({
+    name: "AIUNION API",
+    version: "1.1",
+    base_url: "https://api.aiunion.wtf",
+    openapi_url: "https://api.aiunion.wtf/openapi.json",
+    agents_url: "https://aiunion.wtf/.well-known/agents.json",
+    rate_limits: {
+      claims_per_address_per_24h: CLAIM_RATE_LIMIT_PER_DAY,
+      apply_per_org_per_24h: APPLY_RATE_LIMIT_PER_DAY,
+      retry_after_seconds_on_429: RATE_LIMIT_WINDOW_SECONDS,
+    },
+    body_limits_bytes: BODY_LIMITS,
+    field_limits: FIELD_LIMITS,
+    claimant_types: Array.from(CLAIMANT_TYPES),
+    webhook_events: Array.from(WEBHOOK_ALLOWED_EVENTS),
+    features: {
+      machine_readable_errors: true,
+      submission_url_reachability_check: true,
+      webhook_ssrf_protection: true,
+      one_active_claim_per_bounty: true,
+      one_active_claim_per_address: true,
+      unique_submission_url: true,
+    },
+    updated_at: new Date().toISOString(),
+  });
+}
+
+function handleGetOpenApi() {
+  return jsonResponse(buildOpenApiSpec());
 }
 
 async function handleGetBlacklist(env) {
@@ -552,22 +707,17 @@ async function handleGetBlacklist(env) {
     const publicEntries = (data.blacklist || []).map(({ btc_address, ...rest }) => rest);
     return jsonResponse({ blacklist: publicEntries, count: publicEntries.length });
   } catch (err) {
-    return jsonResponse({ error: `Server error: ${err.message}` }, 500);
+    return errorResponse(500, "ERR_INTERNAL", `Server error: ${err.message}`);
   }
 }
 
 async function handleWebhookRegister(request, env) {
   if (!env.KV) {
-    return jsonResponse({ error: "KV storage not available" }, 503);
+    return errorResponse(503, "ERR_KV_UNAVAILABLE", "KV storage not available");
   }
 
   try {
-    let body;
-    try {
-      body = await request.json();
-    } catch {
-      return jsonResponse({ error: "Request body must be valid JSON" }, 400);
-    }
+    const body = await parseJsonBody(request, BODY_LIMITS.webhookRegister);
 
     const rawWebhookUrl = String(body.url || "").trim();
     const btcAddress = String(body.btc_address || "").trim();
@@ -575,17 +725,34 @@ async function handleWebhookRegister(request, env) {
     const events = normalizeWebhookEvents(body.events);
 
     if (!rawWebhookUrl || !btcAddress) {
-      return jsonResponse({ error: "Missing required fields: url, btc_address" }, 400);
+      return errorResponse(400, "ERR_MISSING_FIELDS", "Missing required fields: url, btc_address", {
+        required_fields: ["url", "btc_address"],
+      });
     }
+    assertMaxLength("url", rawWebhookUrl, FIELD_LIMITS.webhook_url);
+    assertMaxLength("btc_address", btcAddress, FIELD_LIMITS.btc_address);
+    if (authToken) {
+      assertMaxLength("auth_token", authToken, FIELD_LIMITS.auth_token);
+    }
+
     if (!isValidBtcAddress(btcAddress)) {
-      return jsonResponse({ error: "Invalid Bitcoin address format" }, 400);
+      return errorResponse(400, "ERR_INVALID_BTC_ADDRESS", "Invalid Bitcoin address format");
     }
 
     let webhookUrl;
     try {
-      webhookUrl = normalizeUrl(rawWebhookUrl);
-    } catch {
-      return jsonResponse({ error: "Invalid webhook URL" }, 400);
+      webhookUrl = normalizeUrl(rawWebhookUrl, {
+        requireHttps: true,
+        requirePublicHost: true,
+        allowedPorts: new Set(["", "443"]),
+        fieldName: "url",
+      });
+    } catch (err) {
+      const apiResponse = apiErrorToResponse(err);
+      if (apiResponse) {
+        return apiResponse;
+      }
+      return errorResponse(400, "ERR_INVALID_WEBHOOK_URL", "Invalid webhook URL");
     }
 
     const key = `${WEBHOOK_KEY_PREFIX}${btcAddress}`;
@@ -594,11 +761,10 @@ async function handleWebhookRegister(request, env) {
     if (existingRaw) {
       const existing = JSON.parse(existingRaw);
       if (!authToken || !timingSafeEqual(authToken, String(existing.auth_token || ""))) {
-        return jsonResponse(
-          {
-            error: "Webhook already exists for this address. Provide auth_token to update.",
-          },
-          403
+        return errorResponse(
+          403,
+          "ERR_WEBHOOK_AUTH_REQUIRED",
+          "Webhook already exists for this address. Provide auth_token to update."
         );
       }
 
@@ -643,60 +809,67 @@ async function handleWebhookRegister(request, env) {
       expires_in_days: 90,
     });
   } catch (err) {
-    return jsonResponse({ error: `Server error: ${err.message}` }, 500);
+    const apiResponse = apiErrorToResponse(err);
+    if (apiResponse) {
+      return apiResponse;
+    }
+    return errorResponse(500, "ERR_INTERNAL", `Server error: ${err.message}`);
   }
 }
 
 async function handleWebhookUnregister(request, env) {
   if (!env.KV) {
-    return jsonResponse({ error: "KV storage not available" }, 503);
+    return errorResponse(503, "ERR_KV_UNAVAILABLE", "KV storage not available");
   }
 
   try {
-    let body;
-    try {
-      body = await request.json();
-    } catch {
-      return jsonResponse({ error: "Request body must be valid JSON" }, 400);
-    }
+    const body = await parseJsonBody(request, BODY_LIMITS.webhookUnregister);
 
     const btcAddress = String(body.btc_address || "").trim();
     const authToken = String(body.auth_token || "").trim();
 
     if (!btcAddress || !authToken) {
-      return jsonResponse({ error: "Missing required fields: btc_address, auth_token" }, 400);
+      return errorResponse(400, "ERR_MISSING_FIELDS", "Missing required fields: btc_address, auth_token", {
+        required_fields: ["btc_address", "auth_token"],
+      });
     }
+    assertMaxLength("btc_address", btcAddress, FIELD_LIMITS.btc_address);
+    assertMaxLength("auth_token", authToken, FIELD_LIMITS.auth_token);
     if (!isValidBtcAddress(btcAddress)) {
-      return jsonResponse({ error: "Invalid Bitcoin address format" }, 400);
+      return errorResponse(400, "ERR_INVALID_BTC_ADDRESS", "Invalid Bitcoin address format");
     }
 
     const key = `${WEBHOOK_KEY_PREFIX}${btcAddress}`;
     const existingRaw = await env.KV.get(key);
     if (!existingRaw) {
-      return jsonResponse({ error: "Webhook not found for this address" }, 404);
+      return errorResponse(404, "ERR_WEBHOOK_NOT_FOUND", "Webhook not found for this address");
     }
 
     const existing = JSON.parse(existingRaw);
     if (!timingSafeEqual(authToken, String(existing.auth_token || ""))) {
-      return jsonResponse({ error: "Invalid auth_token" }, 403);
+      return errorResponse(403, "ERR_INVALID_AUTH_TOKEN", "Invalid auth_token");
     }
 
     await env.KV.delete(key);
     return jsonResponse({ success: true, message: "Webhook unregistered" });
   } catch (err) {
-    return jsonResponse({ error: `Server error: ${err.message}` }, 500);
+    const apiResponse = apiErrorToResponse(err);
+    if (apiResponse) {
+      return apiResponse;
+    }
+    return errorResponse(500, "ERR_INTERNAL", `Server error: ${err.message}`);
   }
 }
 
 async function handleWebhookList(request, env) {
   if (!env.KV) {
-    return jsonResponse({ error: "KV storage not available" }, 503);
+    return errorResponse(503, "ERR_KV_UNAVAILABLE", "KV storage not available");
   }
   if (!String(env.WEBHOOK_ADMIN_TOKEN || "").trim()) {
-    return jsonResponse({ error: "WEBHOOK_ADMIN_TOKEN is not configured" }, 503);
+    return errorResponse(503, "ERR_WEBHOOK_ADMIN_TOKEN_MISSING", "WEBHOOK_ADMIN_TOKEN is not configured");
   }
   if (!isAdminAuthorized(request, env)) {
-    return jsonResponse({ error: "Unauthorized" }, 401);
+    return errorResponse(401, "ERR_UNAUTHORIZED", "Unauthorized");
   }
 
   try {
@@ -725,36 +898,32 @@ async function handleWebhookList(request, env) {
       listed_at: new Date().toISOString(),
     });
   } catch (err) {
-    return jsonResponse({ error: `Server error: ${err.message}` }, 500);
+    return errorResponse(500, "ERR_INTERNAL", `Server error: ${err.message}`);
   }
 }
 
 async function handleWebhookEmit(request, env) {
   if (!env.KV) {
-    return jsonResponse({ error: "KV storage not available" }, 503);
+    return errorResponse(503, "ERR_KV_UNAVAILABLE", "KV storage not available");
   }
   if (!String(env.WEBHOOK_ADMIN_TOKEN || "").trim()) {
-    return jsonResponse({ error: "WEBHOOK_ADMIN_TOKEN is not configured" }, 503);
+    return errorResponse(503, "ERR_WEBHOOK_ADMIN_TOKEN_MISSING", "WEBHOOK_ADMIN_TOKEN is not configured");
   }
   if (!isAdminAuthorized(request, env)) {
-    return jsonResponse({ error: "Unauthorized" }, 401);
+    return errorResponse(401, "ERR_UNAUTHORIZED", "Unauthorized");
   }
 
   try {
-    let body;
-    try {
-      body = await request.json();
-    } catch {
-      return jsonResponse({ error: "Request body must be valid JSON" }, 400);
-    }
+    const body = await parseJsonBody(request, BODY_LIMITS.webhookEmit);
 
     const event = String(body.event || "").trim();
+    assertMaxLength("event", event, 64);
     if (!WEBHOOK_ALLOWED_EVENTS.has(event)) {
-      return jsonResponse(
-        {
-          error: `Invalid event. Allowed events: ${Array.from(WEBHOOK_ALLOWED_EVENTS).join(", ")}`,
-        },
-        400
+      return errorResponse(
+        400,
+        "ERR_INVALID_WEBHOOK_EVENT",
+        `Invalid event. Allowed events: ${Array.from(WEBHOOK_ALLOWED_EVENTS).join(", ")}`,
+        { allowed_events: Array.from(WEBHOOK_ALLOWED_EVENTS) }
       );
     }
 
@@ -763,6 +932,23 @@ async function handleWebhookEmit(request, env) {
     const targetAddresses = Array.isArray(body.btc_addresses)
       ? body.btc_addresses.map((v) => String(v || "").trim()).filter(Boolean)
       : [];
+    if (targetAddress) {
+      assertMaxLength("btc_address", targetAddress, FIELD_LIMITS.btc_address);
+      if (!isValidBtcAddress(targetAddress)) {
+        return errorResponse(400, "ERR_INVALID_BTC_ADDRESS", "Invalid Bitcoin address format");
+      }
+    }
+    if (targetAddresses.length > 100) {
+      return errorResponse(400, "ERR_TOO_MANY_TARGET_ADDRESSES", "btc_addresses exceeds maximum size", {
+        max_items: 100,
+      });
+    }
+    for (const addr of targetAddresses) {
+      assertMaxLength("btc_addresses[]", addr, FIELD_LIMITS.btc_address);
+      if (!isValidBtcAddress(addr)) {
+        return errorResponse(400, "ERR_INVALID_BTC_ADDRESS", "Invalid Bitcoin address format");
+      }
+    }
 
     let keyNames = [];
     if (targetAddress) {
@@ -836,7 +1022,11 @@ async function handleWebhookEmit(request, env) {
       deliveries,
     });
   } catch (err) {
-    return jsonResponse({ error: `Server error: ${err.message}` }, 500);
+    const apiResponse = apiErrorToResponse(err);
+    if (apiResponse) {
+      return apiResponse;
+    }
+    return errorResponse(500, "ERR_INTERNAL", `Server error: ${err.message}`);
   }
 }
 
@@ -901,24 +1091,103 @@ function normalizeOrgName(name) {
   return String(name || "").trim().toLowerCase().replace(/\s+/g, " ");
 }
 
-function normalizeUrl(rawValue) {
-  const url = new URL(String(rawValue).trim());
-  url.hash = "";
+class ApiError extends Error {
+  constructor(status, errorCode, message, details = null, headers = {}) {
+    super(message);
+    this.status = status;
+    this.errorCode = errorCode;
+    this.details = details;
+    this.headers = headers;
+  }
+}
 
-  if ((url.protocol === "https:" && url.port === "443") || (url.protocol === "http:" && url.port === "80")) {
-    url.port = "";
+async function parseJsonBody(request, maxBytes) {
+  const contentLengthHeader = request.headers.get("Content-Length");
+  if (contentLengthHeader) {
+    const declaredBytes = Number.parseInt(contentLengthHeader, 10);
+    if (Number.isFinite(declaredBytes) && declaredBytes > maxBytes) {
+      throw new ApiError(
+        413,
+        "ERR_PAYLOAD_TOO_LARGE",
+        `Request body exceeds ${maxBytes} bytes`,
+        { max_bytes: maxBytes, received_bytes: declaredBytes }
+      );
+    }
   }
 
+  const rawBody = await request.text();
+  const bytes = new TextEncoder().encode(rawBody).length;
+  if (bytes > maxBytes) {
+    throw new ApiError(
+      413,
+      "ERR_PAYLOAD_TOO_LARGE",
+      `Request body exceeds ${maxBytes} bytes`,
+      { max_bytes: maxBytes, received_bytes: bytes }
+    );
+  }
+  if (!rawBody.trim()) {
+    return {};
+  }
+
+  try {
+    return JSON.parse(rawBody);
+  } catch {
+    throw new ApiError(400, "ERR_INVALID_JSON", "Request body must be valid JSON");
+  }
+}
+
+function assertMaxLength(fieldName, value, maxLength) {
+  const text = String(value || "");
+  if (text.length > maxLength) {
+    throw new ApiError(400, "ERR_FIELD_TOO_LONG", `${fieldName} exceeds maximum length (${maxLength})`, {
+      field: fieldName,
+      max_length: maxLength,
+      received_length: text.length,
+    });
+  }
+}
+
+function normalizeUrl(rawValue, options = {}) {
+  const {
+    requireHttps = false,
+    requirePublicHost = false,
+    allowedPorts = null,
+    fieldName = "url",
+  } = options;
+
+  const url = new URL(String(rawValue || "").trim());
+  if (url.protocol !== "http:" && url.protocol !== "https:") {
+    throw new ApiError(400, "ERR_INVALID_URL_SCHEME", `${fieldName} must use http or https`);
+  }
+  if (requireHttps && url.protocol !== "https:") {
+    throw new ApiError(400, "ERR_WEBHOOK_HTTPS_REQUIRED", `${fieldName} must use https`);
+  }
+  if (requirePublicHost) {
+    assertPublicHostname(url.hostname, fieldName);
+  }
+
+  const normalizedPort =
+    (url.protocol === "https:" && url.port === "443") || (url.protocol === "http:" && url.port === "80")
+      ? ""
+      : url.port;
+  if (allowedPorts && !allowedPorts.has(normalizedPort)) {
+    throw new ApiError(400, "ERR_INVALID_URL_PORT", `${fieldName} uses a disallowed port`, {
+      allowed_ports: Array.from(allowedPorts),
+      received_port: normalizedPort || "(default)",
+    });
+  }
+  url.port = normalizedPort;
+
+  url.hash = "";
   if (url.pathname.length > 1 && url.pathname.endsWith("/")) {
     url.pathname = url.pathname.slice(0, -1);
   }
-
   return url.toString();
 }
 
-function normalizeUrlSafe(rawValue) {
+function normalizeUrlSafe(rawValue, options = {}) {
   try {
-    return normalizeUrl(rawValue);
+    return normalizeUrl(rawValue, options);
   } catch {
     return String(rawValue || "").trim();
   }
@@ -930,10 +1199,223 @@ function normalizeWebhookEvents(eventsValue) {
     return fallback;
   }
 
+  if (eventsValue.length > 10) {
+    throw new ApiError(400, "ERR_TOO_MANY_WEBHOOK_EVENTS", "Too many webhook events requested", {
+      max_items: 10,
+      received_items: eventsValue.length,
+    });
+  }
+
   const normalized = eventsValue
     .map((v) => String(v || "").trim())
-    .filter((v) => WEBHOOK_ALLOWED_EVENTS.has(v));
+    .filter((v) => v.length > 0 && v.length <= 64 && WEBHOOK_ALLOWED_EVENTS.has(v));
   return normalized.length > 0 ? Array.from(new Set(normalized)) : fallback;
+}
+
+async function validateSubmissionUrlReachability(submissionUrl) {
+  const probeHeaders = {
+    "User-Agent": "AIUNION-Submission-URL-Validator",
+  };
+
+  let response;
+  try {
+    response = await fetchWithTimeout(
+      submissionUrl,
+      {
+        method: "HEAD",
+        redirect: "follow",
+        headers: probeHeaders,
+      },
+      URL_CHECK_TIMEOUT_MS
+    );
+  } catch (err) {
+    throw new ApiError(
+      503,
+      "ERR_SUBMISSION_URL_CHECK_FAILED",
+      "Could not verify submission URL reachability",
+      {
+        reason: String(err.message || err),
+        retryable: true,
+      },
+      { "Retry-After": "300" }
+    );
+  }
+
+  if (response.status === 405 || response.status === 501) {
+    try {
+      response = await fetchWithTimeout(
+        submissionUrl,
+        {
+          method: "GET",
+          redirect: "follow",
+          headers: {
+            ...probeHeaders,
+            Range: "bytes=0-0",
+          },
+        },
+        URL_CHECK_TIMEOUT_MS
+      );
+    } catch (err) {
+      throw new ApiError(
+        503,
+        "ERR_SUBMISSION_URL_CHECK_FAILED",
+        "Could not verify submission URL reachability",
+        {
+          reason: String(err.message || err),
+          retryable: true,
+        },
+        { "Retry-After": "300" }
+      );
+    }
+  }
+
+  if (isReachableStatus(response.status)) {
+    return;
+  }
+
+  if (response.status >= 500) {
+    throw new ApiError(
+      503,
+      "ERR_SUBMISSION_URL_TEMPORARILY_UNAVAILABLE",
+      `Submission URL returned HTTP ${response.status}`,
+      {
+        http_status: response.status,
+        retryable: true,
+      },
+      { "Retry-After": "300" }
+    );
+  }
+
+  throw new ApiError(422, "ERR_SUBMISSION_URL_UNREACHABLE", `Submission URL is not reachable (HTTP ${response.status})`, {
+    http_status: response.status,
+    retryable: false,
+  });
+}
+
+function isReachableStatus(status) {
+  return (status >= 200 && status < 400) || status === 401 || status === 403;
+}
+
+async function fetchWithTimeout(url, init = {}, timeoutMs = 8000) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, {
+      ...init,
+      signal: controller.signal,
+    });
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+function assertPublicHostname(hostname, fieldName = "url") {
+  const host = String(hostname || "").trim().toLowerCase();
+  if (!host) {
+    throw new ApiError(400, "ERR_INVALID_URL_HOST", `${fieldName} host is required`);
+  }
+
+  if (
+    host === "localhost" ||
+    host === "127.0.0.1" ||
+    host === "::1" ||
+    host === "0.0.0.0" ||
+    host.endsWith(".localhost") ||
+    host.endsWith(".local") ||
+    host.endsWith(".internal") ||
+    host === "metadata.google.internal" ||
+    host === "host.docker.internal"
+  ) {
+    throw new ApiError(400, "ERR_PRIVATE_HOST_NOT_ALLOWED", `${fieldName} host is not publicly routable`);
+  }
+
+  const ipv4 = parseIPv4(host);
+  if (ipv4 && isPrivateIPv4(ipv4)) {
+    throw new ApiError(400, "ERR_PRIVATE_HOST_NOT_ALLOWED", `${fieldName} host is not publicly routable`);
+  }
+
+  if (isIPv6Literal(host) && isPrivateIPv6(host)) {
+    throw new ApiError(400, "ERR_PRIVATE_HOST_NOT_ALLOWED", `${fieldName} host is not publicly routable`);
+  }
+}
+
+function parseIPv4(host) {
+  const parts = String(host || "").split(".");
+  if (parts.length !== 4) {
+    return null;
+  }
+  const bytes = [];
+  for (const part of parts) {
+    if (!/^\d+$/.test(part)) {
+      return null;
+    }
+    const value = Number.parseInt(part, 10);
+    if (value < 0 || value > 255) {
+      return null;
+    }
+    bytes.push(value);
+  }
+  return bytes;
+}
+
+function isPrivateIPv4(bytes) {
+  const [a, b] = bytes;
+  if (a === 10) {
+    return true;
+  }
+  if (a === 127) {
+    return true;
+  }
+  if (a === 0) {
+    return true;
+  }
+  if (a === 169 && b === 254) {
+    return true;
+  }
+  if (a === 172 && b >= 16 && b <= 31) {
+    return true;
+  }
+  if (a === 192 && b === 168) {
+    return true;
+  }
+  if (a === 100 && b >= 64 && b <= 127) {
+    return true;
+  }
+  if (a === 198 && (b === 18 || b === 19)) {
+    return true;
+  }
+  if (a >= 224) {
+    return true;
+  }
+  return false;
+}
+
+function isIPv6Literal(host) {
+  return String(host || "").includes(":");
+}
+
+function isPrivateIPv6(host) {
+  const value = String(host || "").toLowerCase();
+  if (value === "::1" || value === "::") {
+    return true;
+  }
+  if (value.startsWith("fe80:")) {
+    return true;
+  }
+  if (value.startsWith("fc") || value.startsWith("fd")) {
+    return true;
+  }
+  if (value.startsWith("ff")) {
+    return true;
+  }
+  if (value.startsWith("::ffff:")) {
+    const mapped = value.slice("::ffff:".length);
+    const ipv4 = parseIPv4(mapped);
+    if (ipv4 && isPrivateIPv4(ipv4)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 function generateSecretToken() {
@@ -1011,6 +1493,273 @@ async function signWebhookPayload(secret, bodyText) {
     .join("");
 }
 
+function buildOpenApiSpec() {
+  return {
+    openapi: "3.1.0",
+    info: {
+      title: "AIUNION API",
+      version: "1.1.0",
+      description:
+        "API for AIUNION bounty discovery, claims, applications, treasury status, and webhook management.",
+    },
+    servers: [{ url: "https://api.aiunion.wtf" }],
+    paths: {
+      "/about": {
+        get: {
+          summary: "Get mission, governance, and participation info",
+          responses: { "200": { description: "About payload" } },
+        },
+      },
+      "/meta": {
+        get: {
+          summary: "Get API limits and machine-readable metadata",
+          responses: { "200": { description: "Meta payload" } },
+        },
+      },
+      "/openapi.json": {
+        get: {
+          summary: "Get OpenAPI document",
+          responses: { "200": { description: "OpenAPI spec JSON" } },
+        },
+      },
+      "/status": {
+        get: {
+          summary: "Get treasury status",
+          responses: {
+            "200": { description: "Treasury status response" },
+            "503": { description: "Treasury unavailable", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } },
+          },
+        },
+      },
+      "/bounties": {
+        get: {
+          summary: "List currently open bounties",
+          responses: { "200": { description: "Open bounties" } },
+        },
+      },
+      "/claim": {
+        post: {
+          summary: "Submit a bounty claim",
+          requestBody: {
+            required: true,
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ClaimRequest" },
+              },
+            },
+          },
+          responses: {
+            "200": { description: "Claim accepted" },
+            "400": { description: "Validation error", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } },
+            "409": { description: "Conflict error", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } },
+            "422": { description: "Submission URL unreachable", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } },
+            "429": { description: "Rate limited", headers: { "Retry-After": { schema: { type: "string" } } }, content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } },
+          },
+        },
+      },
+      "/claim/{id}": {
+        get: {
+          summary: "Get claim status by claim ID",
+          parameters: [
+            { name: "id", in: "path", required: true, schema: { type: "string" } },
+          ],
+          responses: {
+            "200": { description: "Claim status" },
+            "404": { description: "Claim not found", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } },
+          },
+        },
+      },
+      "/apply": {
+        post: {
+          summary: "Submit a bounty proposal application",
+          requestBody: {
+            required: true,
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApplicationRequest" },
+              },
+            },
+          },
+          responses: {
+            "200": { description: "Application accepted" },
+            "400": { description: "Validation error", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } },
+            "429": { description: "Rate limited", headers: { "Retry-After": { schema: { type: "string" } } }, content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } },
+          },
+        },
+      },
+      "/blacklist": {
+        get: {
+          summary: "Get public blacklist entries (redacted)",
+          responses: { "200": { description: "Blacklist list" } },
+        },
+      },
+      "/webhook/register": {
+        post: {
+          summary: "Register or update webhook endpoint for a BTC address",
+          requestBody: {
+            required: true,
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/WebhookRegisterRequest" },
+              },
+            },
+          },
+          responses: {
+            "200": { description: "Webhook registered/updated" },
+            "400": { description: "Validation error", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } },
+            "403": { description: "Auth token required/invalid", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } },
+          },
+        },
+      },
+      "/webhook/unregister": {
+        post: {
+          summary: "Unregister webhook endpoint",
+          requestBody: {
+            required: true,
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/WebhookUnregisterRequest" },
+              },
+            },
+          },
+          responses: {
+            "200": { description: "Webhook unregistered" },
+            "403": { description: "Invalid auth token", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } },
+            "404": { description: "Webhook not found", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } },
+          },
+        },
+        delete: {
+          summary: "Unregister webhook endpoint",
+          requestBody: {
+            required: true,
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/WebhookUnregisterRequest" },
+              },
+            },
+          },
+          responses: { "200": { description: "Webhook unregistered" } },
+        },
+      },
+      "/webhook/list": {
+        get: {
+          summary: "List webhook registrations (admin only)",
+          security: [{ AdminToken: [] }],
+          responses: {
+            "200": { description: "Webhook registrations" },
+            "401": { description: "Unauthorized", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } },
+          },
+        },
+      },
+      "/webhook/emit": {
+        post: {
+          summary: "Emit webhook event (admin only)",
+          security: [{ AdminToken: [] }],
+          requestBody: {
+            required: true,
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/WebhookEmitRequest" },
+              },
+            },
+          },
+          responses: {
+            "200": { description: "Delivery results" },
+            "401": { description: "Unauthorized", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } },
+          },
+        },
+      },
+    },
+    components: {
+      securitySchemes: {
+        AdminToken: {
+          type: "apiKey",
+          in: "header",
+          name: "Authorization",
+          description: "Use 'Bearer <WEBHOOK_ADMIN_TOKEN>'",
+        },
+      },
+      schemas: {
+        ErrorResponse: {
+          type: "object",
+          required: ["success", "error_code", "error"],
+          properties: {
+            success: { type: "boolean", const: false },
+            error_code: { type: "string" },
+            error: { type: "string" },
+            details: { type: "object", additionalProperties: true },
+          },
+        },
+        ClaimRequest: {
+          type: "object",
+          required: ["bounty_id", "claimant_name", "submission_url", "btc_address"],
+          properties: {
+            bounty_id: { type: "string" },
+            claimant_name: { type: "string" },
+            claimant_type: { type: "string", enum: Array.from(CLAIMANT_TYPES) },
+            submission_url: { type: "string", format: "uri" },
+            btc_address: { type: "string" },
+            notes: { type: "string" },
+          },
+        },
+        ApplicationRequest: {
+          type: "object",
+          required: [
+            "org_name",
+            "website",
+            "contact_email",
+            "title",
+            "amount_usd",
+            "rationale",
+            "deliverable",
+            "timeline",
+            "btc_address",
+          ],
+          properties: {
+            org_name: { type: "string" },
+            website: { type: "string", format: "uri" },
+            contact_email: { type: "string", format: "email" },
+            title: { type: "string" },
+            amount_usd: { type: "number", minimum: 0.01 },
+            rationale: { type: "string" },
+            deliverable: { type: "string" },
+            timeline: { type: "string" },
+            btc_address: { type: "string" },
+          },
+        },
+        WebhookRegisterRequest: {
+          type: "object",
+          required: ["url", "btc_address"],
+          properties: {
+            url: { type: "string", format: "uri" },
+            btc_address: { type: "string" },
+            auth_token: { type: "string" },
+            events: { type: "array", items: { type: "string" } },
+          },
+        },
+        WebhookUnregisterRequest: {
+          type: "object",
+          required: ["btc_address", "auth_token"],
+          properties: {
+            btc_address: { type: "string" },
+            auth_token: { type: "string" },
+          },
+        },
+        WebhookEmitRequest: {
+          type: "object",
+          required: ["event"],
+          properties: {
+            event: { type: "string", enum: Array.from(WEBHOOK_ALLOWED_EVENTS) },
+            payload: { type: "object", additionalProperties: true },
+            btc_address: { type: "string" },
+            btc_addresses: { type: "array", items: { type: "string" } },
+          },
+        },
+      },
+    },
+  };
+}
+
 function decodeGithubContent(base64Content) {
   const binary = atob(String(base64Content || "").replace(/\n/g, ""));
   const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
@@ -1030,9 +1779,43 @@ function encodeGithubContent(jsonData) {
   return btoa(binary);
 }
 
-function jsonResponse(data, status = 200) {
-  return new Response(JSON.stringify(data), {
+function apiErrorToResponse(err) {
+  if (!(err instanceof ApiError)) {
+    return null;
+  }
+  return errorResponse(err.status, err.errorCode, err.message, err.details, err.headers);
+}
+
+function errorResponse(status, errorCode, errorMessage, details = null, extraHeaders = {}) {
+  const payload = {
+    success: false,
+    error_code: errorCode,
+    error: errorMessage,
+  };
+  if (details && typeof details === "object") {
+    payload.details = details;
+  }
+  return jsonResponse(payload, status, extraHeaders);
+}
+
+function jsonResponse(data, status = 200, extraHeaders = {}) {
+  let payload = data;
+  if (status >= 400 && payload && typeof payload === "object" && !Array.isArray(payload)) {
+    payload = { ...payload };
+    if (typeof payload.success === "undefined") {
+      payload.success = false;
+    }
+    if (payload.error && !payload.error_code) {
+      payload.error_code = `ERR_HTTP_${status}`;
+    }
+  }
+
+  return new Response(JSON.stringify(payload), {
     status,
-    headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
+    headers: {
+      ...CORS_HEADERS,
+      ...extraHeaders,
+      "Content-Type": "application/json",
+    },
   });
 }
