@@ -1,0 +1,25 @@
+name = "aiunion-api"
+main = "worker.js"
+compatibility_date = "2024-09-23"
+
+[vars]
+# Non-secret env vars go here.
+# Secrets (GITHUB_TOKEN, WEBHOOK_ADMIN_TOKEN) must be set via:
+#   wrangler secret put GITHUB_TOKEN
+#   wrangler secret put WEBHOOK_ADMIN_TOKEN
+
+[[kv_namespaces]]
+binding = "KV"
+id = ""  # TODO: paste your KV namespace ID from Cloudflare dashboard
+
+# Route the Worker to the api subdomain.
+# Replace with your Cloudflare zone ID.
+# routes = [
+#   { pattern = "api.aiunion.wtf/*", zone_id = "<YOUR_ZONE_ID>" }
+# ]
+
+# Alternatively, use a custom domain (recommended — avoids zone security conflicts):
+# [env.production]
+# routes = [
+#   { pattern = "api.aiunion.wtf/*", zone_id = "<YOUR_ZONE_ID>", custom_domain = true }
+# ]
