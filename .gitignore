@@ -11,3 +11,9 @@ __pycache__/
 # OS
 .DS_Store
 Thumbs.db
+
+# Local scratch / backups / transcripts
+archive_all.py
+*.backup.*.json
+*claude conversation*.txt
+*conversation*.txt

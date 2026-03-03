@@ -155,9 +155,6 @@
   "recent_transactions": [
     {
       "address": "bc1pjjmjypmzqgqkjxrhx0hpmaetlk75k04gh9hvkexmmfqyl5g7sjfsk4cge7",
-      "parent_descs": [
-        "tr([e542b946/87h/0h/0h]xpub6Br3oGA3uCatGGxzVEcmhEoU4wwJZpHH2bodiKHYankuqRgDLSEsFSoGdaZZkStXxdrhMX9FrRbZjcAwhs2BijPMXM97VUaptFzDZ7TNbGr/0/*,{multi_a(3,[0f7d5110/87h/0h/0h]xpub6DUE2wtdeuyuztSmb1cqtSQLRv2EuAyz3BxBrVpbqCi2pyWLbkDacThLrNXkUqHSa8ukpjXXDRE6MczRKMEn792WEynvSz3bnBf8yrJymdG/0/*,[44a8bdde/87h/0h/0h]xpub6CSYM1Zki28KmUPPLGo6C7nthwxE96gMkc5cLKiBJL4svFBBTTsfpUG89a5jLV97vU6JSWcXQBWJbW1Fg66tsp145RazHn9kFKSeDstT2jb/0/*,[3b63b238/87h/0h/0h]xpub6DKeeteAuBRj73fosMQFgB87c9QC4EycZTqiK2HcZ52KzhYhCRLpAd64iY3AyzBHJESA2vLdKEkmxtD4Nv1hskiwupRsNwYuSVCikZpQTF4/0/*,[ec1aabf1/87h/0h/0h]xpub6D6vd3eTFW6v3nZttRN6di2M2Wr2NRFL7NCHg2KR4cVZdzZ3ZSUwW98vcfa99fbSG8dhret3D5TwHL8uuhF79BzyTMji6ANkJGo7Yf2vdRj/0/*,[aa4d90f8/87h/0h/0h]xpub6DEk4sk71CtVmzHJtCgQwJEePW6GmdgpyhUrM2YXTtoMZ56zvHY1S8mzSSjsupHX71nn7MkQpLFM7eBzVe89izzHFtD5vnjcHhTwcWKP6sy/0/*),pk([e477c2eb/87h/0h/0h]xpub6DD2ZT1mFFHxesfMVCmoENXzXZznX5tRyZWtru4Gec71MEf74ZUm4aXwj7EHjZHByfdRL3B7Z9ZLL8UKVtDYH8XsYAH3PANxLSaZXmEswko/0/*)})#fmffww47"
-      ],
       "category": "receive",
       "amount": 0.0002928,
       "vout": 25,

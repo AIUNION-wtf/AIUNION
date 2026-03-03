@@ -143,10 +143,51 @@ def get_balance():
 def get_recent_transactions(count=10):
     """Get recent transactions."""
     try:
-        return rpc("listtransactions", ["*", count])
+        txs = rpc("listtransactions", ["*", count])
+        return sanitize_transactions(txs)
     except Exception as e:
         print(f"Warning: Could not get transactions: {e}")
         return []
+
+
+SENSITIVE_TX_KEYS = {"parent_descs", "desc", "hdkeypath", "hdseedid"}
+
+
+def sanitize_transaction(tx):
+    """Remove sensitive wallet metadata from transaction records."""
+    if not isinstance(tx, dict):
+        return tx
+
+    cleaned = {}
+    for key, value in tx.items():
+        if key in SENSITIVE_TX_KEYS:
+            continue
+
+        if isinstance(value, str) and ("xpub" in value or "xprv" in value):
+            cleaned[key] = "[REDACTED]"
+        elif isinstance(value, dict):
+            cleaned[key] = sanitize_transaction(value)
+        elif isinstance(value, list):
+            cleaned_list = []
+            for item in value:
+                if isinstance(item, dict):
+                    cleaned_list.append(sanitize_transaction(item))
+                elif isinstance(item, str) and ("xpub" in item or "xprv" in item):
+                    cleaned_list.append("[REDACTED]")
+                else:
+                    cleaned_list.append(item)
+            cleaned[key] = cleaned_list
+        else:
+            cleaned[key] = value
+
+    return cleaned
+
+
+def sanitize_transactions(txs):
+    """Sanitize a transaction list before persisting publicly."""
+    if not isinstance(txs, list):
+        return []
+    return [sanitize_transaction(tx) for tx in txs]
 
 
 # ── AI Agent API calls ────────────────────────────────────────────────────────
