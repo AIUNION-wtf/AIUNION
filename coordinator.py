@@ -594,15 +594,17 @@ def show_status():
     """Display current treasury status."""
     balance = get_balance()
     proposals = load_proposals()
-    pending = [p for p in proposals if p["status"] == "pending"]
-    approved = [p for p in proposals if p["status"] == "approved"]
-    rejected = [p for p in proposals if p["status"] == "rejected"]
+    active = [p for p in proposals if not p.get("archived", False)]
+    archived_count = len(proposals) - len(active)
+    pending = [p for p in active if p["status"] == "pending"]
+    approved = [p for p in active if p["status"] == "approved"]
+    rejected = [p for p in active if p["status"] == "rejected"]
 
     print("\n" + "="*50)
     print("  AIUNION TREASURY STATUS")
     print("="*50)
     print(f"  Balance:    {balance} BTC" if balance is not None else "  Balance:    Unable to connect to Bitcoin Core")
-    print(f"  Proposals:  {len(proposals)} total")
+    print(f"  Proposals:  {len(active)} active ({archived_count} archived)")
     print(f"  Pending:    {len(pending)}")
     print(f"  Approved:   {len(approved)}")
     print(f"  Rejected:   {len(rejected)}")
