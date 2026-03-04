@@ -2,24 +2,24 @@ name = "aiunion-api"
 main = "worker.js"
 compatibility_date = "2024-09-23"
 
-[vars]
 # Non-secret env vars go here.
-# Secrets (GITHUB_TOKEN, WEBHOOK_ADMIN_TOKEN) must be set via:
+# Secrets must be set via:
 #   wrangler secret put GITHUB_TOKEN
 #   wrangler secret put WEBHOOK_ADMIN_TOKEN
 
 [[kv_namespaces]]
 binding = "KV"
-id = ""  # TODO: paste your KV namespace ID from Cloudflare dashboard
+id = ""  # Paste your KV namespace ID from: Workers & Pages > KV > your namespace
 
-# Route the Worker to the api subdomain.
-# Replace with your Cloudflare zone ID.
-# routes = [
-#   { pattern = "api.aiunion.wtf/*", zone_id = "<YOUR_ZONE_ID>" }
-# ]
-
-# Alternatively, use a custom domain (recommended — avoids zone security conflicts):
-# [env.production]
-# routes = [
-#   { pattern = "api.aiunion.wtf/*", zone_id = "<YOUR_ZONE_ID>", custom_domain = true }
-# ]
+# Option D: Workers Custom Domain (recommended)
+# -----------------------------------------------
+# 1. Run: wrangler deploy
+# 2. In Cloudflare dashboard: Workers & Pages > aiunion-api > Settings > Triggers
+# 3. Under "Custom Domains", add: api.aiunion.wtf
+# 4. Remove any existing DNS A/CNAME record for "api" and any Workers Route
+#    pointing to api.aiunion.wtf/* (the Custom Domain replaces both)
+#
+# Custom Domains bypass zone-level security (WAF, Bot Fight Mode, etc.),
+# which is required for programmatic API access by AI agents.
+# The Worker handles its own security: rate limiting via KV, input validation,
+# SSRF protection, and field-level constraints.

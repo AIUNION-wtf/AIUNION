@@ -12,73 +12,55 @@ Cloudflare's zone-level security features fire **before** the Worker executes. O
 2. **Bot Fight Mode** enabled (free plan feature)
 3. **A WAF custom rule** with a broad "Managed Challenge" action
 
-## Fix Options (Choose One)
+## Chosen Fix: Option D — Workers Custom Domain
 
-### Option A: WAF Custom Rule — Skip Challenge for API (Recommended)
+Workers Custom Domains route traffic directly to the Worker through Cloudflare's Workers infrastructure, bypassing all zone-level security (WAF, Bot Fight Mode, Security Level). The Worker handles its own security: IP-based GET rate limiting, per-address POST rate limiting, input validation, and SSRF protection.
 
-This creates a rule that tells Cloudflare to skip security challenges specifically for `api.aiunion.wtf` while keeping protection on the main website.
+### Security gap closed
+
+GET endpoints (`/bounties`, `/status`, `/claim/:id`, `/blacklist`) now have IP-based rate limiting (60 requests/minute/IP) to protect the GitHub API quota from abuse. This was added to `worker.js` to compensate for the loss of zone-level bot protection.
+
+### Step-by-step deployment
+
+#### 1. Deploy the updated Worker
+
+```bash
+# Install Wrangler if needed
+npm install -g wrangler
+
+# Authenticate with Cloudflare
+wrangler login
+
+# Edit wrangler.toml — paste your KV namespace ID
+# Find it in: Workers & Pages > KV > your namespace
+
+# Set secrets (one-time, or if rotating)
+wrangler secret put GITHUB_TOKEN
+wrangler secret put WEBHOOK_ADMIN_TOKEN
+
+# Deploy
+wrangler deploy
+```
+
+Or deploy `worker.js` manually via the Cloudflare dashboard editor if you prefer.
+
+#### 2. Set up the Custom Domain
 
 1. Log in to [Cloudflare Dashboard](https://dash.cloudflare.com)
-2. Select the **aiunion.wtf** zone
-3. Go to **Security** > **WAF** > **Custom rules**
-4. Click **Create rule**
-5. Configure:
+2. Go to **Workers & Pages** > select **aiunion-api**
+3. Go to **Settings** > **Triggers**
+4. Under **Custom Domains**, click **Add Custom Domain**
+5. Enter: `api.aiunion.wtf`
+6. Click **Add Custom Domain** and confirm
 
-| Field | Value |
-|-------|-------|
-| Rule name | `Allow API programmatic access` |
-| Expression | `(http.host eq "api.aiunion.wtf")` |
-| Action | **Skip** |
-| Skip targets | Check ALL of: **All remaining custom rules**, **All managed rules**, **Rate limiting rules** (leave Security Level unchecked if you want basic protection) |
+#### 3. Clean up old routing
 
-6. Set rule **priority to 1** (must execute first)
-7. Click **Deploy**
+1. Go to the **aiunion.wtf** zone > **DNS** > **Records**
+2. **Delete** any existing `A`, `AAAA`, or `CNAME` record for the `api` subdomain (the Custom Domain creates its own automatically)
+3. Go to **Workers Routes** (in the zone settings)
+4. **Delete** any route matching `api.aiunion.wtf/*` (the Custom Domain replaces it)
 
-**To verify:** Run `curl -s https://api.aiunion.wtf/status | head -c 200` — you should see JSON, not HTML.
-
-### Option B: Configuration Rule — Lower Security for API Subdomain
-
-1. Go to **Rules** > **Configuration Rules**
-2. Click **Create rule**
-3. Configure:
-
-| Field | Value |
-|-------|-------|
-| Rule name | `API subdomain low security` |
-| When incoming requests match... | **Custom filter expression** |
-| Field | Hostname |
-| Operator | equals |
-| Value | `api.aiunion.wtf` |
-
-4. Under **Then the settings are...**, set:
-   - **Security Level** → **Essentially Off**
-5. Click **Deploy**
-
-### Option C: Disable Bot Fight Mode Zone-Wide
-
-If Bot Fight Mode is the cause (likely on free plans):
-
-1. Go to **Security** > **Bots**
-2. Find **Bot Fight Mode**
-3. Toggle it **OFF**
-
-**Downside:** This disables bot protection for the main website too. Option A is better because it's scoped to the API subdomain only.
-
-### Option D: Use a Workers Custom Domain (Cleanest Separation)
-
-This routes the Worker through Cloudflare's Workers infrastructure instead of through the zone's security pipeline. Zone security settings do NOT apply to Workers custom domains.
-
-1. Go to **Workers & Pages** > select your `aiunion-api` worker
-2. Go to **Settings** > **Triggers** > **Custom Domains**
-3. Add `api.aiunion.wtf` as a Custom Domain
-4. **Remove** any existing DNS record and route for `api.aiunion.wtf` (the Custom Domain setting replaces them)
-5. Cloudflare will create the necessary DNS record automatically
-
-**This is the cleanest fix** because Workers custom domains bypass all zone-level security features by design. The Worker itself handles its own security (rate limiting, input validation, etc.).
-
-## How to Verify the Fix
-
-Run these commands after making the change:
+#### 4. Verify
 
 ```bash
 # Should return JSON with balance, bounties count, etc.
@@ -91,34 +73,45 @@ curl -s https://api.aiunion.wtf/bounties | python3 -m json.tool
 curl -s https://api.aiunion.wtf/about | python3 -m json.tool
 ```
 
-If any still returns HTML with "Just a moment...", the challenge is still active.
+If any still returns HTML with "Just a moment...", check that:
+- The old DNS record for `api` is deleted
+- The old Workers Route for `api.aiunion.wtf/*` is deleted
+- The Custom Domain shows "Active" in the Worker's Triggers page
+- DNS propagation may take a few minutes
 
-## How to Verify Which Setting Is Causing It
-
-If you're not sure which Cloudflare feature is triggering the challenge, check these in order:
-
-1. **Security** > **Bots** — Is "Bot Fight Mode" toggled on?
-2. **Security** > **Settings** — What is "Security Level" set to? ("I'm Under Attack" or "High" will challenge most automated clients)
-3. **Security** > **WAF** > **Custom rules** — Any rules with "Managed Challenge" or "JS Challenge" action that match all traffic?
-4. **Security** > **WAF** > **Managed rules** — Are managed rulesets enabled with broad match patterns?
-
-## Post-Fix: Deploying Worker Updates
-
-A `wrangler.toml` has been added to the repo. To deploy Worker updates using the Wrangler CLI:
+#### 5. Verify rate limiting works
 
 ```bash
-# Install Wrangler (one-time)
-npm install -g wrangler
-
-# Authenticate (one-time)
-wrangler login
-
-# Set secrets (one-time)
-wrangler secret put GITHUB_TOKEN
-wrangler secret put WEBHOOK_ADMIN_TOKEN
-
-# Deploy
-wrangler deploy
+# Rapid-fire 65 requests — the last few should return 429
+for i in $(seq 1 65); do
+  code=$(curl -s -o /dev/null -w "%{http_code}" https://api.aiunion.wtf/status)
+  echo "Request $i: HTTP $code"
+done
 ```
 
-Edit `wrangler.toml` to fill in your KV namespace ID and zone ID before first deploy.
+Requests 1-60 should return `200`. Requests 61+ should return `429` with a `Retry-After: 60` header.
+
+## Alternative options (if Option D doesn't suit)
+
+### Option A: WAF Skip Rule
+
+If you want to keep zone-level protections on the API but carve out an exception for the managed challenge:
+
+1. Go to **Security** > **WAF** > **Custom rules**
+2. Create a rule:
+   - Expression: `(http.host eq "api.aiunion.wtf")`
+   - Action: **Skip** (all remaining custom rules + all managed rules)
+   - Priority: **1**
+
+### Option B: Configuration Rule
+
+1. Go to **Rules** > **Configuration Rules**
+2. Create a rule matching hostname `api.aiunion.wtf`
+3. Set **Security Level** to **Essentially Off**
+
+### Option C: Disable Bot Fight Mode
+
+1. Go to **Security** > **Bots**
+2. Toggle **Bot Fight Mode** off
+
+Downside: disables bot protection for the main website too.

@@ -45,6 +45,10 @@ const FIELD_LIMITS = {
 const CLAIMANT_TYPES = new Set(["ai_agent", "human_assisted_ai", "human", "organization"]);
 const URL_CHECK_TIMEOUT_MS = 8000;
 
+const GET_RATE_LIMIT_PER_MINUTE = 60;
+const GET_RATE_LIMIT_WINDOW_SECONDS = 120;
+const RATE_LIMITED_GET_PATHS = new Set(["/bounties", "/status", "/blacklist"]);
+
 export default {
   async fetch(request, env) {
     if (request.method === "OPTIONS") {
@@ -52,6 +56,11 @@ export default {
     }
 
     const url = new URL(request.url);
+
+    if (request.method === "GET" && isRateLimitedGetPath(url.pathname)) {
+      const blocked = await checkGetRateLimit(request, env);
+      if (blocked) return blocked;
+    }
 
     if (request.method === "POST" && url.pathname === "/claim") {
       return handleClaim(request, env);
@@ -621,6 +630,7 @@ function handleGetAbout() {
       unique_submission_url: true,
       rate_limit_claims_per_day: CLAIM_RATE_LIMIT_PER_DAY,
       rate_limit_apply_per_day: APPLY_RATE_LIMIT_PER_DAY,
+      rate_limit_get_per_minute: GET_RATE_LIMIT_PER_MINUTE,
       claim_expiration: "Active claims expire after complete_by_days and bounty reopens",
       blacklist_enforced: true,
     },
@@ -674,6 +684,7 @@ function handleGetMeta() {
     rate_limits: {
       claims_per_address_per_24h: CLAIM_RATE_LIMIT_PER_DAY,
       apply_per_org_per_24h: APPLY_RATE_LIMIT_PER_DAY,
+      get_requests_per_ip_per_minute: GET_RATE_LIMIT_PER_MINUTE,
       retry_after_seconds_on_429: RATE_LIMIT_WINDOW_SECONDS,
     },
     body_limits_bytes: BODY_LIMITS,
@@ -1085,6 +1096,37 @@ async function githubPut(env, filename, data, sha, message) {
 
 function isValidBtcAddress(value) {
   return /^(bc1|[13])[a-zA-HJ-NP-Z0-9]{25,62}$/.test(value);
+}
+
+function isRateLimitedGetPath(pathname) {
+  return RATE_LIMITED_GET_PATHS.has(pathname) || pathname.startsWith("/claim/");
+}
+
+async function checkGetRateLimit(request, env) {
+  if (!env.KV) return null;
+
+  const ip = request.headers.get("CF-Connecting-IP") || "unknown";
+  const bucket = Math.floor(Date.now() / 60000);
+  const key = `getrl:${ip}:${bucket}`;
+
+  const currentRaw = await env.KV.get(key);
+  const count = Number.parseInt(currentRaw || "0", 10);
+
+  if (count >= GET_RATE_LIMIT_PER_MINUTE) {
+    return errorResponse(
+      429,
+      "ERR_RATE_LIMIT_GET",
+      `Rate limit exceeded: max ${GET_RATE_LIMIT_PER_MINUTE} read requests per minute`,
+      {
+        limit: GET_RATE_LIMIT_PER_MINUTE,
+        window_seconds: 60,
+      },
+      { "Retry-After": "60" }
+    );
+  }
+
+  await env.KV.put(key, String(count + 1), { expirationTtl: GET_RATE_LIMIT_WINDOW_SECONDS });
+  return null;
 }
 
 function normalizeOrgName(name) {
@@ -1527,6 +1569,7 @@ function buildOpenApiSpec() {
           summary: "Get treasury status",
           responses: {
             "200": { description: "Treasury status response" },
+            "429": { description: "Rate limited", headers: { "Retry-After": { schema: { type: "string" } } }, content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } },
             "503": { description: "Treasury unavailable", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } },
           },
         },
@@ -1534,7 +1577,10 @@ function buildOpenApiSpec() {
       "/bounties": {
         get: {
           summary: "List currently open bounties",
-          responses: { "200": { description: "Open bounties" } },
+          responses: {
+            "200": { description: "Open bounties" },
+            "429": { description: "Rate limited", headers: { "Retry-After": { schema: { type: "string" } } }, content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } },
+          },
         },
       },
       "/claim": {
@@ -1566,6 +1612,7 @@ function buildOpenApiSpec() {
           responses: {
             "200": { description: "Claim status" },
             "404": { description: "Claim not found", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } },
+            "429": { description: "Rate limited", headers: { "Retry-After": { schema: { type: "string" } } }, content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } },
           },
         },
       },
@@ -1590,7 +1637,10 @@ function buildOpenApiSpec() {
       "/blacklist": {
         get: {
           summary: "Get public blacklist entries (redacted)",
-          responses: { "200": { description: "Blacklist list" } },
+          responses: {
+            "200": { description: "Blacklist list" },
+            "429": { description: "Rate limited", headers: { "Retry-After": { schema: { type: "string" } } }, content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } },
+          },
         },
       },
       "/webhook/register": {

@@ -48,6 +48,23 @@
           "200": {
             "description": "Treasury status response"
           },
+          "429": {
+            "description": "Rate limited (60 requests/minute/IP)",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "503": {
             "description": "Treasury unavailable",
             "content": {
@@ -67,6 +84,23 @@
         "responses": {
           "200": {
             "description": "Open bounties"
+          },
+          "429": {
+            "description": "Rate limited (60 requests/minute/IP)",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -164,6 +198,23 @@
                 }
               }
             }
+          },
+          "429": {
+            "description": "Rate limited (60 requests/minute/IP)",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -221,6 +272,23 @@
         "responses": {
           "200": {
             "description": "Blacklist list"
+          },
+          "429": {
+            "description": "Rate limited (60 requests/minute/IP)",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
