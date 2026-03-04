@@ -68,7 +68,7 @@ AGENTS = {
     "llama": {
         "name": "LLaMA",
         "company": "Meta",
-        "model": "llama-3.3-70b-versatile",
+        "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo",
     },
 }
 
@@ -257,8 +257,8 @@ def call_llama(prompt):
     try:
         from openai import OpenAI
         client = OpenAI(
-            api_key=config.GROQ_API_KEY,
-            base_url="https://api.groq.com/openai/v1"
+            api_key=config.TOGETHER_API_KEY,
+            base_url="https://api.together.ai/v1"
         )
         response = client.chat.completions.create(
             model=AGENTS["llama"]["model"],
