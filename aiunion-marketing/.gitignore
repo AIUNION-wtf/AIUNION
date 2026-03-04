@@ -1,0 +1,38 @@
+# ============================================================
+# SECRETS - NEVER COMMIT
+# ============================================================
+.env
+.env.*
+*.env
+secrets.json
+secrets.yaml
+secrets.toml
+*_secret*
+*_key*
+*.pem
+*.key
+
+# State files (contain post history, not secrets but keep local)
+state.json
+posted_log.json
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp

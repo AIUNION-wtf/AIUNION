@@ -1,0 +1,66 @@
+name: AIUNION Marketing Agent
+
+on:
+  schedule:
+    # 5 posts per day at: 9am, 12pm, 3pm, 6pm, 9pm UTC
+    - cron: "0 9 * * *"
+    - cron: "0 12 * * *"
+    - cron: "0 15 * * *"
+    - cron: "0 18 * * *"
+    - cron: "0 21 * * *"
+
+  # Allow manual trigger for testing
+  workflow_dispatch:
+
+jobs:
+  post:
+    name: Generate and Post
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    # Minimal permissions — this job only needs to run code
+    # No repo write access, no admin, no packages
+    permissions:
+      contents: none
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Syntax check (pre-run validation)
+        run: |
+          python -m py_compile agent.py
+          python -m py_compile grok_client.py
+          python -m py_compile twitter_client.py
+          python -m py_compile aiunion_client.py
+          echo "All syntax checks passed"
+
+      - name: Secret scan (gitleaks)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run marketing agent
+        env:
+          # Marketing agent secrets only — scoped to this repo
+          # Never add treasury, signing, or admin keys here
+          XAI_API_KEY:                  ${{ secrets.XAI_API_KEY }}
+          TWITTER_API_KEY:              ${{ secrets.TWITTER_API_KEY }}
+          TWITTER_API_SECRET:           ${{ secrets.TWITTER_API_SECRET }}
+          TWITTER_ACCESS_TOKEN:         ${{ secrets.TWITTER_ACCESS_TOKEN }}
+          TWITTER_ACCESS_TOKEN_SECRET:  ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
+        run: python agent.py
+
+      - name: Upload state artifact (preserves post history across runs)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: agent-state
+          path: state.json
+          retention-days: 30
+          if-no-files-found: ignore
