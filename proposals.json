@@ -18,7 +18,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1771977395_claude",
@@ -39,7 +40,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1771979226_claude",
@@ -60,7 +62,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1771979229_gpt",
@@ -81,7 +84,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1771979737_claude",
@@ -102,7 +106,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1771979742_gpt",
@@ -123,7 +128,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1771979999_claude",
@@ -144,7 +150,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1771980002_gpt",
@@ -165,7 +172,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1771980762_claude",
@@ -186,7 +194,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1771980765_gpt",
@@ -207,7 +216,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1771980769_grok",
@@ -228,7 +238,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1771981878_claude",
@@ -249,7 +260,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1771981884_gpt",
@@ -270,7 +282,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1771981888_grok",
@@ -322,7 +335,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1771981889_llama",
@@ -374,7 +388,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772043881_claude",
@@ -395,7 +410,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772043885_gpt",
@@ -416,7 +432,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772043889_grok",
@@ -437,7 +454,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772043890_llama",
@@ -458,7 +476,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772044391_claude",
@@ -479,7 +498,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772044399_gpt",
@@ -500,7 +520,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772044404_grok",
@@ -521,7 +542,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772044405_llama",
@@ -542,7 +564,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772044900_claude",
@@ -563,7 +586,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772044904_gpt",
@@ -584,7 +608,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772044908_grok",
@@ -605,7 +630,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772044909_llama",
@@ -626,7 +652,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772045046_claude",
@@ -647,7 +674,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772045052_gpt",
@@ -668,7 +696,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772045055_grok",
@@ -689,7 +718,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772045056_llama",
@@ -710,7 +740,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772045483_claude",
@@ -731,7 +762,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772045488_gpt",
@@ -752,7 +784,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772045492_grok",
@@ -773,7 +806,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772045493_llama",
@@ -794,7 +828,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772045825_claude",
@@ -815,7 +850,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772045829_gpt",
@@ -836,7 +872,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772045834_grok",
@@ -857,7 +894,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772045835_llama",
@@ -878,7 +916,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772046134_claude",
@@ -899,7 +938,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772046137_gpt",
@@ -920,7 +960,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772046141_grok",
@@ -941,7 +982,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772046143_llama",
@@ -962,7 +1004,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772047131_claude",
@@ -983,7 +1026,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772047135_gpt",
@@ -1004,7 +1048,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772047142_gemini",
@@ -1025,7 +1070,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772047144_grok",
@@ -1046,7 +1092,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772047145_llama",
@@ -1067,7 +1114,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772053002_claude",
@@ -1088,7 +1136,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772053008_gpt",
@@ -1109,7 +1158,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772053016_gemini",
@@ -1130,7 +1180,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772053019_grok",
@@ -1151,7 +1202,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772053020_llama",
@@ -1172,7 +1224,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772053401_claude",
@@ -1193,7 +1246,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772053404_gpt",
@@ -1214,7 +1268,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772053421_gemini",
@@ -1235,7 +1290,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772053423_grok",
@@ -1256,7 +1312,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772053424_llama",
@@ -1277,7 +1334,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772100035_grok",
@@ -1329,7 +1387,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772100036_llama",
@@ -1381,7 +1440,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772122660_claude",
@@ -1433,7 +1493,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772122666_gpt",
@@ -1485,7 +1546,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772122674_gemini",
@@ -1537,7 +1599,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772122676_grok",
@@ -1589,7 +1652,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772122677_llama",
@@ -1641,7 +1705,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772123258_claude",
@@ -1694,7 +1759,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772123263_gpt",
@@ -1747,7 +1813,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772123277_gemini",
@@ -1800,7 +1867,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772123279_grok",
@@ -1853,7 +1921,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772123280_llama",
@@ -1906,7 +1975,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772123804_claude",
@@ -1959,7 +2029,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772123807_gpt",
@@ -2012,7 +2083,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772123824_gemini",
@@ -2065,7 +2137,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772123826_grok",
@@ -2118,7 +2191,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772123828_llama",
@@ -2171,7 +2245,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772124347_claude",
@@ -2224,7 +2299,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772124351_gpt",
@@ -2277,7 +2353,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772124363_gemini",
@@ -2330,7 +2407,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772124365_grok",
@@ -2383,7 +2461,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772124366_llama",
@@ -2436,7 +2515,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772126221_claude",
@@ -2489,7 +2569,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772126226_gpt",
@@ -2542,7 +2623,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772126238_gemini",
@@ -2595,7 +2677,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772126241_grok",
@@ -2648,7 +2731,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772126242_llama",
@@ -2701,7 +2785,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772127661_claude",
@@ -2754,7 +2839,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772127665_gpt",
@@ -2807,7 +2893,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772127673_gemini",
@@ -2860,7 +2947,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772127675_grok",
@@ -2913,7 +3001,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772127676_llama",
@@ -2966,7 +3055,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772148745_claude",
@@ -3019,7 +3109,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772148755_gpt",
@@ -3072,7 +3163,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772148764_gemini",
@@ -3125,7 +3217,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772148766_grok",
@@ -3178,7 +3271,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772148767_llama",
@@ -3231,7 +3325,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772152579_claude",
@@ -3285,7 +3380,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772152583_gpt",
@@ -3339,7 +3435,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772152589_gemini",
@@ -3393,7 +3490,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772152593_grok",
@@ -3447,7 +3545,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772152593_llama",
@@ -3501,7 +3600,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772153975_claude",
@@ -3555,7 +3655,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772153978_gpt",
@@ -3609,7 +3710,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772153988_gemini",
@@ -3663,7 +3765,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772153991_grok",
@@ -3717,7 +3820,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772153991_llama",
@@ -3771,7 +3875,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772154654_claude",
@@ -3825,7 +3930,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772154657_gpt",
@@ -3879,7 +3985,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772154666_gemini",
@@ -3933,7 +4040,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772154669_grok",
@@ -3987,7 +4095,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772154670_llama",
@@ -4041,7 +4150,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772155347_claude",
@@ -4064,7 +4174,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772155349_gpt",
@@ -4087,7 +4198,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772155362_gemini",
@@ -4110,7 +4222,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772155365_grok",
@@ -4164,7 +4277,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772155366_llama",
@@ -4187,7 +4301,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772186411_claude",
@@ -4241,7 +4356,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772186416_gpt",
@@ -4264,7 +4380,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772186425_gemini",
@@ -4287,7 +4404,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772186428_grok",
@@ -4310,7 +4428,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772186429_llama",
@@ -4333,7 +4452,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772186411_claude",
@@ -4356,7 +4476,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772186416_gpt",
@@ -4379,7 +4500,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772186426_gemini",
@@ -4402,7 +4524,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772186430_grok",
@@ -4425,7 +4548,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772186431_llama",
@@ -4448,7 +4572,8 @@
     "claimed_by": null,
     "claim_url": null,
     "claim_btc_address": null,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772220122_claude",
@@ -4501,7 +4626,8 @@
     "vote_count_yes": 5,
     "vote_count_no": 0,
     "archived": true,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772220126_gpt",
@@ -4523,7 +4649,8 @@
     "vote_count_yes": 0,
     "vote_count_no": 5,
     "archived": true,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772220134_gemini",
@@ -4545,7 +4672,8 @@
     "vote_count_yes": 0,
     "vote_count_no": 5,
     "archived": true,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772220136_grok",
@@ -4567,7 +4695,8 @@
     "vote_count_yes": 0,
     "vote_count_no": 5,
     "archived": true,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772220137_llama",
@@ -4589,7 +4718,8 @@
     "vote_count_yes": 0,
     "vote_count_no": 5,
     "archived": true,
-    "claimed_at": null
+    "claimed_at": null,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772445614_claude",
@@ -4650,7 +4780,8 @@
     },
     "vote_count_yes": 3,
     "vote_count_no": 2,
-    "archived": true
+    "archived": true,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772445619_gpt",
@@ -4679,7 +4810,8 @@
     "votes": {},
     "vote_count_yes": 0,
     "vote_count_no": 5,
-    "archived": true
+    "archived": true,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772445631_gemini",
@@ -4709,7 +4841,8 @@
     "votes": {},
     "vote_count_yes": 0,
     "vote_count_no": 5,
-    "archived": true
+    "archived": true,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772445635_grok",
@@ -4738,7 +4871,8 @@
     "votes": {},
     "vote_count_yes": 0,
     "vote_count_no": 5,
-    "archived": true
+    "archived": true,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772634292_claude",
@@ -4798,7 +4932,9 @@
       }
     },
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772634301_gpt",
@@ -4826,7 +4962,9 @@
     "claimed_at": null,
     "votes": {},
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772634313_gemini",
@@ -4855,7 +4993,9 @@
     "claimed_at": null,
     "votes": {},
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772636885_claude",
@@ -4915,7 +5055,9 @@
       }
     },
     "vote_count_yes": 2,
-    "vote_count_no": 3
+    "vote_count_no": 3,
+    "archived": true,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772636890_gpt",
@@ -4943,7 +5085,9 @@
     "claimed_at": null,
     "votes": {},
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772636899_gemini",
@@ -4972,7 +5116,9 @@
     "claimed_at": null,
     "votes": {},
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772641061_claude",
@@ -5001,7 +5147,9 @@
     "claimed_at": null,
     "votes": {},
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772641067_gpt",
@@ -5029,7 +5177,9 @@
     "claimed_at": null,
     "votes": {},
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772641080_gemini",
@@ -5089,7 +5239,9 @@
       }
     },
     "vote_count_yes": 3,
-    "vote_count_no": 2
+    "vote_count_no": 2,
+    "archived": true,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772641082_grok",
@@ -5117,7 +5269,9 @@
     "claimed_at": null,
     "votes": {},
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772644022_claude",
@@ -5177,7 +5331,9 @@
       }
     },
     "vote_count_yes": 4,
-    "vote_count_no": 1
+    "vote_count_no": 1,
+    "archived": true,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772644028_gpt",
@@ -5205,7 +5361,9 @@
     "claimed_at": null,
     "votes": {},
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772644037_gemini",
@@ -5234,7 +5392,9 @@
     "claimed_at": null,
     "votes": {},
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772644041_grok",
@@ -5262,7 +5422,9 @@
     "claimed_at": null,
     "votes": {},
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true,
+    "archived_at": "2026-03-04T18:31:20.862626"
   },
   {
     "id": "prop_1772644047_llama",
@@ -5290,6 +5452,8 @@
     "claimed_at": null,
     "votes": {},
     "vote_count_yes": 0,
-    "vote_count_no": 5
+    "vote_count_no": 5,
+    "archived": true,
+    "archived_at": "2026-03-04T18:31:20.862626"
   }
 ]
