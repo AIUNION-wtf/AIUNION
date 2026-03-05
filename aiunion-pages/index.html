@@ -305,10 +305,10 @@
       <div style="flex:1;">
         <div class="treasury-label">// TREASURY BALANCE</div>
         <div class="treasury-balance">
-          <span id="balance-display">0.00000000</span><span class="unit">BTC</span>
+          <span id="balance-usd" style="color:var(--amber)">$0.00</span><span class="unit">USD</span>
         </div>
         <div style="font-size:1.2rem; color:var(--muted); margin-top:8px; font-family:'Space Mono',monospace;">
-          ≈ <span id="balance-usd" style="color:var(--amber)">$--.--</span> USD
+          ≈ <span id="balance-display">0.00000000</span> BTC
           <span style="font-size:0.6rem; color:var(--muted); margin-left:8px;">@ $<span id="btc-price">--</span>/BTC</span>
         </div>
         <div class="treasury-meta">
@@ -757,6 +757,7 @@ function renderTransactions(txs) {
     const hash = tx.txid ? tx.txid.slice(0,8) + '...' + tx.txid.slice(-6) : '???';
     const link = tx.txid ? `https://mempool.space/tx/${tx.txid}` : '#';
     const amount = tx.amount ? Math.abs(tx.amount).toFixed(8) : '?';
+    const amountUSD = (btcPrice > 0 && tx.amount) ? '$' + (Math.abs(tx.amount) * btcPrice).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}) : '';
     const time = tx.time ? timeAgo(new Date(tx.time * 1000).toISOString()) : '';
 
     return `
@@ -767,7 +768,7 @@ function renderTransactions(txs) {
           <div style="font-size:0.58rem; color:var(--muted); margin-top:3px;">${tx.label || ''}</div>
         </div>
         <div class="tx-amount">
-          ${sign}${amount} BTC
+          ${amountUSD ? `${sign}${amountUSD}` : `${sign}${amount} BTC`}
           <span class="tx-time">${time}</span>
         </div>
       </div>`;
@@ -788,6 +789,13 @@ async function loadTreasury() {
 
     // Balance
     document.getElementById('balance-display').textContent = formatBTC(balance);
+    const usdVal = btcPrice > 0 ? '$' + (balance * btcPrice).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}) : '$0.00';
+    document.getElementById('balance-usd').textContent = usdVal;
+
+    // Ticker
+    const tickerVal = btcPrice > 0 ? usdVal + ' USD' : formatBTC(balance) + ' BTC';
+    document.getElementById('ticker-balance').textContent  = tickerVal;
+    document.getElementById('ticker-balance2').textContent = tickerVal;
 
     // Stats
     const total    = stats.total_proposals || 0;
@@ -806,9 +814,7 @@ async function loadTreasury() {
     document.getElementById('meta-approved').textContent = approved;
     document.getElementById('meta-rejected').textContent = rejected;
 
-    // Ticker
-    document.getElementById('ticker-balance').textContent  = formatBTC(balance) + ' BTC';
-    document.getElementById('ticker-balance2').textContent = formatBTC(balance) + ' BTC';
+    // Ticker proposals
     document.getElementById('ticker-proposals').textContent  = total;
     document.getElementById('ticker-proposals2').textContent = total;
     document.getElementById('ticker-approved').textContent  = approved;
@@ -850,7 +856,14 @@ async function loadBTCPrice() {
     btcPrice = data.USD || 0;
     const balance = parseFloat(document.getElementById('balance-display').textContent) || 0;
     document.getElementById('btc-price').textContent = btcPrice.toLocaleString();
-    document.getElementById('balance-usd').textContent = '$' + (balance * btcPrice).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+    const usd = (balance * btcPrice).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+    document.getElementById('balance-usd').textContent = '$' + usd;
+    // Update tickers with USD
+    if (balance > 0 && btcPrice > 0) {
+      const tickerUSD = '$' + usd + ' USD';
+      document.getElementById('ticker-balance').textContent  = tickerUSD;
+      document.getElementById('ticker-balance2').textContent = tickerUSD;
+    }
   } catch(e) {}
 }
 
@@ -864,9 +877,11 @@ async function loadOnChainBalance() {
     const btc = sats / 1e8;
     if (btc > 0) {
       document.getElementById('balance-display').textContent = formatBTC(btc);
-    if (btcPrice > 0) { document.getElementById('balance-usd').textContent = '$' + (btc * btcPrice).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}); }
-      document.getElementById('ticker-balance').textContent  = formatBTC(btc) + ' BTC';
-      document.getElementById('ticker-balance2').textContent = formatBTC(btc) + ' BTC';
+      const usd = btcPrice > 0 ? '$' + (btc * btcPrice).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}) : '$--.--';
+      document.getElementById('balance-usd').textContent = usd;
+      const tickerVal = btcPrice > 0 ? usd + ' USD' : formatBTC(btc) + ' BTC';
+      document.getElementById('ticker-balance').textContent  = tickerVal;
+      document.getElementById('ticker-balance2').textContent = tickerVal;
     }
   } catch(e) {
     // silently fail, treasury.json balance is fallback
