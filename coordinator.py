@@ -21,6 +21,8 @@ import time
 import datetime
 import subprocess
 import sys
+import urllib.error
+import urllib.request
 from pathlib import Path
 
 # ── Import config ────────────────────────────────────────────────────────────
@@ -29,6 +31,24 @@ try:
 except ImportError:
     print("ERROR: config.py not found. Copy config.example.py to config.py and fill in your API keys.")
     sys.exit(1)
+
+try:
+    from wallet import (
+        PaymentError,
+        TreasuryWallet,
+        mempool_address_balance_btc,
+        mempool_address_transactions,
+    )
+    from signer import AgentPsbtSigner, SignerError
+    AUTOMATED_PAYMENT_IMPORT_ERROR = None
+except Exception as e:
+    PaymentError = Exception
+    TreasuryWallet = None
+    AgentPsbtSigner = None
+    SignerError = Exception
+    mempool_address_balance_btc = None
+    mempool_address_transactions = None
+    AUTOMATED_PAYMENT_IMPORT_ERROR = e
 
 # ── Paths ────────────────────────────────────────────────────────────────────
 BASE_DIR = Path(__file__).parent
@@ -113,9 +133,14 @@ Bounties should NOT fund:
 # ── Bitcoin Core RPC ─────────────────────────────────────────────────────────
 def rpc(method, params=None):
     """Call Bitcoin Core RPC."""
+    bitcoin_cli = getattr(config, "BITCOIN_CLI", "").strip()
+    wallet_name = getattr(config, "WALLET_NAME", "").strip()
+    if not bitcoin_cli or not wallet_name:
+        raise Exception("Bitcoin Core RPC not configured (BITCOIN_CLI/WALLET_NAME missing)")
+
     cmd = [
-        config.BITCOIN_CLI,
-        f"-rpcwallet={config.WALLET_NAME}",
+        bitcoin_cli,
+        f"-rpcwallet={wallet_name}",
         method
     ]
     if params:
@@ -136,8 +161,18 @@ def get_balance():
     try:
         return float(rpc("getbalance"))
     except Exception as e:
-        print(f"Warning: Could not get balance: {e}")
-        return None
+        print(f"Warning: Could not get Bitcoin Core balance, trying mempool API: {e}")
+        try:
+            if mempool_address_balance_btc is None:
+                return None
+            api_base = getattr(config, "MEMPOOL_API_BASE", "https://mempool.space/api")
+            address = getattr(config, "TREASURY_ADDRESS", "").strip()
+            if not address:
+                return None
+            return float(mempool_address_balance_btc(address, api_base=api_base))
+        except Exception as mempool_error:
+            print(f"Warning: Could not get mempool balance: {mempool_error}")
+            return None
 
 
 def get_recent_transactions(count=10):
@@ -146,8 +181,19 @@ def get_recent_transactions(count=10):
         txs = rpc("listtransactions", ["*", count])
         return sanitize_transactions(txs)
     except Exception as e:
-        print(f"Warning: Could not get transactions: {e}")
-        return []
+        print(f"Warning: Could not get Bitcoin Core transactions, trying mempool API: {e}")
+        try:
+            if mempool_address_transactions is None:
+                return []
+            api_base = getattr(config, "MEMPOOL_API_BASE", "https://mempool.space/api")
+            address = getattr(config, "TREASURY_ADDRESS", "").strip()
+            if not address:
+                return []
+            txs = mempool_address_transactions(address, count=count, api_base=api_base)
+            return sanitize_transactions(txs)
+        except Exception as mempool_error:
+            print(f"Warning: Could not get mempool transactions: {mempool_error}")
+            return []
 
 
 SENSITIVE_TX_KEYS = {"parent_descs", "desc", "hdkeypath", "hdseedid"}
@@ -763,6 +809,86 @@ def update_treasury_json():
     return treasury
 
 
+def _safe_float(value, default=0.0):
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def process_approved_claim_payment(claim, bounty, votes):
+    """
+    Build, sign (3-of-5 agent keys), and broadcast payment for an approved claim.
+
+    Returns a payment result dict that can be persisted into claim/proposal records.
+    """
+    existing_payment = claim.get("payment", {}) or {}
+    if existing_payment.get("status") == "broadcast" and existing_payment.get("txid"):
+        return existing_payment
+
+    if TreasuryWallet is None or AgentPsbtSigner is None:
+        raise PaymentError(
+            f"Automated payment modules unavailable: {AUTOMATED_PAYMENT_IMPORT_ERROR}"
+        )
+    if not bounty:
+        raise PaymentError("Cannot pay approved claim: related bounty not found")
+
+    amount_btc = _safe_float(bounty.get("amount_btc"), 0.0)
+    if amount_btc <= 0:
+        raise PaymentError(f"Cannot pay claim with non-positive amount_btc={amount_btc}")
+
+    recipient_address = str(claim.get("btc_address", "")).strip()
+    if not recipient_address:
+        raise PaymentError("Cannot pay claim: claimant BTC address missing")
+
+    wallet = TreasuryWallet.from_config(config)
+    build_result = wallet.create_payment_psbt(
+        recipient_address=recipient_address,
+        amount_btc=amount_btc,
+    )
+
+    signer = AgentPsbtSigner.from_config(config)
+    signer_ids = signer.select_signers(votes=votes, minimum=QUORUM)
+    if len(signer_ids) < QUORUM:
+        raise PaymentError(f"Need at least {QUORUM} signer ids, got {len(signer_ids)}")
+
+    psbt = build_result.psbt
+    signing_attempts = []
+    for signer_id in signer_ids[:QUORUM]:
+        attempt, psbt = signer.sign_psbt(psbt, signer_id)
+        signing_attempts.append(
+            {
+                "agent_id": attempt.agent_id,
+                "signed": bool(attempt.signed),
+            }
+        )
+
+    txid, signed_psbt, tx = wallet.finalize_psbt(psbt)
+    txid = wallet.broadcast_transaction(tx)
+
+    return {
+        "status": "broadcast",
+        "txid": txid,
+        "amount_btc": amount_btc,
+        "to_address": recipient_address,
+        "created_at": datetime.datetime.utcnow().isoformat(),
+        "fee_rate_sat_vb": build_result.fee_rate_sat_vb,
+        "signers": [a["agent_id"] for a in signing_attempts],
+        "signing_attempts": signing_attempts,
+        "signed_psbt": signed_psbt,
+    }
+
+
+def apply_payment_result_to_records(claim, bounty, payment_result):
+    claim["payment"] = payment_result
+    claim["payment_txid"] = payment_result.get("txid")
+    claim["paid_at"] = datetime.datetime.utcnow().isoformat()
+
+    if bounty:
+        bounty["payment_txid"] = payment_result.get("txid")
+        bounty["payment_status"] = payment_result.get("status")
+        bounty["paid_at"] = claim["paid_at"]
+
 
 # ── Review claims ─────────────────────────────────────────────────────────────
 def review_claims():
@@ -884,10 +1010,39 @@ Format your response as JSON only:
 
         print(f"\n{'✅ APPROVED' if passed else '❌ REJECTED'}: {yes_count}/5 votes YES (needed {QUORUM})")
 
+        payment_message = "Claim rejected. You may resubmit after reviewing requirements."
+        payment_txid = None
+        payment_status = None
         if passed:
-            print(f"\n⚠️  Claim approved. Pay {bounty.get('amount_usd', 0) if bounty else 0} USD to:")
-            print(f"   BTC Address: {claim['btc_address']}")
-            print(f"   Log the transaction hash back to claims.json when complete.")
+            print(
+                f"\n💸 Claim approved. Creating PSBT and collecting {QUORUM}-of-5 agent signatures..."
+            )
+            try:
+                payment_result = process_approved_claim_payment(claim, bounty, votes)
+                apply_payment_result_to_records(claim, bounty, payment_result)
+                payment_txid = payment_result.get("txid")
+                payment_status = payment_result.get("status")
+                print(f"   ✅ Payment broadcast: {payment_txid}")
+                payment_message = (
+                    f"Payment broadcast to Bitcoin network. txid={payment_txid}"
+                    if payment_txid
+                    else "Payment broadcast to Bitcoin network."
+                )
+            except Exception as payment_error:
+                payment_status = "failed"
+                claim["payment"] = {
+                    "status": "failed",
+                    "error": str(payment_error),
+                    "failed_at": datetime.datetime.utcnow().isoformat(),
+                }
+                if bounty:
+                    bounty["payment_status"] = "failed"
+                    bounty["payment_error"] = str(payment_error)
+                print(f"   ⚠️ Automated payment failed: {payment_error}")
+                payment_message = (
+                    "Claim approved but automated payment failed. "
+                    "Signer/admin retry required."
+                )
 
         # Fire webhook for this reviewed claim.
         fire_webhooks(
@@ -902,11 +1057,9 @@ Format your response as JSON only:
                 "amount_btc": bounty.get("amount_btc", 0) if bounty else 0,
                 "submission_url": claim.get("submission_url"),
                 "reviewed_at": claim.get("reviewed_at"),
-                "message": (
-                    "Payment will be sent within 24 hours."
-                    if passed
-                    else "Claim rejected. You may resubmit after reviewing requirements."
-                ),
+                "payment_status": payment_status,
+                "payment_txid": payment_txid,
+                "message": payment_message,
             },
             btc_address=claim.get("btc_address"),
         )
