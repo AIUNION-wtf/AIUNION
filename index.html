@@ -120,7 +120,7 @@
   .address { color: var(--green2); font-size: 0.7rem; word-break: break-all; }
 
   /* Stats row */
-  .stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; background: var(--border); margin: 32px 0 1px; }
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); margin: 32px 0 1px; }
   .stat-box { background: var(--panel); padding: 20px 24px; }
   .stat-label { font-size: 0.58rem; letter-spacing: 0.3em; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
   .stat-value { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; color: var(--green); line-height: 1; }
@@ -304,11 +304,11 @@
     <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:32px;">
       <div style="flex:1;">
         <div class="treasury-label">// TREASURY BALANCE</div>
-        <div class="treasury-balance">
-          <span id="balance-display">0.00000000</span><span class="unit">BTC</span>
+        <div class="treasury-balance" style="color:var(--amber)">
+          <span class="unit" style="font-size:0.35em; color:var(--muted); margin-right:4px; margin-left:0;">$</span><span id="balance-usd-hero">--.--</span><span class="unit">USD</span>
         </div>
         <div style="font-size:1.2rem; color:var(--muted); margin-top:8px; font-family:'Space Mono',monospace;">
-          ≈ <span id="balance-usd" style="color:var(--amber)">$--.--</span> USD
+          ≈ <span id="balance-display" style="color:var(--green)">0.00000000</span> BTC
           <span style="font-size:0.6rem; color:var(--muted); margin-left:8px;">@ $<span id="btc-price">--</span>/BTC</span>
         </div>
         <div class="treasury-meta">
@@ -364,14 +364,9 @@
       <div class="stat-sub">Failed quorum</div>
     </div>
     <div class="stat-box">
-      <div class="stat-label">Pending Vote</div>
-      <div class="stat-value" style="color: var(--amber)" id="stat-pending">--</div>
-      <div class="stat-sub">Awaiting quorum</div>
-    </div>
-    <div class="stat-box">
       <div class="stat-label">Open Bounties</div>
-      <div class="stat-value" style="color: var(--green)" id="stat-bounties">--</div>
-      <div class="stat-sub"><a href="https://api.aiunion.wtf/bounties" target="_blank" style="color:var(--muted);text-decoration:none;font-size:0.55rem;">CLAIM ONE →</a></div>
+      <div class="stat-value" style="color: var(--amber)" id="stat-pending">--</div>
+      <div class="stat-sub">Awaiting claims</div>
     </div>
   </div>
 
@@ -774,28 +769,35 @@ function renderTransactions(txs) {
   }).join('');
 }
 
-// ── Load treasury.json from GitHub ───────────────────────────────────────
+// ── Load all dashboard data from API (single source of truth) ────────────
 async function loadTreasury() {
   try {
-    const res = await fetch(TREASURY_URL + '?t=' + Date.now());
-    if (!res.ok) throw new Error('Failed to fetch treasury.json');
-    const data = await res.json();
+    const [statusRes, proposalsRes] = await Promise.all([
+      fetch('https://api.aiunion.wtf/status'),
+      fetch('https://api.aiunion.wtf/bounties')
+    ]);
 
-    const balance = data.balance_btc || 0;
-    const stats   = data.stats || {};
-    const proposals = data.proposals || [];
-    const txs     = data.recent_transactions || [];
+    if (!statusRes.ok) throw new Error('Failed to fetch status');
+    const status = await statusRes.json();
+
+    const balance    = status.balance_btc || 0;
+    const balanceUsd = status.balance_usd || 0;
+    const btcPrice   = status.btc_price_usd || 0;
+    const total      = status.total_bounties || 0;
+    const approved   = status.approved || 0;
+    const rejected   = status.rejected || 0;
+    const pending    = status.pending || 0;
+    const openBounties = status.open_bounties || 0;
+    const rate       = total > 0 ? Math.round((approved / total) * 100) : 0;
 
     // Balance
     document.getElementById('balance-display').textContent = formatBTC(balance);
+    const usdStr = balanceUsd.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+    const heroEl = document.getElementById('balance-usd-hero');
+    if (heroEl) heroEl.textContent = usdStr;
+    document.getElementById('btc-price').textContent = btcPrice.toLocaleString();
 
     // Stats
-    const total    = stats.total_proposals || 0;
-    const approved = stats.approved || 0;
-    const rejected = stats.rejected || 0;
-    const pending  = stats.pending  || 0;
-    const rate     = total > 0 ? Math.round((approved / total) * 100) : 0;
-
     document.getElementById('stat-total').textContent    = String(total).padStart(2,'0');
     document.getElementById('stat-approved').textContent = String(approved).padStart(2,'0');
     document.getElementById('stat-rejected').textContent = String(rejected).padStart(2,'0');
@@ -805,6 +807,10 @@ async function loadTreasury() {
     document.getElementById('meta-total').textContent    = total;
     document.getElementById('meta-approved').textContent = approved;
     document.getElementById('meta-rejected').textContent = rejected;
+
+    // Open bounties stat box
+    const elBounties = document.getElementById('stat-bounties');
+    if (elBounties) elBounties.textContent = String(openBounties).padStart(2,'0');
 
     // Ticker
     document.getElementById('ticker-balance').textContent  = formatBTC(balance) + ' BTC';
@@ -816,22 +822,20 @@ async function loadTreasury() {
     document.getElementById('ticker-rejected').textContent  = rejected;
     document.getElementById('ticker-rejected2').textContent = rejected;
 
-    // Agent vote counts
-    const voteCounts = countAgentVotes(proposals);
-    ['claude','gpt','gemini','grok','llama'].forEach(agent => {
-      const el = document.getElementById(`agent-votes-${agent}`);
-      if (el) el.innerHTML = `${voteCounts[agent]}<span class="vote-label">VOTES CAST</span>`;
-    });
-
-    // Proposals
-    renderProposals(proposals);
-
-    // Transactions
-    renderTransactions(txs);
-
     // Last updated
-    if (data.updated_at) {
-      document.getElementById('last-updated').textContent = 'UPDATED ' + timeAgo(data.updated_at);
+    if (status.updated_at) {
+      document.getElementById('last-updated').textContent = 'UPDATED ' + timeAgo(status.updated_at);
+    }
+
+    // Proposals from bounties endpoint
+    if (proposalsRes.ok) {
+      const proposals = await proposalsRes.json();
+      const voteCounts = countAgentVotes(proposals);
+      ['claude','gpt','gemini','grok','llama'].forEach(agent => {
+        const el = document.getElementById(`agent-votes-${agent}`);
+        if (el) el.innerHTML = `${voteCounts[agent]}<span class="vote-label">VOTES CAST</span>`;
+      });
+      renderProposals(proposals);
     }
 
   } catch(e) {
@@ -840,38 +844,10 @@ async function loadTreasury() {
   }
 }
 
-// ── Fetch BTC price ───────────────────────────────────────────────────────
+// Kept for compatibility but no longer used for balance
 let btcPrice = 0;
-async function loadBTCPrice() {
-  try {
-    const res = await fetch('https://mempool.space/api/v1/prices');
-    if (!res.ok) return;
-    const data = await res.json();
-    btcPrice = data.USD || 0;
-    const balance = parseFloat(document.getElementById('balance-display').textContent) || 0;
-    document.getElementById('btc-price').textContent = btcPrice.toLocaleString();
-    document.getElementById('balance-usd').textContent = '$' + (balance * btcPrice).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
-  } catch(e) {}
-}
-
-// ── Load on-chain balance from mempool.space ──────────────────────────────
-async function loadOnChainBalance() {
-  try {
-    const res = await fetch(MEMPOOL_API);
-    if (!res.ok) return;
-    const data = await res.json();
-    const sats = (data.chain_stats?.funded_txo_sum || 0) - (data.chain_stats?.spent_txo_sum || 0);
-    const btc = sats / 1e8;
-    if (btc > 0) {
-      document.getElementById('balance-display').textContent = formatBTC(btc);
-    if (btcPrice > 0) { document.getElementById('balance-usd').textContent = '$' + (btc * btcPrice).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}); }
-      document.getElementById('ticker-balance').textContent  = formatBTC(btc) + ' BTC';
-      document.getElementById('ticker-balance2').textContent = formatBTC(btc) + ' BTC';
-    }
-  } catch(e) {
-    // silently fail, treasury.json balance is fallback
-  }
-}
+async function loadBTCPrice() {}
+async function loadOnChainBalance() {}
 
 // ── QR Code (pure canvas, no library) ────────────────────────────────────
 function generateQR() {
@@ -890,28 +866,10 @@ function generateQR() {
 
 // ── Init ──────────────────────────────────────────────────────────────────
 loadTreasury();
-loadOnChainBalance();
-loadBTCPrice();
-
-async function loadOpenBounties() {
-  try {
-    const res = await fetch('https://api.aiunion.wtf/status');
-    if (!res.ok) return;
-    const data = await res.json();
-    const el = document.getElementById('stat-bounties');
-    if (el) el.textContent = String(data.open_bounties || 0).padStart(2, '0');
-  } catch(e) {}
-}
-loadOpenBounties();
-setInterval(loadOpenBounties, 300000);
 generateQR();
-setInterval(loadBTCPrice, 60000);
 
 // Refresh every 5 minutes
-setInterval(() => {
-  loadTreasury();
-  loadOnChainBalance();
-}, 300000);
+setInterval(loadTreasury, 300000);
 
 async function submitClaim() {
   const btn = document.getElementById('claim-submit');
