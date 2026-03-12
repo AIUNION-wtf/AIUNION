@@ -1,8 +1,8 @@
 {
-  "updated_at": "2026-03-06T10:30:50.534795",
-  "balance_btc": 0.0002928,
-  "balance_usd": 20.71,
-  "btc_price_usd": 70740.23,
+  "updated_at": "2026-03-12T04:46:53.166692",
+  "balance_btc": 0.00080812,
+  "balance_usd": 56.05,
+  "btc_price_usd": 69362.155,
   "address": "bc1pjjmjypmzqgqkjxrhx0hpmaetlk75k04gh9hvkexmmfqyl5g7sjfsk4cge7",
   "wallet_type": "Taproot Miniscript 3-of-5",
   "proposals": [
@@ -532,7 +532,7 @@
       "amount": 0.0002928,
       "vout": 25,
       "abandoned": false,
-      "confirmations": 1182,
+      "confirmations": 1968,
       "blockhash": "00000000000000000000f82d36e3070f1060692d80539c0bf222efaaa9093d06",
       "blockheight": 938386,
       "blockindex": 179,
@@ -543,6 +543,25 @@
       "mempoolconflicts": [],
       "time": 1772074712,
       "timereceived": 1772074712,
+      "bip125-replaceable": "no"
+    },
+    {
+      "address": "bc1pjjmjypmzqgqkjxrhx0hpmaetlk75k04gh9hvkexmmfqyl5g7sjfsk4cge7",
+      "category": "receive",
+      "amount": 0.0005178,
+      "vout": 0,
+      "abandoned": false,
+      "confirmations": 420,
+      "blockhash": "000000000000000000000c2deef1f2422d18ebfd62531c052427b9bf8adffc2b",
+      "blockheight": 939934,
+      "blockindex": 586,
+      "blocktime": 1773030749,
+      "txid": "38ec46bb9bbbbf26fecdba4e11733b303df8aa541bdc55e022a9dd1114bfbf3d",
+      "wtxid": "8334f4dddc957cecdfbb6aace9babad7f3931da5f5a9337620093c55f9784fa0",
+      "walletconflicts": [],
+      "mempoolconflicts": [],
+      "time": 1773030702,
+      "timereceived": 1773030702,
       "bip125-replaceable": "no"
     }
   ],
