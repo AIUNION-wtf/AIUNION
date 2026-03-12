@@ -17,3 +17,7 @@ archive_all.py
 *.backup.*.json
 *claude conversation*.txt
 *conversation*.txt
+
+secrets/
+preflight.py
+build_signers.py
