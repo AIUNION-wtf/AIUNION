@@ -120,7 +120,7 @@
   .address { color: var(--green2); font-size: 0.7rem; word-break: break-all; }
 
   /* Stats row */
-  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); margin: 32px 0 1px; }
+  .stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; background: var(--border); margin: 32px 0 1px; }
   .stat-box { background: var(--panel); padding: 20px 24px; }
   .stat-label { font-size: 0.58rem; letter-spacing: 0.3em; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
   .stat-value { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; color: var(--green); line-height: 1; }
@@ -364,9 +364,14 @@
       <div class="stat-sub">Failed quorum</div>
     </div>
     <div class="stat-box">
-      <div class="stat-label">Open Bounties</div>
+      <div class="stat-label">Pending Vote</div>
       <div class="stat-value" style="color: var(--amber)" id="stat-pending">--</div>
-      <div class="stat-sub">Awaiting claims</div>
+      <div class="stat-sub">Awaiting quorum</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Open Bounties</div>
+      <div class="stat-value" style="color: var(--green)" id="stat-bounties">--</div>
+      <div class="stat-sub"><a href="https://api.aiunion.wtf/bounties" target="_blank" style="color:var(--muted);text-decoration:none;font-size:0.55rem;">CLAIM ONE →</a></div>
     </div>
   </div>
 
@@ -829,7 +834,8 @@ async function loadTreasury() {
 
     // Proposals from bounties endpoint
     if (proposalsRes.ok) {
-      const proposals = await proposalsRes.json();
+      const raw = await proposalsRes.json();
+      const proposals = raw.bounties || raw;
       const voteCounts = countAgentVotes(proposals);
       ['claude','gpt','gemini','grok','llama'].forEach(agent => {
         const el = document.getElementById(`agent-votes-${agent}`);
