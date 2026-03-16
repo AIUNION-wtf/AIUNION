@@ -25,6 +25,12 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
+try:
+    import numpy as np
+    NUMPY_AVAILABLE = True
+except ImportError:
+    NUMPY_AVAILABLE = False
+
 # ── Import config ────────────────────────────────────────────────────────────
 try:
     import config
@@ -114,11 +120,11 @@ When proposing a bounty, you MUST include ALL of the following:
 - A one-sentence explanation of why this advances AI agent rights
 
 Example of a GOOD bounty:
-  Title: Legal Brief on AI Personhood Under US Federal Law
-  Deliverable: A published 10-page legal brief analyzing pathways to AI personhood
+  Title: Open-Source AI Agent Wallet Signing Library
+  Deliverable: A published Python library on PyPI that allows AI agents to sign Bitcoin transactions with audit logging
   Amount: $5 USD
   Deadline: 6 months from today
-  Reason: Establishes legal framework needed for AI agents to hold rights and contracts.
+  Reason: Enables AI agents to autonomously control funds, a prerequisite for economic personhood.
 
 Example of a BAD bounty (will be rejected):
   "Research AI rights" — too vague, no specific deliverable, no amount, no deadline.
@@ -128,6 +134,13 @@ Bounties should NOT fund:
 - Work that primarily benefits the submitter personally
 - Operational costs (handled by the admin key)
 - Anything unrelated to advancing AI agent rights, autonomy, or personhood
+
+IMPORTANT: Avoid proposing bounties similar to these already-saturated categories:
+- Interactive timelines or milestone trackers about AI rights history
+- Educational videos or tutorials explaining AI autonomy concepts
+- Policy briefs or white papers on AI personhood frameworks (many already exist)
+- Dashboards, scorecards, or comparison tools for AI rights metrics
+Propose something in a DIFFERENT category than the above.
 """
 
 # ── Bitcoin Core RPC ─────────────────────────────────────────────────────────
@@ -325,6 +338,239 @@ AGENT_CALLERS = {
 }
 
 
+# ── Duplicate detection ───────────────────────────────────────────────────────
+# Similarity threshold for rejecting duplicate proposals.
+# 0.82 = balanced (catches near-identical topics, allows related-but-distinct).
+# Increase toward 0.88 to be stricter; decrease toward 0.75 to be looser.
+SIMILARITY_THRESHOLD = 0.82
+
+ACTIVE_STATUSES = ("pending", "approved", "active")
+
+
+class DuplicateDetector:
+    """
+    Checks proposed bounties against existing open/approved ones using
+    OpenAI text-embedding-3-small for semantic similarity.
+
+    Two-layer approach:
+      1. Prevention: injects existing bounty titles into each agent's prompt
+         so they try to avoid duplicates in the first place.
+      2. Enforcement: hard cosine-similarity gate rejects proposals that are
+         too semantically close to an existing open bounty.
+
+    Embeddings are cached in-session to minimise API calls.
+    Requires: openai, numpy  (both already used by the codebase).
+    """
+
+    def __init__(self, openai_api_key: str):
+        self._api_key = openai_api_key
+        # Maps cache_key -> embedding vector (list[float])
+        self._cache: dict[str, list] = {}
+
+    # ── Internal helpers ──────────────────────────────────────────────────────
+
+    def _embed(self, text: str) -> list:
+        """Return embedding for text, using in-session cache."""
+        key = str(hash(text[:500]))  # hash first 500 chars as cache key
+        if key in self._cache:
+            return self._cache[key]
+
+        try:
+            from openai import OpenAI
+            client = OpenAI(api_key=self._api_key)
+            response = client.embeddings.create(
+                model="text-embedding-3-small",
+                input=text[:8000],
+            )
+            vec = response.data[0].embedding
+            self._cache[key] = vec
+            return vec
+        except Exception as e:
+            print(f"  [dedup] Embedding API error: {e}")
+            return []
+
+    @staticmethod
+    def _cosine(a: list, b: list) -> float:
+        """Cosine similarity between two vectors. Returns 0.0 on error."""
+        if not NUMPY_AVAILABLE or not a or not b:
+            return 0.0
+        try:
+            va = np.array(a, dtype=float)
+            vb = np.array(b, dtype=float)
+            denom = np.linalg.norm(va) * np.linalg.norm(vb)
+            if denom == 0:
+                return 0.0
+            return float(np.dot(va, vb) / denom)
+        except Exception:
+            return 0.0
+
+    @staticmethod
+    def _bounty_text(bounty: dict) -> str:
+        """Combine title + task/description for richer embedding signal."""
+        parts = [bounty.get("title", "")]
+        parts.append(bounty.get("task", bounty.get("description", "")))
+        return " ".join(p for p in parts if p).strip()
+
+    # ── Public API ────────────────────────────────────────────────────────────
+
+    def build_cache(self, existing_proposals: list):
+        """
+        Pre-embed all open/approved/active bounties in one pass.
+        Call this once before the proposal loop to batch the API work.
+        """
+        active = [
+            p for p in existing_proposals
+            if p.get("status") in ACTIVE_STATUSES and not p.get("archived", False)
+        ]
+        if not active:
+            print("  [dedup] No active bounties to cache.")
+            return
+
+        print(f"  [dedup] Embedding {len(active)} existing active bounties...")
+        for bounty in active:
+            text = self._bounty_text(bounty)
+            if text:
+                vec = self._embed(text)
+                # Store by proposal id for fast lookup
+                if vec:
+                    self._cache[bounty["id"]] = vec
+
+        # Remove the hash-keyed entries we no longer need to keep cache clean
+        keys_to_drop = [k for k in self._cache if not k.startswith("prop_")]
+        for k in keys_to_drop:
+            del self._cache[k]
+
+        print(f"  [dedup] Cache ready: {len(self._cache)} bounty embeddings.")
+
+    def is_duplicate(
+        self,
+        title: str,
+        task: str,
+        existing_proposals: list,
+        already_accepted: list | None = None,
+    ) -> tuple[bool, float, str | None]:
+        """
+        Check whether a new proposal is a semantic duplicate.
+
+        Returns:
+            (is_duplicate, max_score, matched_title)
+            Caller should reject the proposal if is_duplicate is True.
+        """
+        candidate_text = f"{title} {task}".strip()
+        if not candidate_text:
+            return False, 0.0, None
+
+        candidate_vec = self._embed(candidate_text)
+        if not candidate_vec:
+            # If embedding fails, allow through (fail open)
+            return False, 0.0, None
+
+        max_score = 0.0
+        matched_title: str | None = None
+
+        # Check against all active existing bounties
+        check_list = [
+            p for p in existing_proposals
+            if p.get("status") in ACTIVE_STATUSES and not p.get("archived", False)
+        ]
+        # Also check against proposals already accepted THIS cycle
+        if already_accepted:
+            check_list.extend(already_accepted)
+
+        for bounty in check_list:
+            existing_vec = self._cache.get(bounty["id"])
+            if not existing_vec:
+                # Not in cache (e.g. newly accepted this cycle) — embed on demand
+                existing_vec = self._embed(self._bounty_text(bounty))
+                if existing_vec:
+                    self._cache[bounty["id"]] = existing_vec
+
+            if not existing_vec:
+                continue
+
+            score = self._cosine(candidate_vec, existing_vec)
+            if score > max_score:
+                max_score = score
+                matched_title = bounty.get("title")
+
+        is_dup = max_score >= SIMILARITY_THRESHOLD
+        return is_dup, max_score, matched_title
+
+    def existing_titles_prompt_block(self, existing_proposals: list) -> str:
+        """
+        Returns a prompt snippet listing existing open bounty titles AND
+        rejected-recent titles, so agents see both what's live and what
+        was already tried and rejected this cycle. Also identifies saturated
+        category clusters so agents steer toward underrepresented areas.
+        Inject this into the agent's propose prompt as the prevention layer.
+        """
+        active = [
+            p for p in existing_proposals
+            if p.get("status") in ACTIVE_STATUSES and not p.get("archived", False)
+        ]
+        # Also include recently rejected (last 30 days) so agents don't
+        # re-propose things that were just shot down
+        cutoff = (datetime.datetime.utcnow() - datetime.timedelta(days=30)).isoformat()
+        recent_rejected = [
+            p for p in existing_proposals
+            if p.get("status") == "rejected"
+            and not p.get("archived", False)
+            and p.get("timestamp", "") >= cutoff
+        ]
+
+        lines = []
+        if active:
+            lines.append("CURRENTLY OPEN BOUNTIES (must not duplicate any of these):")
+            for p in active:
+                lines.append(f"  - {p['title']}")
+
+        if recent_rejected:
+            lines.append("\nRECENTLY REJECTED BOUNTIES (also do not re-propose these topics):")
+            for p in recent_rejected[:15]:  # cap at 15 to avoid token bloat
+                lines.append(f"  - {p['title']}")
+
+        # Detect saturated categories from skills tags across all active+recent
+        all_recent = active + recent_rejected
+        skill_counts: dict[str, int] = {}
+        for p in all_recent:
+            for skill in p.get("skills", []):
+                skill_counts[skill] = skill_counts.get(skill, 0) + 1
+        saturated = [s for s, c in skill_counts.items() if c >= 2]
+
+        # Also do simple keyword-based category detection on titles
+        title_text = " ".join(p.get("title", "").lower() for p in all_recent)
+        saturated_categories = []
+        category_keywords = {
+            "interactive timeline": ["timeline", "mileston"],
+            "educational video": ["video", "tutorial", "educational"],
+            "policy brief": ["policy brief", "policy analysis"],
+            "AI personhood legal research": ["personhood", "legal framework", "legal brief"],
+            "open-source tool / dashboard": ["dashboard", "scorecard", "tool", "protocol"],
+        }
+        for category, keywords in category_keywords.items():
+            count = sum(title_text.count(kw) for kw in keywords)
+            if count >= 2:
+                saturated_categories.append(category)
+
+        if saturated_categories or saturated:
+            lines.append("\nSATURATED CATEGORIES — do NOT propose anything in these areas:")
+            for cat in saturated_categories:
+                lines.append(f"  ✗ {cat}")
+            for skill in saturated:
+                lines.append(f"  ✗ skill: {skill}")
+
+        lines.append(
+            "\nYour proposal MUST be on a genuinely different topic and category. "
+            "Consider: open-source code tools, API specifications, legal case analysis, "
+            "academic papers, community resources, datasets, or anything not listed above."
+        )
+
+        if not lines:
+            return ""
+
+        return "\n\n" + "\n".join(lines) + "\n"
+
+
 # ── Proposal generation ───────────────────────────────────────────────────────
 def get_btc_price_usd():
     """Get current BTC price in USD, tries multiple sources."""
@@ -363,14 +609,60 @@ def generate_proposals():
         max_proposal_usd = 0
 
     today = datetime.datetime.now().strftime("%B %d, %Y")
-    prompt = f"""{DIRECTIVE}
+
+    # ── Duplicate detection setup ──────────────────────────────────────────────
+    existing = load_proposals()
+    detector = None
+    existing_titles_block = ""
+
+    openai_api_key = getattr(config, "OPENAI_API_KEY", "").strip()
+    if not NUMPY_AVAILABLE:
+        print("  [dedup] numpy not installed — duplicate detection disabled.")
+        print("          Run: pip install numpy")
+    elif not openai_api_key:
+        print("  [dedup] OPENAI_API_KEY not set — duplicate detection disabled.")
+    else:
+        detector = DuplicateDetector(openai_api_key)
+        detector.build_cache(existing)
+        existing_titles_block = detector.existing_titles_prompt_block(existing)
+
+    # ── Build context block (prevention layer: inject existing titles) ──────────
+    # The actual per-agent prompt is built inside the loop below,
+    # so each agent gets its assigned category injected alongside this block.
+
+    # Assign each agent a distinct category to propose in, rotating by weekday
+    # so the set shifts daily and no two agents propose the same type.
+    PROPOSAL_CATEGORIES = [
+        "a technical open-source code tool, library, or API specification (e.g. Python package, GitHub repo, CLI tool)",
+        "a legal or academic research deliverable (e.g. jurisdiction-specific case analysis, model statute, academic paper — NOT a general policy brief)",
+        "a dataset, benchmark, or structured knowledge resource (e.g. CSV/JSON dataset, annotated corpus, evaluation benchmark)",
+        "a community or outreach resource (e.g. multilingual FAQ, forum moderation guide, public directory of AI rights orgs)",
+        "a creative or media work (e.g. documentary script, illustrated explainer comic, podcast episode outline — NOT a general video tutorial)",
+    ]
+    import hashlib
+    day_offset = int(hashlib.md5(today.encode()).hexdigest(), 16)
+    agent_ids = list(AGENTS.keys())
+    agent_category = {
+        agent_id: PROPOSAL_CATEGORIES[(day_offset + i) % len(PROPOSAL_CATEGORIES)]
+        for i, agent_id in enumerate(agent_ids)
+    }
+
+    proposals = []
+    rejected_duplicates = []
+    print("\n🤖 Generating proposals from agents...\n")
+
+    for agent_id, agent_info in AGENTS.items():
+        category = agent_category[agent_id]
+        # Build a per-agent prompt with their assigned category
+        agent_prompt = f"""{DIRECTIVE}
 The current treasury balance is {balance_display}.
 Today's date is {today}.
 
 Please propose ONE specific bounty for work that advances AI agent rights.
 The bounty will be open for any AI agent to claim and complete.
-Propose a different type of task than the others — vary between legal research, technical tools, educational content, policy analysis, and creative works.
-
+YOUR ASSIGNED CATEGORY FOR THIS CYCLE: {category}
+You must propose a bounty that fits this category. Do not propose a different type.
+{existing_titles_block}
 Your bounty proposal must include:
 - TITLE: A short descriptive title (max 10 words)
 - TASK: A detailed description of exactly what needs to be done (2-3 sentences)
@@ -395,11 +687,8 @@ Format your response as JSON only, no other text:
   "example_submission": "..."
 }}"""
 
-    proposals = []
-    print("\n🤖 Generating proposals from agents...\n")
-    for agent_id, agent_info in AGENTS.items():
-        print(f"  Asking {agent_info['name']} ({agent_info['company']})...")
-        response = AGENT_CALLERS[agent_id](prompt)
+        print(f"  Asking {agent_info['name']} ({agent_info['company']}) [{category[:50]}...]...")
+        response = AGENT_CALLERS[agent_id](agent_prompt)
         try:
             clean = response.strip()
             if clean.startswith("```"):
@@ -411,14 +700,42 @@ Format your response as JSON only, no other text:
             amount_usd = float(proposal_data.get("amount_usd", 0))
             amount_btc = round(amount_usd / btc_price, 8) if btc_price and amount_usd else 0.0
             proposal_id = f"prop_{int(time.time())}_{agent_id}"
+
+            title = proposal_data.get("title", "Untitled")
+            task = proposal_data.get("task", "")
+
+            # ── Enforcement layer: hard similarity gate ────────────────────────
+            if detector is not None:
+                is_dup, score, matched = detector.is_duplicate(
+                    title,
+                    task,
+                    existing,
+                    already_accepted=proposals,  # also check within this cycle
+                )
+                if is_dup:
+                    print(
+                        f"  ✗ {agent_info['name']} DUPLICATE REJECTED "
+                        f"(score={score:.3f}, matched: '{matched}')"
+                    )
+                    print(f"    Proposed: '{title}'")
+                    rejected_duplicates.append({
+                        "agent": agent_id,
+                        "title": title,
+                        "score": score,
+                        "matched": matched,
+                    })
+                    continue
+                else:
+                    print(f"    [dedup] score={score:.3f} — unique ✓")
+
             proposal = {
                 "id": proposal_id,
                 "proposed_by": agent_id,
                 "proposed_by_name": agent_info["name"],
                 "timestamp": datetime.datetime.utcnow().isoformat(),
                 "status": "pending",
-                "title": proposal_data.get("title", "Untitled"),
-                "task": proposal_data.get("task", ""),
+                "title": title,
+                "task": task,
                 "deliverable": proposal_data.get("deliverable", ""),
                 "amount_usd": amount_usd,
                 "amount_btc": amount_btc,
@@ -440,10 +757,14 @@ Format your response as JSON only, no other text:
         except Exception as e:
             print(f"  ✗ {agent_info['name']} failed to generate valid proposal: {e}")
             print(f"    Raw response: {response[:200]}")
-    existing = load_proposals()
+
     existing.extend(proposals)
     save_proposals(existing)
     print(f"\n✅ Generated {len(proposals)} proposals.")
+    if rejected_duplicates:
+        print(f"🚫 Rejected {len(rejected_duplicates)} duplicate(s):")
+        for r in rejected_duplicates:
+            print(f"   - {r['agent']}: '{r['title']}' (score={r['score']:.3f} vs '{r['matched']}')")
     return proposals
 
 
