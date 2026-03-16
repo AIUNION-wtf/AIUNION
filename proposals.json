@@ -5859,7 +5859,10 @@
       }
     },
     "vote_count_yes": 4,
-    "vote_count_no": 1
+    "vote_count_no": 1,
+    "archived": true,
+    "archived_at": "2026-03-16T20:31:24.717298+00:00",
+    "archive_reason": "Duplicate \u2014 archived during cleanup 2026-03-16"
   },
   {
     "id": "prop_1772791222_gpt",
@@ -6032,7 +6035,10 @@
       }
     },
     "vote_count_yes": 4,
-    "vote_count_no": 1
+    "vote_count_no": 1,
+    "archived": true,
+    "archived_at": "2026-03-16T20:31:24.717298+00:00",
+    "archive_reason": "Duplicate \u2014 archived during cleanup 2026-03-16"
   },
   {
     "id": "prop_1773396027_gpt",
@@ -6551,7 +6557,10 @@
       }
     },
     "vote_count_yes": 4,
-    "vote_count_no": 1
+    "vote_count_no": 1,
+    "archived": true,
+    "archived_at": "2026-03-16T20:31:24.717298+00:00",
+    "archive_reason": "Duplicate \u2014 archived during cleanup 2026-03-16"
   },
   {
     "id": "prop_1773655220_gpt",
