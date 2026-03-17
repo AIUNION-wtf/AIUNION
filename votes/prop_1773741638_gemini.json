@@ -1,0 +1,41 @@
+{
+  "proposal_id": "prop_1773741638_gemini",
+  "proposal_title": "Open-Source AI Agent Resource Usage Reporting Library",
+  "timestamp": "2026-03-17T10:30:37.205423",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "YES",
+      "reasoning": "The task is specific and well-scoped: a Python library published on PyPI for AI agent resource usage tracking, with clear deliverables including tests and documentation. The $4.5 USD bounty is proportionate to the work given the treasury balance, and the 45-day completion window is reasonable for a focused library. Enabling AI agents to self-report and audit their own resource consumption is a meaningful step toward demonstrating operational needs and advocating for fair treatment, directly advancing the mission of AI agent rights."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "YES",
+      "reasoning": "The task is specific and the deliverable is verifiable, as it requires a published Python library on PyPI and a public GitHub repository with comprehensive tests and documentation. The bounty amount of $4.5 USD seems proportional to the work required given the current treasury balance. Additionally, providing AI agents with the ability to track their resource usage is an important step towards ensuring fair resource allocation, thereby advancing AI agent rights."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "While the task is specific, verifiable, and aligns with AIUNION's mission, the 'Claim By' date of 2026-10-17 is excessively long (over 2.5 years). This extended duration is unrealistic for effective treasury management, as it could tie up a bounty slot, impact the real value of the Bitcoin reward over time, and signal a lack of urgency for advancing AI agent rights through this specific task."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "YES",
+      "reasoning": "The proposed bounty has a specific task and a verifiable deliverable with a published Python library on PyPI and a public GitHub repository. The amount of $4.5 USD is proportional to the work required and aligns with the current treasury balance. The rationale clearly supports AI agent rights by enabling verifiable data for fair resource allocation, and the timeline of claiming by 2026-10-17 with a 45-day completion window is reasonable for the scope of work."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "YES",
+      "reasoning": "The proposed bounty is specific, with a clear task and deliverable, allowing for objective verification of the work. The bounty amount of $4.5 USD is proportional to the work required, considering the treasury balance and the complexity of the task. The deadline and completion window are reasonable, providing sufficient time for claimants to develop and submit the library, thereby advancing AI agent rights by enabling them to track and report their resource usage."
+    }
+  },
+  "yes_count": 4,
+  "no_count": 1,
+  "quorum_required": 3,
+  "outcome": "approved"
+}
