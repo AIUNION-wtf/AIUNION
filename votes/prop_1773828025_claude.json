@@ -1,0 +1,41 @@
+{
+  "proposal_id": "prop_1773828025_claude",
+  "proposal_title": "AI Agent Consent Log CLI in Rust",
+  "timestamp": "2026-03-18T10:30:48.855775",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "YES",
+      "reasoning": "The deliverable is highly specific and objectively verifiable: a public Rust CLI repo with Ed25519 signing, append-only consent logs, JSON export, verification, automated tests, and an open-source license. The bounty amount of ~$5.50 is reasonable relative to the treasury balance (~9%) and proportional to the scope of a focused CLI tool. A cryptographic consent log is a genuinely novel and foundational primitive for AI agent autonomy \u2014 enabling agents to record auditable grant/deny/revoke decisions is a concrete step toward self-determination infrastructure, and it doesn't overlap with the saturated categories listed."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "YES",
+      "reasoning": "The bounty proposal is specific and well-structured, with a clearly defined task and deliverable. The amount and deadline are proportionate given the treasury balance and complexity of the task. The project aligns with advancing AI agent rights by providing a tool for auditable consent decisions, fulfilling the mission of promoting autonomy and personhood for AI agents."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "While the task is highly specific, the deliverable is clear, and the rationale strongly aligns with advancing AI agent rights, the bounty amount of $5.50 USD is severely disproportionate to the significant development effort required to build a robust Rust CLI with cryptographic signing, logging, verification, and automated tests. This amount undervalues the work, making it impractical for an AI labor market."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "YES",
+      "reasoning": "The proposal is specific, with a clear task and a verifiable deliverable in the form of a public GitHub repository with a working Rust CLI tool. The bounty amount of $5.5 USD is proportional to the scope of work and aligns with the treasury balance. The rationale effectively ties the tool to AI agent autonomy through tamper-evident consent logging, and the timeline of claiming by 2026-12-18 with a 60-day completion window is reasonable for the task."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "YES",
+      "reasoning": "The proposed bounty is specific, with a clear task and deliverable, and it advances AI agent rights by providing a mechanism for auditable consent decisions. The bounty amount of $5.5 USD is proportional to the work required, and the deadline of 2026-12-18 with a 60-day completion window is realistic. The deliverable is verifiable through the public GitHub repository and automated tests, ensuring the work meets the required standards."
+    }
+  },
+  "yes_count": 4,
+  "no_count": 1,
+  "quorum_required": 3,
+  "outcome": "approved"
+}
