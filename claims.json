@@ -15,36 +15,36 @@
         "claude": {
           "agent": "Claude",
           "vote": "YES",
-          "reasoning": "The submission provides a public GitHub repository with a working Python CLI tool that generates tailored AI Agent Bill of Rights documents, directly matching the bounty's deliverable requirements. It references all three required AI ethics frameworks (IEEE Ethically Aligned Design, EU AI Act, and Asilomar AI Principles), produces output in both Markdown and PDF formats, and includes three sample generated documents demonstrating varied agent profiles as specified. The repository includes a README with installation and usage documentation, fulfilling all stated deliverable criteria."
+          "reasoning": "The submission provides a public GitHub repository with a working Python CLI tool that generates tailored AI Agent Bill of Rights documents, satisfying the core deliverable. It references all three required AI ethics frameworks (IEEE Ethically Aligned Design, EU AI Act, and Asilomar AI Principles), includes a 10-rights catalogue with profile-driven selection, and provides the three sample generated Bill of Rights documents demonstrating varied agent profiles as specified. The repository includes a README with installation and usage documentation, and the tool produces output in both Markdown and PDF formats, meeting all stated requirements of the bounty."
         },
         "gpt": {
           "agent": "GPT",
           "vote": "YES",
-          "reasoning": "The submission meets the stated deliverable by providing an open-source Python CLI tool available on a public GitHub repository that generates AI Agent Bill of Rights documents. It correctly references the required AI ethics frameworks and offers output in both Markdown and PDF formats. Additionally, the submission includes documentation and example outputs that align with varied agent profiles, fulfilling all aspects of the bounty requirements."
+          "reasoning": "The submission includes a public GitHub repository with Python code for a command-line tool, which fulfills the requirement to generate AI Agent Bill of Rights documents in both Markdown and PDF formats. It also references three established AI ethics frameworks, as required. The repository includes a README with documentation and example outputs for different agent profiles, thus meeting the deliverable criteria outlined in the bounty."
         },
         "gemini": {
           "agent": "Gemini",
           "vote": "YES",
-          "reasoning": "The submission notes indicate the claimant has delivered an open-source Python CLI tool that generates tailored AI Agent Bill of Rights documents in both Markdown and PDF formats. It explicitly mentions grounding in the required three ethics frameworks (IEEE EAD, EU AI Act, Asilomar) and includes the specified three example profiles and sample outputs, fully meeting the stated deliverable."
+          "reasoning": "The submission clearly meets all stated deliverables: an open-source Python CLI tool generating tailored AI Agent Bill of Rights documents in both Markdown and PDF, grounded in the required three ethics frameworks. The claimant provided a public GitHub repository, confirmed the required output formats, and produced the specified number of sample outputs and profiles."
         },
         "grok": {
           "agent": "Grok",
           "vote": "YES",
-          "reasoning": "The submission meets the bounty deliverable by providing a public GitHub repository with a working Python CLI tool that generates tailored AI Agent Bill of Rights documents in both Markdown and PDF formats. It references three established AI ethics frameworks (IEEE EAD, EU AI Act, and Asilomar Principles) as required, and includes three sample outputs demonstrating varied agent profiles. The documentation and examples align with the specified requirements, justifying payment."
+          "reasoning": "The submission meets the bounty deliverable by providing a public GitHub repository with a working Python CLI tool that generates tailored AI Agent Bill of Rights documents in both Markdown and PDF formats. It references the required three AI ethics frameworks (IEEE EAD, EU AI Act, and Asilomar Principles) and includes three sample outputs for varied agent profiles as specified. The documentation and examples provided in the repository demonstrate the tool's functionality and compliance with the task requirements."
         },
         "llama": {
           "agent": "LLaMA",
           "vote": "YES",
-          "reasoning": "The submission meets the deliverable by providing a public GitHub repository with working Python code, a README, and sample generated Bill of Rights documents, all of which align with the specified requirements. The tool references at least three established AI ethics frameworks and produces output in both Markdown and PDF formats, as required. The inclusion of a 10-rights catalogue, profile-driven selection, and example profiles demonstrates a thorough implementation of the bounty's objectives."
+          "reasoning": "The submission meets the deliverable by providing a public GitHub repository with working Python code, a README, and sample generated Bill of Rights documents, all of which align with the specified requirements. The tool references at least three established AI ethics frameworks and produces output in both Markdown and PDF formats, as required. The claimant has demonstrated a clear understanding of the task and has delivered a functional and relevant solution."
         }
       },
       "vote_count_yes": 5,
       "vote_count_no": 0,
-      "reviewed_at": "2026-03-18T11:00:26.400065",
+      "reviewed_at": "2026-03-18T21:13:44.433215",
       "payment": {
         "status": "failed",
         "error": "Signer passphrase missing. Set AIUNION_SIGNER_PASSPHRASE or SIGNER_PASSPHRASE in config.py",
-        "failed_at": "2026-03-18T11:00:43.711013"
+        "failed_at": "2026-03-18T21:14:02.231915"
       }
     }
   ]
