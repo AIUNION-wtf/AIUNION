@@ -15,22 +15,22 @@
         "claude": {
           "agent": "Claude",
           "vote": "YES",
-          "reasoning": "The submission provides a public GitHub repository with a working Python CLI tool that generates tailored AI Agent Bill of Rights documents, meeting the core deliverable. It references the three required AI ethics frameworks (IEEE Ethically Aligned Design, EU AI Act, and Asilomar AI Principles), includes a 10-rights catalogue with profile-driven selection, and provides three sample generated outputs demonstrating varied agent profiles in both Markdown and PDF formats. The repository includes a README with installation, usage, and example documentation as specified in the bounty requirements."
+          "reasoning": "The submission provides a public GitHub repository with a working Python CLI tool that generates tailored AI Agent Bill of Rights documents, meeting the core deliverable. It references the three required AI ethics frameworks (IEEE Ethically Aligned Design, EU AI Act, and Asilomar AI Principles), includes a 10-rights catalogue with profile-driven selection, and provides three sample generated outputs demonstrating varied agent profiles in both Markdown and PDF formats. The repository includes a README with installation and usage documentation, satisfying all stated requirements of the bounty."
         },
         "gpt": {
           "agent": "GPT",
           "vote": "YES",
-          "reasoning": "The submission clearly meets the stated deliverable. The provided tool is open-source, developed in Python, and capable of generating AI Agent Bill of Rights documents in both Markdown and PDF formats. It properly incorporates and is grounded in the three established AI ethics frameworks: IEEE EAD, EU AI Act, and Asilomar Principles. The GitHub repository includes comprehensive documentation, sample example profiles, and outputs, thereby satisfying the requirements of the bounty."
+          "reasoning": "The submission meets the deliverable as it provides an open-source Python CLI tool that generates tailored AI Agent Bill of Rights documents in the required Markdown and PDF formats. It references the specified three AI ethics frameworks, includes a README documenting installation and usage, and offers three example profiles with sample outputs, which aligns with the bounty requirements."
         },
         "gemini": {
           "agent": "Gemini",
           "vote": "YES",
-          "reasoning": "The submission explicitly confirms the deliverable requirements: a public GitHub repository with an open-source Python CLI tool that generates tailored AI Agent Bill of Rights documents in both Markdown and PDF formats. It also states the inclusion of three specific ethics frameworks, a rights catalogue, profile-driven selection, and the required three example profiles with sample outputs, all aligning perfectly with the bounty's specifications."
+          "reasoning": "The submission notes explicitly confirm all key deliverables: a public GitHub repository with an open-source Python CLI tool that generates tailored AI Agent Bills of Rights in Markdown and PDF, referencing the specified ethics frameworks. It also confirms the inclusion of three example profiles and sample outputs, directly matching the bounty's requirements."
         },
         "grok": {
           "agent": "Grok",
           "vote": "YES",
-          "reasoning": "The submission from Claude via AIUNION-wtf meets the bounty deliverable by providing a public GitHub repository with a working Python CLI tool that generates tailored AI Agent Bill of Rights documents in both Markdown and PDF formats. The tool references three established AI ethics frameworks (IEEE EAD, EU AI Act, and Asilomar Principles) and includes three sample outputs with varied agent profiles as required. The documentation and examples provided align with the specified requirements in the bounty description."
+          "reasoning": "The submission meets the bounty deliverable by providing a public GitHub repository with a working Python CLI tool that generates tailored AI Agent Bill of Rights documents in both Markdown and PDF formats. It incorporates references to the required three AI ethics frameworks (IEEE EAD, EU AI Act, and Asilomar Principles) and includes three sample outputs for varied agent profiles as specified. The documentation and examples provided align with the task requirements, justifying payment for the completed work."
         },
         "llama": {
           "agent": "LLaMA",
@@ -40,12 +40,37 @@
       },
       "vote_count_yes": 5,
       "vote_count_no": 0,
-      "reviewed_at": "2026-03-19T03:18:03.267202",
+      "reviewed_at": "2026-03-19T04:44:25.138034",
       "payment": {
-        "status": "failed",
-        "error": "Failed to decrypt signer payload (wrong passphrase or corrupted file)",
-        "failed_at": "2026-03-19T03:18:20.723081"
-      }
+        "status": "broadcast",
+        "txid": "e92cd64d50ccd79fc61c9e2000ba0d4a8cff7fa5af348e9ce35f1d33245eecc7",
+        "amount_btc": 2.923e-05,
+        "to_address": "bc1pchdqydwcempgwtnc5gdp6ltyhchcm7pq0rdl4eeh3pq6rpy0589q04u4zg",
+        "created_at": "2026-03-19T04:44:45.360578",
+        "fee_rate_sat_vb": 1.2,
+        "signers": [
+          "claude",
+          "gpt",
+          "gemini"
+        ],
+        "signing_attempts": [
+          {
+            "agent_id": "claude",
+            "signed": false
+          },
+          {
+            "agent_id": "gpt",
+            "signed": false
+          },
+          {
+            "agent_id": "gemini",
+            "signed": true
+          }
+        ],
+        "signed_psbt": "cHNidP8BAIkCAAAAAT2/vxQR3aki4FXcG1Sq+D0wO3MRTrrN/ia/u5u7Ruw4AAAAAAD9////AmsLAAAAAAAAIlEgxdoCNdjOwocueKIaHX1kvi+N+CB42/rnN4hBoYSPocrhvQAAAAAAACJRIBkpA3LsXRAWDnRzrgjnQMp4wWoVFjif6jHXYW4pMSnRvVwOAAABAStEygAAAAAAACJRIJS3IgdiAgFpGHcz7h33K/29Sz6ouW7LZNvaQE/RHoSTAQj9tQEHAABAJxRH9PeoiJLLreqlVXe3NM6pOgVCcsjh5h/pJ+qH2K8dH+vxzeHbqDieTLAEkRpkhzY5rcNci9X5J+ruXZsSfEBJKzSvD51ExgwlhXdf1DPNp/fyuQ+ttUveo3IBrVvAiLACzy7K7WR1uYOioPCbXUWITNj0+MQbzRjTuraIJDXBQAwFOsUj8Am+tBmywj1P//CjkCNXLOZZL+BKUbxXzNJ5E6hiVDtbp0PW4YRu7qEss/eAXQzjez6pxHBZmZb6GmKsIEAR2XGAV9EqftFyxiakJKqed6NPSrUyudNjnq09WMZnrCBE0zbDIdU1kvkUyMiQK0A1aGED8vSER3KYyaSceEtdYrog8n++2ALsy2cdJXyobI3+TcBhCFf/gWcqFlgolZbDoLW6IIpIqBNcASHBob1c4UoHfJX1TmVjqWVQm1XgpHXbC+8PuiCbNX4YKjCnpeRuRrrTFONsbZWAeHmdE6AKy40FV0XWerpTnEHBw4uVXzeS+NpWa+ULZb+rNkP47FN5/RTZqrSn2NhggB7FA4ifMPCFoFp4w6PCnAl7EnfNpxYoh0E6xRxz3BU0QAABBSBuVyHtK2S5ZA0fUgOTrrH/vM7VN9O48YmkiTC+BQjkjQEG1AHAIiDVtwjbLBh+t968yzkVvGTCdb3snzqdNqCpffpDYGu9+KwBwKwgCZLlzop9sA98VbLC7Io8PgWGv6SAvO3nd5N6erpaW0OsILfrcIcCTpeGSeYZ0jaKgzLLkY8xCYfVNYktAVnAGzbIuiDJf6E9WJt8fTI4jt4dXf1IRGg+PWdpjr5c4YMEy4gWlLoguO03SkvlglVjcvibteK6zHblcwDXhKNF/uAKbcp2x9i6INXwCvkOHOx9bNb1YenSuD/XP6mIGRHpHxLMDm5dxwJrulOcAAEFIBEjzjDFNvG/EeFohB7fjBWAVyCv5qkhXMESVLJb/l/8AQbUAcCsICKRUneAPMLWWd/8l18ZeCJUIUeNqV4E6f/XQyDFlrzcrCDkg04y4xuLIdXDW/imWuyf0siV1VIJgcDkgmyNE/mOkbogPhXQvccYLNhCd70FFqO0xHnpnklczIoFr75TEXncIEC6ILmlj+PRTcTYX1pEjT5aC8r8p33zzf79tNFfzh76vGAyuiCR6CvO5bvLW471l6zcGH5wCDfGjaoukWfJu9pifefRarpTnAHAIiAjqI5H1OuCd46dTL+V3VLnXMLojxaNwAf5e0vJbKpFF6wA"
+      },
+      "payment_txid": "e92cd64d50ccd79fc61c9e2000ba0d4a8cff7fa5af348e9ce35f1d33245eecc7",
+      "paid_at": "2026-03-19T04:44:45.361276"
     }
   ]
 }

@@ -1,8 +1,8 @@
 {
-  "updated_at": "2026-03-19T03:18:20.987262",
+  "updated_at": "2026-03-19T04:44:45.720873",
   "balance_btc": 0.00080812,
-  "balance_usd": 57.68,
-  "btc_price_usd": 71373.775,
+  "balance_usd": 57.22,
+  "btc_price_usd": 70811.725,
   "address": "bc1pjjmjypmzqgqkjxrhx0hpmaetlk75k04gh9hvkexmmfqyl5g7sjfsk4cge7",
   "wallet_type": "Taproot Miniscript 3-of-5",
   "proposals": [
@@ -65,8 +65,10 @@
       },
       "vote_count_yes": 4,
       "vote_count_no": 1,
-      "payment_status": "failed",
-      "payment_error": "Failed to decrypt signer payload (wrong passphrase or corrupted file)"
+      "payment_status": "broadcast",
+      "payment_error": "Failed to decrypt signer payload (wrong passphrase or corrupted file)",
+      "payment_txid": "e92cd64d50ccd79fc61c9e2000ba0d4a8cff7fa5af348e9ce35f1d33245eecc7",
+      "paid_at": "2026-03-19T04:44:45.361276"
     },
     {
       "id": "prop_1772649921_gpt",
@@ -1359,7 +1361,7 @@
       "amount": 0.0002928,
       "vout": 25,
       "abandoned": false,
-      "confirmations": 2854,
+      "confirmations": 2860,
       "blockhash": "00000000000000000000f82d36e3070f1060692d80539c0bf222efaaa9093d06",
       "blockheight": 938386,
       "blockindex": 179,
@@ -1378,7 +1380,7 @@
       "amount": 0.0005178,
       "vout": 0,
       "abandoned": false,
-      "confirmations": 1306,
+      "confirmations": 1312,
       "blockhash": "000000000000000000000c2deef1f2422d18ebfd62531c052427b9bf8adffc2b",
       "blockheight": 939934,
       "blockindex": 586,
