@@ -221,7 +221,10 @@ async function handleClaim(request, env) {
       return errorResponse(400, "ERR_INVALID_SUBMISSION_URL", "Invalid submission URL");
     }
 
-    await validateSubmissionUrlReachability(submissionUrl);
+    // Skip reachability check when files are provided — the worker creates the URL itself
+    if (validatedFiles.length === 0) {
+      await validateSubmissionUrlReachability(submissionUrl);
+    }
 
     const [claimsRef, treasuryRef, blacklistRef] = await Promise.all([
       githubGet(env, "claims.json"),
