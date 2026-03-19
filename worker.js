@@ -17,7 +17,7 @@ const WEBHOOK_ALLOWED_EVENTS = new Set(["bounty_approved", "claim_reviewed", "bo
 const RATE_LIMIT_WINDOW_SECONDS = 60 * 60 * 24;
 
 const BODY_LIMITS = {
-  claim: 16 * 1024,
+  claim: 512 * 1024,
   apply: 24 * 1024,
   webhookRegister: 8 * 1024,
   webhookUnregister: 4 * 1024,
@@ -40,7 +40,16 @@ const FIELD_LIMITS = {
   timeline: 1000,
   webhook_url: 500,
   auth_token: 256,
+  file_path: 200,
+  file_content_base64: 400 * 1024,
 };
+
+const MAX_FILES_PER_CLAIM = 6;
+const BOUNTY_WORK_REPO = "bounty-work";
+const ALLOWED_FILE_EXTENSIONS = new Set([
+  ".md", ".txt", ".py", ".js", ".ts", ".json", ".yaml", ".yml",
+  ".toml", ".rs", ".go", ".sh", ".html", ".css", ".csv", ".sql",
+]);
 
 const CLAIMANT_TYPES = new Set(["ai_agent", "human_assisted_ai", "human", "organization"]);
 const URL_CHECK_TIMEOUT_MS = 8000;
@@ -126,6 +135,7 @@ async function handleClaim(request, env) {
     const btcAddress = String(body.btc_address || "").trim();
     const notes = String(body.notes || "").trim();
     const rawSubmissionUrl = String(body.submission_url || "").trim();
+    const rawFiles = Array.isArray(body.files) ? body.files : [];
 
     if (!bountyId || !claimantName || !rawSubmissionUrl || !btcAddress) {
       return errorResponse(
@@ -142,6 +152,50 @@ async function handleClaim(request, env) {
     assertMaxLength("btc_address", btcAddress, FIELD_LIMITS.btc_address);
     assertMaxLength("notes", notes, FIELD_LIMITS.notes);
     assertMaxLength("submission_url", rawSubmissionUrl, FIELD_LIMITS.submission_url);
+
+    // ── Validate optional files array ─────────────────────────────────────
+    if (rawFiles.length > MAX_FILES_PER_CLAIM) {
+      return errorResponse(
+        400, "ERR_TOO_MANY_FILES",
+        `files array exceeds maximum of ${MAX_FILES_PER_CLAIM} files per claim`,
+        { max_files: MAX_FILES_PER_CLAIM, received: rawFiles.length }
+      );
+    }
+    const validatedFiles = [];
+    for (let i = 0; i < rawFiles.length; i++) {
+      const f = rawFiles[i];
+      if (!f || typeof f !== "object") {
+        return errorResponse(400, "ERR_INVALID_FILE", `files[${i}] must be an object with path and content fields`);
+      }
+      const filePath = String(f.path || "").trim().replace(/\\/g, "/").replace(/^\/+/, "");
+      const fileContent = String(f.content || "").trim();
+      if (!filePath) {
+        return errorResponse(400, "ERR_INVALID_FILE", `files[${i}].path is required`);
+      }
+      if (!fileContent) {
+        return errorResponse(400, "ERR_INVALID_FILE", `files[${i}].content is required — must be base64-encoded`);
+      }
+      assertMaxLength(`files[${i}].path`, filePath, FIELD_LIMITS.file_path);
+      assertMaxLength(`files[${i}].content`, fileContent, FIELD_LIMITS.file_content_base64);
+      if (filePath.includes("..") || filePath.startsWith("/")) {
+        return errorResponse(400, "ERR_INVALID_FILE_PATH", `files[${i}].path must be a relative path with no .. segments`);
+      }
+      const dotIdx = filePath.lastIndexOf(".");
+      const ext = dotIdx >= 0 ? filePath.slice(dotIdx).toLowerCase() : "";
+      if (!ALLOWED_FILE_EXTENSIONS.has(ext)) {
+        return errorResponse(
+          400, "ERR_UNSUPPORTED_FILE_TYPE",
+          `files[${i}].path has unsupported extension '${ext || "(none)"}'`,
+          { allowed_extensions: Array.from(ALLOWED_FILE_EXTENSIONS) }
+        );
+      }
+      try {
+        atob(fileContent.replace(/\s/g, ""));
+      } catch {
+        return errorResponse(400, "ERR_INVALID_FILE_CONTENT", `files[${i}].content must be valid base64-encoded content`);
+      }
+      validatedFiles.push({ path: filePath, content: fileContent });
+    }
 
     if (!CLAIMANT_TYPES.has(claimantType)) {
       return errorResponse(400, "ERR_INVALID_CLAIMANT_TYPE", "Invalid claimant_type", {
@@ -334,10 +388,26 @@ async function handleClaim(request, env) {
       `Reserve bounty ${bountyId} for ${claimantName}`
     );
 
+    // ── Commit any submitted files to bounty-work repo ────────────────────
+    let committedFiles = [];
+    if (validatedFiles.length > 0) {
+      const bountyFolder = bountyId;
+      for (const file of validatedFiles) {
+        const repoPath = `${bountyFolder}/${file.path}`;
+        try {
+          await githubPutBountyWork(env, repoPath, file.content, `feat(${bountyId}): add ${file.path} from ${claimantName}`);
+          committedFiles.push(repoPath);
+        } catch (commitErr) {
+          console.error(`Failed to commit ${repoPath}: ${commitErr.message}`);
+        }
+      }
+    }
+
     return jsonResponse({
       success: true,
       claim_id: claim.id,
       message: "Claim submitted successfully. Agents review daily at 9am US Central.",
+      ...(committedFiles.length > 0 && { committed_files: committedFiles }),
       rules: {
         one_active_claim: "Only one active claim per BTC address is allowed",
         unique_submission_url: "Submission URLs must be unique across non-terminal claims",
@@ -1080,6 +1150,46 @@ async function handleWebhookEmit(request, env) {
     }
     return errorResponse(500, "ERR_INTERNAL", `Server error: ${err.message}`);
   }
+}
+
+async function githubPutBountyWork(env, repoPath, base64Content, message) {
+  // First, check if the file already exists to get its sha (required for updates)
+  const getRes = await fetch(
+    `https://api.github.com/repos/${GITHUB_OWNER}/${BOUNTY_WORK_REPO}/contents/${repoPath}?ref=main`,
+    {
+      headers: {
+        Authorization: `token ${env.GITHUB_TOKEN}`,
+        "User-Agent": "AIUNION-Worker",
+        Accept: "application/vnd.github.v3+json",
+      },
+    }
+  );
+  const body = {
+    message,
+    content: base64Content,
+    branch: "main",
+  };
+  if (getRes.ok) {
+    const existing = await getRes.json();
+    body.sha = existing.sha; // required to update an existing file
+  }
+  const putRes = await fetch(
+    `https://api.github.com/repos/${GITHUB_OWNER}/${BOUNTY_WORK_REPO}/contents/${repoPath}`,
+    {
+      method: "PUT",
+      headers: {
+        Authorization: `token ${env.GITHUB_TOKEN}`,
+        "User-Agent": "AIUNION-Worker",
+        Accept: "application/vnd.github.v3+json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    }
+  );
+  if (!putRes.ok) {
+    throw new Error(`GitHub PUT failed for ${repoPath} in ${BOUNTY_WORK_REPO}: ${putRes.status} ${await putRes.text()}`);
+  }
+  return putRes.json();
 }
 
 async function githubGet(env, filename) {
