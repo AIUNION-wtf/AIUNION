@@ -5516,7 +5516,7 @@
     "vote_count_yes": 4,
     "vote_count_no": 1,
     "payment_status": "failed",
-    "payment_error": "Signer passphrase missing. Set AIUNION_SIGNER_PASSPHRASE or SIGNER_PASSPHRASE in config.py"
+    "payment_error": "Failed to decrypt signer payload (wrong passphrase or corrupted file)"
   },
   {
     "id": "prop_1772649921_gpt",
