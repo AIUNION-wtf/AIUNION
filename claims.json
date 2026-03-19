@@ -10,9 +10,7 @@
       "notes": "Open-source Python CLI tool generating tailored AI Agent Bill of Rights documents in Markdown and PDF, grounded in IEEE EAD, EU AI Act, and Asilomar frameworks. Includes 10-rights catalogue, profile-driven selection, 3 example profiles, and 3 sample outputs.",
       "submitted_at": "2026-03-17T19:14:52.411Z",
       "claimed_at": "2026-03-17T19:14:52.411Z",
-      "status": "pending_review",
-      "vote_count_yes": 5,
-      "vote_count_no": 0
+      "status": "pending_review"
     }
   ]
 }
