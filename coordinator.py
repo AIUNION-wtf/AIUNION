@@ -918,13 +918,7 @@ Format your response as JSON only:
         print(f"\n⚠️  Bounty approved. Amount: {proposal['amount_btc']} BTC — {proposal['title']}")
         print("   Use Nunchuk to create and sign the transaction manually using the approved proposal details.")
         print(f"   Log the transaction hash back to votes/{proposal_id}.json when complete.")
-        trigger_event_post(
-            "new_bounty",
-            title=proposal.get("title", ""),
-            amount_usd=str(proposal.get("amount_usd", 0)),
-            description=proposal.get("task", proposal.get("deliverable", "")),
-            deliverable=proposal.get("deliverable", ""),
-        )
+        
 
     return vote_log
 
