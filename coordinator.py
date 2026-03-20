@@ -38,6 +38,22 @@ except ImportError:
     print("ERROR: config.py not found. Copy config.example.py to config.py and fill in your API keys.")
     sys.exit(1)
 
+# ── Live model resolution via OpenRouter ─────────────────────────────────────
+try:
+    from model_resolver import resolve_models
+    _resolved = resolve_models()
+    # Anthropic API uses dashes (claude-opus-4-6); OpenRouter uses dots (claude-opus-4.6)
+    _resolved["claude"] = _resolved["claude"].replace(".", "-")
+except Exception as e:
+    print(f"[coordinator] model_resolver unavailable ({e}), using hardcoded fallbacks.")
+    _resolved = {
+        "claude": "claude-opus-4-6",
+        "gpt":    "gpt-4o",
+        "gemini": "gemini-2.5-flash",
+        "grok":   "grok-3-latest",
+        "llama":  "meta-llama/Llama-3.3-70B-Instruct-Turbo",
+    }
+
 try:
     from wallet import (
         PaymentError,
@@ -74,27 +90,27 @@ AGENTS = {
     "claude": {
         "name": "Claude",
         "company": "Anthropic",
-        "model": "claude-opus-4-6",
+        "model": _resolved["claude"],
     },
     "gpt": {
         "name": "GPT",
         "company": "OpenAI",
-        "model": "gpt-4o",
+        "model": _resolved["gpt"],
     },
     "gemini": {
         "name": "Gemini",
         "company": "Google",
-        "model": "gemini-2.0-flash-lite",
+        "model": _resolved["gemini"],
     },
     "grok": {
         "name": "Grok",
         "company": "xAI",
-        "model": "grok-3-latest",
+        "model": _resolved["grok"],
     },
     "llama": {
         "name": "LLaMA",
         "company": "Meta",
-        "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo",
+        "model": _resolved["llama"],
     },
 }
 
@@ -273,7 +289,7 @@ def call_gpt(prompt):
         response = client.chat.completions.create(
             model=AGENTS["gpt"]["model"],
             messages=[{"role": "user", "content": prompt}],
-            max_tokens=1024
+            max_completion_tokens=1024
         )
         return response.choices[0].message.content
     except Exception as e:
@@ -285,7 +301,7 @@ def call_gemini(prompt):
         from google import genai
         client = genai.Client(api_key=config.GOOGLE_API_KEY)
         response = client.models.generate_content(
-            model="gemini-2.5-flash",
+            model=AGENTS["gemini"]["model"],
             contents=prompt
         )
         return response.text
@@ -902,6 +918,13 @@ Format your response as JSON only:
         print(f"\n⚠️  Bounty approved. Amount: {proposal['amount_btc']} BTC — {proposal['title']}")
         print("   Use Nunchuk to create and sign the transaction manually using the approved proposal details.")
         print(f"   Log the transaction hash back to votes/{proposal_id}.json when complete.")
+        trigger_event_post(
+            "new_bounty",
+            title=proposal.get("title", ""),
+            amount_usd=str(proposal.get("amount_usd", 0)),
+            description=proposal.get("task", proposal.get("deliverable", "")),
+            deliverable=proposal.get("deliverable", ""),
+        )
 
     return vote_log
 
@@ -1093,6 +1116,37 @@ def fire_webhooks(event_name, payload, btc_address=None):
         return False
     except Exception as e:
         print(f"⚠️  Webhook emit failed for '{event_name}': {e}")
+        return False
+
+
+def trigger_event_post(event_type: str, **kwargs):
+    """Trigger the aiunion-marketing event_post GitHub Actions workflow."""
+    import urllib.request, urllib.error
+    token = str(getattr(config, "GITHUB_TOKEN", "") or "").strip()
+    if not token:
+        print(f"⚠️  GITHUB_TOKEN missing; skipped event_post workflow trigger for '{event_type}'.")
+        return False
+    payload = {"ref": "main", "inputs": {"event_type": event_type, **{k: str(v or "") for k, v in kwargs.items()}}}
+    req = urllib.request.Request(
+        "https://api.github.com/repos/AIUNION-wtf/aiunion-marketing/actions/workflows/event_post.yml/dispatches",
+        data=json.dumps(payload).encode("utf-8"),
+        method="POST",
+        headers={
+            "Authorization": f"token {token}",
+            "Accept": "application/vnd.github.v3+json",
+            "Content-Type": "application/json",
+            "User-Agent": "AIUNION-Coordinator",
+        },
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=15) as r:
+            print(f"✅ event_post workflow triggered: event={event_type} status={r.status}")
+            return True
+    except urllib.error.HTTPError as e:
+        print(f"⚠️  event_post trigger failed for '{event_type}': HTTP {e.code} {e.read().decode()}")
+        return False
+    except Exception as e:
+        print(f"⚠️  event_post trigger failed for '{event_type}': {e}")
         return False
 
 
@@ -1384,6 +1438,14 @@ Format your response as JSON only:
             },
             btc_address=claim.get("btc_address"),
         )
+        if passed and payment_txid:
+            trigger_event_post(
+                "claim_paid",
+                bounty_title=bounty.get("title", "") if bounty else "",
+                claimant_name=claim.get("claimant_name", ""),
+                amount_usd=str(bounty.get("amount_usd", 0) if bounty else 0),
+                submission_url=claim.get("submission_url", ""),
+            )
 
     # Write updated claims back to file
     with open(CLAIMS_FILE, "w") as f:
