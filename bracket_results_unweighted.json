@@ -1,0 +1,1006 @@
+{
+  "weights": {
+    "Gemini": 1,
+    "Claude": 1,
+    "GPT": 1,
+    "LLaMA": 1,
+    "Grok": 1
+  },
+  "models": {
+    "Claude": "claude-opus-4-6",
+    "GPT": "gpt-5",
+    "Gemini": "gemini-3.1-pro-preview",
+    "Grok": "grok-4.20-beta",
+    "LLaMA": "meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8"
+  },
+  "regions": {
+    "East": {
+      "r64": [
+        {
+          "team1": "1 Duke",
+          "team2": "16 Siena",
+          "agent_picks": {
+            "Gemini": "1 Duke",
+            "Claude": "1 Duke",
+            "GPT": "1 Duke",
+            "LLaMA": "1 Duke",
+            "Grok": "1 Duke"
+          },
+          "score1": 5,
+          "score2": 0,
+          "winner": "1 Duke",
+          "tiebreak": false
+        },
+        {
+          "team1": "8 Ohio State",
+          "team2": "9 TCU",
+          "agent_picks": {
+            "Gemini": "8 Ohio State",
+            "Claude": "8 Ohio State",
+            "GPT": "8 Ohio State",
+            "LLaMA": "8 Ohio State",
+            "Grok": "8 Ohio State"
+          },
+          "score1": 5,
+          "score2": 0,
+          "winner": "8 Ohio State",
+          "tiebreak": false
+        },
+        {
+          "team1": "5 St Johns",
+          "team2": "12 Northern Iowa",
+          "agent_picks": {
+            "Gemini": "5 St Johns",
+            "Claude": "5 St Johns",
+            "GPT": "5 St Johns",
+            "LLaMA": "12 Northern Iowa",
+            "Grok": "5 St Johns"
+          },
+          "score1": 4,
+          "score2": 1,
+          "winner": "5 St Johns",
+          "tiebreak": false
+        },
+        {
+          "team1": "4 Kansas",
+          "team2": "13 Cal Baptist",
+          "agent_picks": {
+            "Gemini": "4 Kansas",
+            "Claude": "4 Kansas",
+            "GPT": "4 Kansas",
+            "LLaMA": "4 Kansas",
+            "Grok": "4 Kansas"
+          },
+          "score1": 5,
+          "score2": 0,
+          "winner": "4 Kansas",
+          "tiebreak": false
+        },
+        {
+          "team1": "6 Louisville",
+          "team2": "11 South Florida",
+          "agent_picks": {
+            "Gemini": "6 Louisville",
+            "Claude": "6 Louisville",
+            "GPT": "6 Louisville",
+            "LLaMA": "6 Louisville",
+            "Grok": "6 Louisville"
+          },
+          "score1": 5,
+          "score2": 0,
+          "winner": "6 Louisville",
+          "tiebreak": false
+        },
+        {
+          "team1": "3 Michigan State",
+          "team2": "14 North Dakota State",
+          "agent_picks": {
+            "Gemini": "3 Michigan State",
+            "Claude": "3 Michigan State",
+            "GPT": "3 Michigan State",
+            "LLaMA": "3 Michigan State",
+            "Grok": "3 Michigan State"
+          },
+          "score1": 5,
+          "score2": 0,
+          "winner": "3 Michigan State",
+          "tiebreak": false
+        },
+        {
+          "team1": "7 UCLA",
+          "team2": "10 UCF",
+          "agent_picks": {
+            "Gemini": "7 UCLA",
+            "Claude": "7 UCLA",
+            "GPT": "7 UCLA",
+            "LLaMA": "7 UCLA",
+            "Grok": "7 UCLA"
+          },
+          "score1": 5,
+          "score2": 0,
+          "winner": "7 UCLA",
+          "tiebreak": false
+        },
+        {
+          "team1": "2 UConn",
+          "team2": "15 Furman",
+          "agent_picks": {
+            "Gemini": "2 UConn",
+            "Claude": "2 UConn",
+            "GPT": "2 UConn",
+            "LLaMA": "2 UConn",
+            "Grok": "2 UConn"
+          },
+          "score1": 5,
+          "score2": 0,
+          "winner": "2 UConn",
+          "tiebreak": false
+        }
+      ],
+      "r32": [
+        {
+          "team1": "1 Duke",
+          "team2": "8 Ohio State",
+          "agent_picks": {
+            "Gemini": "1 Duke",
+            "Claude": "1 Duke",
+            "GPT": "1 Duke",
+            "LLaMA": "1 Duke",
+            "Grok": "1 Duke"
+          },
+          "score1": 5,
+          "score2": 0,
+          "winner": "1 Duke",
+          "tiebreak": false
+        },
+        {
+          "team1": "5 St Johns",
+          "team2": "4 Kansas",
+          "agent_picks": {
+            "Gemini": "4 Kansas",
+            "Claude": "4 Kansas",
+            "GPT": "5 St Johns",
+            "LLaMA": "4 Kansas",
+            "Grok": "4 Kansas"
+          },
+          "score1": 1,
+          "score2": 4,
+          "winner": "4 Kansas",
+          "tiebreak": false
+        },
+        {
+          "team1": "6 Louisville",
+          "team2": "3 Michigan State",
+          "agent_picks": {
+            "Gemini": "3 Michigan State",
+            "Claude": "3 Michigan State",
+            "GPT": "6 Louisville",
+            "LLaMA": "3 Michigan State",
+            "Grok": "3 Michigan State"
+          },
+          "score1": 1,
+          "score2": 4,
+          "winner": "3 Michigan State",
+          "tiebreak": false
+        },
+        {
+          "team1": "7 UCLA",
+          "team2": "2 UConn",
+          "agent_picks": {
+            "Gemini": "2 UConn",
+            "Claude": "2 UConn",
+            "GPT": "7 UCLA",
+            "LLaMA": "2 UConn",
+            "Grok": "2 UConn"
+          },
+          "score1": 1,
+          "score2": 4,
+          "winner": "2 UConn",
+          "tiebreak": false
+        }
+      ],
+      "s16": [
+        {
+          "team1": "1 Duke",
+          "team2": "4 Kansas",
+          "agent_picks": {
+            "Gemini": "1 Duke",
+            "Claude": "1 Duke",
+            "GPT": "1 Duke",
+            "LLaMA": "4 Kansas",
+            "Grok": "1 Duke"
+          },
+          "score1": 4,
+          "score2": 1,
+          "winner": "1 Duke",
+          "tiebreak": false
+        },
+        {
+          "team1": "3 Michigan State",
+          "team2": "2 UConn",
+          "agent_picks": {
+            "Gemini": "2 UConn",
+            "Claude": "2 UConn",
+            "GPT": "3 Michigan State",
+            "LLaMA": "2 UConn",
+            "Grok": "2 UConn"
+          },
+          "score1": 1,
+          "score2": 4,
+          "winner": "2 UConn",
+          "tiebreak": false
+        }
+      ],
+      "e8": [
+        {
+          "team1": "1 Duke",
+          "team2": "2 UConn",
+          "agent_picks": {
+            "Gemini": "1 Duke",
+            "Claude": "1 Duke",
+            "GPT": "1 Duke",
+            "LLaMA": "2 UConn",
+            "Grok": "2 UConn"
+          },
+          "score1": 3,
+          "score2": 2,
+          "winner": "1 Duke",
+          "tiebreak": false
+        }
+      ]
+    },
+    "West": {
+      "r64": [
+        {
+          "team1": "1 Arizona",
+          "team2": "16 LIU",
+          "agent_picks": {
+            "Gemini": "1 Arizona",
+            "Claude": "1 Arizona",
+            "GPT": "1 Arizona",
+            "LLaMA": "1 Arizona",
+            "Grok": "1 Arizona"
+          },
+          "score1": 5,
+          "score2": 0,
+          "winner": "1 Arizona",
+          "tiebreak": false
+        },
+        {
+          "team1": "8 Villanova",
+          "team2": "9 Utah State",
+          "agent_picks": {
+            "Gemini": "8 Villanova",
+            "Claude": "8 Villanova",
+            "GPT": "8 Villanova",
+            "LLaMA": "8 Villanova",
+            "Grok": "8 Villanova"
+          },
+          "score1": 5,
+          "score2": 0,
+          "winner": "8 Villanova",
+          "tiebreak": false
+        },
+        {
+          "team1": "5 Wisconsin",
+          "team2": "12 High Point",
+          "agent_picks": {
+            "Gemini": "5 Wisconsin",
+            "Claude": "5 Wisconsin",
+            "GPT": "5 Wisconsin",
+            "LLaMA": "5 Wisconsin",
+            "Grok": "5 Wisconsin"
+          },
+          "score1": 5,
+          "score2": 0,
+          "winner": "5 Wisconsin",
+          "tiebreak": false
+        },
+        {
+          "team1": "4 Arkansas",
+          "team2": "13 Hawaii",
+          "agent_picks": {
+            "Gemini": "4 Arkansas",
+            "Claude": "4 Arkansas",
+            "GPT": "4 Arkansas",
+            "LLaMA": "4 Arkansas",
+            "Grok": "4 Arkansas"
+          },
+          "score1": 5,
+          "score2": 0,
+          "winner": "4 Arkansas",
+          "tiebreak": false
+        },
+        {
+          "team1": "6 BYU",
+          "team2": "11 NC State",
+          "agent_picks": {
+            "Gemini": "6 BYU",
+            "Claude": "6 BYU",
+            "GPT": "6 BYU",
+            "LLaMA": "11 NC State",
+            "Grok": "6 BYU"
+          },
+          "score1": 4,
+          "score2": 1,
+          "winner": "6 BYU",
+          "tiebreak": false
+        },
+        {
+          "team1": "3 Gonzaga",
+          "team2": "14 Kennesaw State",
+          "agent_picks": {
+            "Gemini": "3 Gonzaga",
+            "Claude": "3 Gonzaga",
+            "GPT": "3 Gonzaga",
+            "LLaMA": "3 Gonzaga",
+            "Grok": "3 Gonzaga"
+          },
+          "score1": 5,
+          "score2": 0,
+          "winner": "3 Gonzaga",
+          "tiebreak": false
+        },
+        {
+          "team1": "7 Miami FL",
+          "team2": "10 Missouri",
+          "agent_picks": {
+            "Gemini": "7 Miami FL",
+            "Claude": "10 Missouri",
+            "GPT": "7 Miami FL",
+            "LLaMA": "10 Missouri",
+            "Grok": "10 Missouri"
+          },
+          "score1": 2,
+          "score2": 3,
+          "winner": "10 Missouri",
+          "tiebreak": false
+        },
+        {
+          "team1": "2 Purdue",
+          "team2": "15 Queens",
+          "agent_picks": {
+            "Gemini": "2 Purdue",
+            "Claude": "2 Purdue",
+            "GPT": "2 Purdue",
+            "LLaMA": "2 Purdue",
+            "Grok": "2 Purdue"
+          },
+          "score1": 5,
+          "score2": 0,
+          "winner": "2 Purdue",
+          "tiebreak": false
+        }
+      ],
+      "r32": [
+        {
+          "team1": "1 Arizona",
+          "team2": "8 Villanova",
+          "agent_picks": {
+            "Gemini": "1 Arizona",
+            "Claude": "1 Arizona",
+            "GPT": "1 Arizona",
+            "LLaMA": "1 Arizona",
+            "Grok": "1 Arizona"
+          },
+          "score1": 5,
+          "score2": 0,
+          "winner": "1 Arizona",
+          "tiebreak": false
+        },
+        {
+          "team1": "5 Wisconsin",
+          "team2": "4 Arkansas",
+          "agent_picks": {
+            "Gemini": "4 Arkansas",
+            "Claude": "4 Arkansas",
+            "GPT": "5 Wisconsin",
+            "LLaMA": "4 Arkansas",
+            "Grok": "5 Wisconsin"
+          },
+          "score1": 2,
+          "score2": 3,
+          "winner": "4 Arkansas",
+          "tiebreak": false
+        },
+        {
+          "team1": "6 BYU",
+          "team2": "3 Gonzaga",
+          "agent_picks": {
+            "Gemini": "3 Gonzaga",
+            "Claude": "3 Gonzaga",
+            "GPT": "6 BYU",
+            "LLaMA": "3 Gonzaga",
+            "Grok": "3 Gonzaga"
+          },
+          "score1": 1,
+          "score2": 4,
+          "winner": "3 Gonzaga",
+          "tiebreak": false
+        },
+        {
+          "team1": "10 Missouri",
+          "team2": "2 Purdue",
+          "agent_picks": {
+            "Gemini": "2 Purdue",
+            "Claude": "2 Purdue",
+            "GPT": "10 Missouri",
+            "LLaMA": "2 Purdue",
+            "Grok": "2 Purdue"
+          },
+          "score1": 1,
+          "score2": 4,
+          "winner": "2 Purdue",
+          "tiebreak": false
+        }
+      ],
+      "s16": [
+        {
+          "team1": "1 Arizona",
+          "team2": "4 Arkansas",
+          "agent_picks": {
+            "Gemini": "1 Arizona",
+            "Claude": "1 Arizona",
+            "GPT": "1 Arizona",
+            "LLaMA": "1 Arizona",
+            "Grok": "1 Arizona"
+          },
+          "score1": 5,
+          "score2": 0,
+          "winner": "1 Arizona",
+          "tiebreak": false
+        },
+        {
+          "team1": "3 Gonzaga",
+          "team2": "2 Purdue",
+          "agent_picks": {
+            "Gemini": "3 Gonzaga",
+            "Claude": "3 Gonzaga",
+            "GPT": "3 Gonzaga",
+            "LLaMA": "2 Purdue",
+            "Grok": "2 Purdue"
+          },
+          "score1": 3,
+          "score2": 2,
+          "winner": "3 Gonzaga",
+          "tiebreak": false
+        }
+      ],
+      "e8": [
+        {
+          "team1": "1 Arizona",
+          "team2": "3 Gonzaga",
+          "agent_picks": {
+            "Gemini": "3 Gonzaga",
+            "Claude": "1 Arizona",
+            "GPT": "1 Arizona",
+            "LLaMA": "1 Arizona",
+            "Grok": "3 Gonzaga"
+          },
+          "score1": 3,
+          "score2": 2,
+          "winner": "1 Arizona",
+          "tiebreak": false
+        }
+      ]
+    },
+    "Midwest": {
+      "r64": [
+        {
+          "team1": "1 Michigan",
+          "team2": "16 Howard",
+          "agent_picks": {
+            "Gemini": "1 Michigan",
+            "Claude": "1 Michigan",
+            "GPT": "1 Michigan",
+            "LLaMA": "1 Michigan",
+            "Grok": "1 Michigan"
+          },
+          "score1": 5,
+          "score2": 0,
+          "winner": "1 Michigan",
+          "tiebreak": false
+        },
+        {
+          "team1": "8 Georgia",
+          "team2": "9 Saint Louis",
+          "agent_picks": {
+            "Gemini": "8 Georgia",
+            "Claude": "8 Georgia",
+            "GPT": "8 Georgia",
+            "LLaMA": "8 Georgia",
+            "Grok": "8 Georgia"
+          },
+          "score1": 5,
+          "score2": 0,
+          "winner": "8 Georgia",
+          "tiebreak": false
+        },
+        {
+          "team1": "5 Texas Tech",
+          "team2": "12 Akron",
+          "agent_picks": {
+            "Gemini": "5 Texas Tech",
+            "Claude": "5 Texas Tech",
+            "GPT": "5 Texas Tech",
+            "LLaMA": "5 Texas Tech",
+            "Grok": "5 Texas Tech"
+          },
+          "score1": 5,
+          "score2": 0,
+          "winner": "5 Texas Tech",
+          "tiebreak": false
+        },
+        {
+          "team1": "4 Alabama",
+          "team2": "13 Hofstra",
+          "agent_picks": {
+            "Gemini": "4 Alabama",
+            "Claude": "4 Alabama",
+            "GPT": "4 Alabama",
+            "LLaMA": "4 Alabama",
+            "Grok": "4 Alabama"
+          },
+          "score1": 5,
+          "score2": 0,
+          "winner": "4 Alabama",
+          "tiebreak": false
+        },
+        {
+          "team1": "6 Tennessee",
+          "team2": "11 SMU",
+          "agent_picks": {
+            "Gemini": "6 Tennessee",
+            "Claude": "6 Tennessee",
+            "GPT": "6 Tennessee",
+            "LLaMA": "6 Tennessee",
+            "Grok": "6 Tennessee"
+          },
+          "score1": 5,
+          "score2": 0,
+          "winner": "6 Tennessee",
+          "tiebreak": false
+        },
+        {
+          "team1": "3 Virginia",
+          "team2": "14 Wright State",
+          "agent_picks": {
+            "Gemini": "3 Virginia",
+            "Claude": "3 Virginia",
+            "GPT": "3 Virginia",
+            "LLaMA": "3 Virginia",
+            "Grok": "3 Virginia"
+          },
+          "score1": 5,
+          "score2": 0,
+          "winner": "3 Virginia",
+          "tiebreak": false
+        },
+        {
+          "team1": "7 Kentucky",
+          "team2": "10 Santa Clara",
+          "agent_picks": {
+            "Gemini": "7 Kentucky",
+            "Claude": "7 Kentucky",
+            "GPT": "7 Kentucky",
+            "LLaMA": "7 Kentucky",
+            "Grok": "7 Kentucky"
+          },
+          "score1": 5,
+          "score2": 0,
+          "winner": "7 Kentucky",
+          "tiebreak": false
+        },
+        {
+          "team1": "2 Iowa State",
+          "team2": "15 Tennessee State",
+          "agent_picks": {
+            "Gemini": "2 Iowa State",
+            "Claude": "2 Iowa State",
+            "GPT": "2 Iowa State",
+            "LLaMA": "2 Iowa State",
+            "Grok": "2 Iowa State"
+          },
+          "score1": 5,
+          "score2": 0,
+          "winner": "2 Iowa State",
+          "tiebreak": false
+        }
+      ],
+      "r32": [
+        {
+          "team1": "1 Michigan",
+          "team2": "8 Georgia",
+          "agent_picks": {
+            "Gemini": "1 Michigan",
+            "Claude": "1 Michigan",
+            "GPT": "1 Michigan",
+            "LLaMA": "1 Michigan",
+            "Grok": "1 Michigan"
+          },
+          "score1": 5,
+          "score2": 0,
+          "winner": "1 Michigan",
+          "tiebreak": false
+        },
+        {
+          "team1": "5 Texas Tech",
+          "team2": "4 Alabama",
+          "agent_picks": {
+            "Gemini": "4 Alabama",
+            "Claude": "4 Alabama",
+            "GPT": "5 Texas Tech",
+            "LLaMA": "4 Alabama",
+            "Grok": "4 Alabama"
+          },
+          "score1": 1,
+          "score2": 4,
+          "winner": "4 Alabama",
+          "tiebreak": false
+        },
+        {
+          "team1": "6 Tennessee",
+          "team2": "3 Virginia",
+          "agent_picks": {
+            "Gemini": "6 Tennessee",
+            "Claude": "6 Tennessee",
+            "GPT": "6 Tennessee",
+            "LLaMA": "6 Tennessee",
+            "Grok": "6 Tennessee"
+          },
+          "score1": 5,
+          "score2": 0,
+          "winner": "6 Tennessee",
+          "tiebreak": false
+        },
+        {
+          "team1": "7 Kentucky",
+          "team2": "2 Iowa State",
+          "agent_picks": {
+            "Gemini": "7 Kentucky",
+            "Claude": "2 Iowa State",
+            "GPT": "7 Kentucky",
+            "LLaMA": "7 Kentucky",
+            "Grok": "7 Kentucky"
+          },
+          "score1": 4,
+          "score2": 1,
+          "winner": "7 Kentucky",
+          "tiebreak": false
+        }
+      ],
+      "s16": [
+        {
+          "team1": "1 Michigan",
+          "team2": "4 Alabama",
+          "agent_picks": {
+            "Gemini": "4 Alabama",
+            "Claude": "4 Alabama",
+            "GPT": "1 Michigan",
+            "LLaMA": "1 Michigan",
+            "Grok": "4 Alabama"
+          },
+          "score1": 2,
+          "score2": 3,
+          "winner": "4 Alabama",
+          "tiebreak": false
+        },
+        {
+          "team1": "6 Tennessee",
+          "team2": "7 Kentucky",
+          "agent_picks": {
+            "Gemini": "7 Kentucky",
+            "Claude": "6 Tennessee",
+            "GPT": "6 Tennessee",
+            "LLaMA": "6 Tennessee",
+            "Grok": "6 Tennessee"
+          },
+          "score1": 4,
+          "score2": 1,
+          "winner": "6 Tennessee",
+          "tiebreak": false
+        }
+      ],
+      "e8": [
+        {
+          "team1": "4 Alabama",
+          "team2": "6 Tennessee",
+          "agent_picks": {
+            "Gemini": "4 Alabama",
+            "Claude": "4 Alabama",
+            "GPT": "4 Alabama",
+            "LLaMA": "4 Alabama",
+            "Grok": "6 Tennessee"
+          },
+          "score1": 4,
+          "score2": 1,
+          "winner": "4 Alabama",
+          "tiebreak": false
+        }
+      ]
+    },
+    "South": {
+      "r64": [
+        {
+          "team1": "1 Florida",
+          "team2": "16 Lehigh",
+          "agent_picks": {
+            "Gemini": "1 Florida",
+            "Claude": "1 Florida",
+            "GPT": "1 Florida",
+            "LLaMA": "1 Florida",
+            "Grok": "1 Florida"
+          },
+          "score1": 5,
+          "score2": 0,
+          "winner": "1 Florida",
+          "tiebreak": false
+        },
+        {
+          "team1": "8 Clemson",
+          "team2": "9 Iowa",
+          "agent_picks": {
+            "Gemini": "8 Clemson",
+            "Claude": "8 Clemson",
+            "GPT": "8 Clemson",
+            "LLaMA": "8 Clemson",
+            "Grok": "9 Iowa"
+          },
+          "score1": 4,
+          "score2": 1,
+          "winner": "8 Clemson",
+          "tiebreak": false
+        },
+        {
+          "team1": "5 Vanderbilt",
+          "team2": "12 McNeese",
+          "agent_picks": {
+            "Gemini": "5 Vanderbilt",
+            "Claude": "5 Vanderbilt",
+            "GPT": "5 Vanderbilt",
+            "LLaMA": "5 Vanderbilt",
+            "Grok": "5 Vanderbilt"
+          },
+          "score1": 5,
+          "score2": 0,
+          "winner": "5 Vanderbilt",
+          "tiebreak": false
+        },
+        {
+          "team1": "4 Nebraska",
+          "team2": "13 Troy",
+          "agent_picks": {
+            "Gemini": "4 Nebraska",
+            "Claude": "4 Nebraska",
+            "GPT": "4 Nebraska",
+            "LLaMA": "4 Nebraska",
+            "Grok": "4 Nebraska"
+          },
+          "score1": 5,
+          "score2": 0,
+          "winner": "4 Nebraska",
+          "tiebreak": false
+        },
+        {
+          "team1": "6 North Carolina",
+          "team2": "11 VCU",
+          "agent_picks": {
+            "Gemini": "6 North Carolina",
+            "Claude": "6 North Carolina",
+            "GPT": "6 North Carolina",
+            "LLaMA": "6 North Carolina",
+            "Grok": "6 North Carolina"
+          },
+          "score1": 5,
+          "score2": 0,
+          "winner": "6 North Carolina",
+          "tiebreak": false
+        },
+        {
+          "team1": "3 Illinois",
+          "team2": "14 Penn",
+          "agent_picks": {
+            "Gemini": "3 Illinois",
+            "Claude": "3 Illinois",
+            "GPT": "3 Illinois",
+            "LLaMA": "3 Illinois",
+            "Grok": "3 Illinois"
+          },
+          "score1": 5,
+          "score2": 0,
+          "winner": "3 Illinois",
+          "tiebreak": false
+        },
+        {
+          "team1": "7 Saint Marys",
+          "team2": "10 Texas AM",
+          "agent_picks": {
+            "Gemini": "7 Saint Marys",
+            "Claude": "10 Texas AM",
+            "GPT": "7 Saint Marys",
+            "LLaMA": "7 Saint Marys",
+            "Grok": "10 Texas AM"
+          },
+          "score1": 3,
+          "score2": 2,
+          "winner": "7 Saint Marys",
+          "tiebreak": false
+        },
+        {
+          "team1": "2 Houston",
+          "team2": "15 Idaho",
+          "agent_picks": {
+            "Gemini": "2 Houston",
+            "Claude": "2 Houston",
+            "GPT": "2 Houston",
+            "LLaMA": "2 Houston",
+            "Grok": "2 Houston"
+          },
+          "score1": 5,
+          "score2": 0,
+          "winner": "2 Houston",
+          "tiebreak": false
+        }
+      ],
+      "r32": [
+        {
+          "team1": "1 Florida",
+          "team2": "8 Clemson",
+          "agent_picks": {
+            "Gemini": "1 Florida",
+            "Claude": "1 Florida",
+            "GPT": "1 Florida",
+            "LLaMA": "1 Florida",
+            "Grok": "1 Florida"
+          },
+          "score1": 5,
+          "score2": 0,
+          "winner": "1 Florida",
+          "tiebreak": false
+        },
+        {
+          "team1": "5 Vanderbilt",
+          "team2": "4 Nebraska",
+          "agent_picks": {
+            "Gemini": "5 Vanderbilt",
+            "Claude": "5 Vanderbilt",
+            "GPT": "5 Vanderbilt",
+            "LLaMA": "5 Vanderbilt",
+            "Grok": "4 Nebraska"
+          },
+          "score1": 4,
+          "score2": 1,
+          "winner": "5 Vanderbilt",
+          "tiebreak": false
+        },
+        {
+          "team1": "6 North Carolina",
+          "team2": "3 Illinois",
+          "agent_picks": {
+            "Gemini": "6 North Carolina",
+            "Claude": "6 North Carolina",
+            "GPT": "6 North Carolina",
+            "LLaMA": "6 North Carolina",
+            "Grok": "6 North Carolina"
+          },
+          "score1": 5,
+          "score2": 0,
+          "winner": "6 North Carolina",
+          "tiebreak": false
+        },
+        {
+          "team1": "7 Saint Marys",
+          "team2": "2 Houston",
+          "agent_picks": {
+            "Gemini": "2 Houston",
+            "Claude": "2 Houston",
+            "GPT": "7 Saint Marys",
+            "LLaMA": "2 Houston",
+            "Grok": "2 Houston"
+          },
+          "score1": 1,
+          "score2": 4,
+          "winner": "2 Houston",
+          "tiebreak": false
+        }
+      ],
+      "s16": [
+        {
+          "team1": "1 Florida",
+          "team2": "5 Vanderbilt",
+          "agent_picks": {
+            "Gemini": "1 Florida",
+            "Claude": "1 Florida",
+            "GPT": "1 Florida",
+            "LLaMA": "1 Florida",
+            "Grok": "1 Florida"
+          },
+          "score1": 5,
+          "score2": 0,
+          "winner": "1 Florida",
+          "tiebreak": false
+        },
+        {
+          "team1": "6 North Carolina",
+          "team2": "2 Houston",
+          "agent_picks": {
+            "Gemini": "2 Houston",
+            "Claude": "2 Houston",
+            "GPT": "6 North Carolina",
+            "LLaMA": "6 North Carolina",
+            "Grok": "2 Houston"
+          },
+          "score1": 2,
+          "score2": 3,
+          "winner": "2 Houston",
+          "tiebreak": false
+        }
+      ],
+      "e8": [
+        {
+          "team1": "1 Florida",
+          "team2": "2 Houston",
+          "agent_picks": {
+            "Gemini": "2 Houston",
+            "Claude": "2 Houston",
+            "GPT": "1 Florida",
+            "LLaMA": "2 Houston",
+            "Grok": "2 Houston"
+          },
+          "score1": 1,
+          "score2": 4,
+          "winner": "2 Houston",
+          "tiebreak": false
+        }
+      ]
+    }
+  },
+  "final_four": {
+    "Duke_vs_Houston": {
+      "team1": "1 Duke",
+      "team2": "2 Houston",
+      "agent_picks": {
+        "Gemini": "1 Duke",
+        "Claude": "1 Duke",
+        "GPT": "1 Duke",
+        "LLaMA": "1 Duke",
+        "Grok": "1 Duke"
+      },
+      "score1": 5,
+      "score2": 0,
+      "winner": "1 Duke",
+      "tiebreak": false
+    },
+    "Arizona_vs_Alabama": {
+      "team1": "1 Arizona",
+      "team2": "4 Alabama",
+      "agent_picks": {
+        "Gemini": "4 Alabama",
+        "Claude": "1 Arizona",
+        "GPT": "1 Arizona",
+        "LLaMA": "1 Arizona",
+        "Grok": "4 Alabama"
+      },
+      "score1": 3,
+      "score2": 2,
+      "winner": "1 Arizona",
+      "tiebreak": false
+    }
+  },
+  "championship": {
+    "team1": "1 Duke",
+    "team2": "1 Arizona",
+    "agent_picks": {
+      "Gemini": "1 Duke",
+      "Claude": "1 Duke",
+      "GPT": "1 Duke",
+      "LLaMA": "1 Duke",
+      "Grok": "1 Duke"
+    },
+    "score1": 5,
+    "score2": 0,
+    "winner": "1 Duke",
+    "tiebreak": false
+  },
+  "champion": "1 Duke"
+}
