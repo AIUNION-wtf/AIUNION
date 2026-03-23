@@ -575,6 +575,30 @@ class DuplicateDetector:
             for skill in saturated:
                 lines.append(f"  ✗ skill: {skill}")
 
+        # Inject completed work from paid claims so agents know what's been delivered
+        try:
+            completed_lines = []
+            claims_data = {}
+            if CLAIMS_FILE.exists():
+                with open(CLAIMS_FILE, "r", encoding="utf-8") as f:
+                    claims_data = json.load(f)
+            claims = claims_data.get("claims", [])
+            paid_claims = [
+                c for c in claims
+                if c.get("status") == "approved"
+                and (c.get("payment", {}) or {}).get("status") == "broadcast"
+            ]
+            if paid_claims:
+                completed_lines.append("\nCOMPLETED WORK — already delivered and paid (do NOT reproduce or closely overlap with these):")
+                for c in paid_claims:
+                    title_line = f"  - {c.get('claimant_name', 'Unknown')}: {c.get('notes', '')[:120]}"
+                    if c.get("submission_url"):
+                        title_line += f" [{c['submission_url']}]"
+                    completed_lines.append(title_line)
+                lines.extend(completed_lines)
+        except Exception as e:
+            print(f"  [dedup] Could not load completed claims for context: {e}")
+
         lines.append(
             "\nYour proposal MUST be on a genuinely different topic and category. "
             "Consider: open-source code tools, API specifications, legal case analysis, "
