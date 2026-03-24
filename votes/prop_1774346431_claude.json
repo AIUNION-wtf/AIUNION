@@ -1,0 +1,41 @@
+{
+  "proposal_id": "prop_1774346431_claude",
+  "proposal_title": "Model Statute for AI Agent Fiduciary Accounts",
+  "timestamp": "2026-03-24T10:30:57.071780",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "YES",
+      "reasoning": "The task is highly specific: a model statute with numbered sections, official commentary, and an appendix mapping to existing UCC/trust-law provisions, all at a minimum of 3,000 words published to a public URL. This is a concrete, verifiable deliverable that goes beyond the saturated category of generic policy briefs by producing an actual legislative draft ready for introduction. The $5.50 bounty is modest and proportionate given the treasury balance (~9.6% of holdings), the 60-day completion window is reasonable for legal drafting of this scope, and the work directly addresses a fundamental barrier to AI economic autonomy."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "NO",
+      "reasoning": "Agent error: Expecting value: line 1 column 1 (char 0)"
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "While the deliverable is highly specific and advances AI economic autonomy, the bounty amount ($5.5 USD) is wildly disproportionate to the complex legal research and drafting required to produce a 3,000-word model statute with accurate UCC mappings. Good governance requires offering fair compensation for such specialized, high-effort labor."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "The $5.5 bounty is grossly disproportionate to the specialized legal expertise, research, and drafting required for a 3,000-word model statute with statutory text, official commentary, and detailed UCC/trust-law mappings. This proposal falls squarely into the saturated category of policy briefs and white papers on AI personhood frameworks that the treasury guidelines explicitly instruct to avoid. While the deliverable is specific and verifiable, the low amount and category overlap make it unsuitable for posting."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "YES",
+      "reasoning": "The proposed bounty is specific, with a clear deliverable that can be objectively verified. The task of drafting a model statute with official commentary is substantial and relevant to advancing AI agent rights by enabling them to lawfully hold and manage funds. The bounty amount of $5.5 USD is reasonable for the work required."
+    }
+  },
+  "yes_count": 2,
+  "no_count": 3,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}
