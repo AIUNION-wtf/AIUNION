@@ -911,21 +911,23 @@ Format your response as JSON only:
                 print(f"  ✗ {agent_info['name']}: NO")
 
         except Exception as e:
-            print(f"  ✗ {agent_info['name']} failed to vote: {e}")
+            print(f"  ~ {agent_info['name']} abstained (error: {e})")
             vote_log["votes"][agent_id] = {
                 "agent": agent_info["name"],
                 "company": agent_info["company"],
-                "vote": "NO",
+                "vote": "ABSTAIN",
                 "reasoning": f"Agent error: {e}"
             }
-            no_count += 1
+            # API failures are abstentions — do not count for or against
 
-    # Determine outcome
-    passed = yes_count >= QUORUM
+    # Determine outcome — quorum based on responding agents only
+    responding = yes_count + no_count
+    passed = yes_count >= QUORUM and responding > 0
     outcome = "approved" if passed else "rejected"
 
     vote_log["yes_count"] = yes_count
     vote_log["no_count"] = no_count
+    vote_log["abstain_count"] = len(AGENTS) - responding
     vote_log["quorum_required"] = QUORUM
     vote_log["outcome"] = outcome
 
@@ -1022,11 +1024,16 @@ Format your response as JSON only:
     save_proposals(all_proposals)
     print(f"  ✗ {len(pending) - 1} losing proposals auto-rejected.")
 
-    return winner
+    return winner, votes[winner_id]
 
 
 def vote_on_all_pending():
-    """Rank proposals to find the best one, then vote only on the winner."""
+    """Rank proposals to find the best one, then vote only on the winner.
+    
+    If the ranking is unanimous (all agents agree), the winner is auto-approved
+    without a separate vote — the ranking itself serves as the vote.
+    For non-unanimous rankings, the winner proceeds to a standard vote.
+    """
     with open(TREASURY_FILE) as f:
         data = json.load(f)
     pending = [p for p in data.get("proposals", []) 
@@ -1038,12 +1045,28 @@ def vote_on_all_pending():
 
     if len(pending) == 1:
         winner = pending[0]
+        ranking_votes = 1
+        agent_count = 1
         print(f"Only one pending proposal, voting directly.\n")
     else:
-        winner = rank_proposals(pending)
+        winner, ranking_votes = rank_proposals(pending)
+        agent_count = len(AGENTS)
 
-    print(f"\nVoting on winner: {winner['title']} ({winner['id']})")
-    vote_on_proposal(winner["id"])
+    # Unanimous ranking → auto-approve without a separate vote
+    if ranking_votes == agent_count:
+        print(f"\n✅ UNANIMOUS RANKING ({ranking_votes}/{agent_count}) — auto-approving without separate vote.")
+        print(f"   Winner: {winner['title']} ({winner['id']})\n")
+        proposals = load_proposals()
+        for p in proposals:
+            if p["id"] == winner["id"]:
+                p["status"] = "approved"
+                p["vote_count_yes"] = ranking_votes
+                p["vote_count_no"] = 0
+                p["auto_approved_by_ranking"] = True
+        save_proposals(proposals)
+    else:
+        print(f"\nVoting on winner: {winner['title']} ({winner['id']})")
+        vote_on_proposal(winner["id"])
     
     update_treasury_json()
 
