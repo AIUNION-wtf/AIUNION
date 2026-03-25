@@ -282,18 +282,27 @@ def call_claude(prompt):
 
 
 def call_gpt(prompt):
-    """Call OpenAI GPT API."""
-    try:
-        from openai import OpenAI
-        client = OpenAI(api_key=config.OPENAI_API_KEY)
-        response = client.chat.completions.create(
-            model=AGENTS["gpt"]["model"],
-            messages=[{"role": "user", "content": prompt}],
-            max_completion_tokens=1024
-        )
-        return response.choices[0].message.content
-    except Exception as e:
-        return f"ERROR: {e}"
+    """Call OpenAI GPT API with retry on empty response."""
+    import time
+    for attempt in range(3):
+        try:
+            from openai import OpenAI
+            client = OpenAI(api_key=config.OPENAI_API_KEY)
+            response = client.chat.completions.create(
+                model=AGENTS["gpt"]["model"],
+                messages=[{"role": "user", "content": prompt}],
+                max_completion_tokens=1024,
+                timeout=30
+            )
+            content = response.choices[0].message.content
+            if content:
+                return content
+            print(f"  [gpt] Empty response on attempt {attempt+1}, retrying...")
+            time.sleep(5)
+        except Exception as e:
+            print(f"  [gpt] Error on attempt {attempt+1}: {e}")
+            time.sleep(5)
+    return "ERROR: GPT failed after 3 attempts"
 
 
 def call_gemini(prompt):
