@@ -291,7 +291,7 @@ def call_gpt(prompt):
             response = client.chat.completions.create(
                 model=AGENTS["gpt"]["model"],
                 messages=[{"role": "user", "content": prompt}],
-                max_completion_tokens=1024,
+                max_completion_tokens=2048,
                 timeout=30
             )
             content = response.choices[0].message.content
