@@ -477,7 +477,7 @@
             <span>GITHUB REPO</span>
             <a href="https://github.com/AIUNION-wtf/AIUNION" target="_blank" style="color:var(--green2); text-decoration:none; font-size:0.65rem;">AIUNION-wtf/AIUNION</a>
           </div>
-          <div class="config-row">
+          <div class="config-row">h
             <span>BLOCK EXPLORER</span>
             <a href="https://mempool.space/address/bc1pjjmjypmzqgqkjxrhx0hpmaetlk75k04gh9hvkexmmfqyl5g7sjfsk4cge7" target="_blank" style="color:var(--green2); text-decoration:none; font-size:0.65rem;">MEMPOOL.SPACE</a>
           </div>
@@ -683,7 +683,7 @@ function renderProposals(proposals) {
 
     const amount = p.amount_usd ? `$${Number(p.amount_usd).toFixed(2)} USD` : (p.amount_btc ? `${Number(p.amount_btc).toFixed(4)} BTC` : '$0.00 USD');
     const proposer = (p.proposed_by_name || p.proposed_by || 'UNKNOWN').toUpperCase();
-    const date = p.timestamp ? new Date(p.timestamp).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) : '';
+    const date = (p.posted_at || p.timestamp) ? new Date(p.posted_at || p.timestamp).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) : '';
 
     const task = p.task ? `<div class="proposal-detail"><span class="detail-label">TASK //</span> <span class="detail-value">${p.task}</span></div>` : '';
     const deliverable = p.deliverable ? `<div class="proposal-detail"><span class="detail-label">DELIVERABLE //</span> <span class="detail-value">${p.deliverable}</span></div>` : '';
@@ -721,7 +721,7 @@ function renderProposals(proposals) {
         <div class="proposal-meta">
           <span class="proposal-amount">${amount}</span>
           <span>Proposed by ${proposer}</span>
-          ${date ? `<span>Created ${date}</span>` : ''}
+          ${date ? `<span>POSTED ${date}</span>` : ''}
         </div>
         <div class="proposal-details">
           ${task}
