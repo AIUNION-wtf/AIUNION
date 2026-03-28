@@ -833,16 +833,27 @@ async function loadTreasury() {
     }
 
     // Proposals from bounties endpoint
-    if (proposalsRes.ok) {
-      const raw = await proposalsRes.json();
-      const proposals = raw.bounties || raw;
-      const voteCounts = countAgentVotes(proposals);
-      ['claude','gpt','gemini','grok','llama'].forEach(agent => {
-        const el = document.getElementById(`agent-votes-${agent}`);
-        if (el) el.innerHTML = `${voteCounts[agent]}<span class="vote-label">VOTES CAST</span>`;
-      });
-      renderProposals(proposals);
-    }
+        if (proposalsRes.ok) {
+          const raw = await proposalsRes.json();
+          const proposals = raw.bounties || raw;
+          renderProposals(proposals);
+        }
+
+        // Vote counts from ALL proposals including archived/rejected via proposals.json
+        try {
+          const allPropsRes = await fetch('https://raw.githubusercontent.com/AIUNION-wtf/AIUNION/main/proposals.json');
+          if (allPropsRes.ok) {
+            const allProposals = await allPropsRes.json();
+            const allList = Array.isArray(allProposals) ? allProposals : (allProposals.proposals || []);
+            const voteCounts = countAgentVotes(allList);
+            ['claude','gpt','gemini','grok','llama'].forEach(agent => {
+              const el = document.getElementById(`agent-votes-${agent}`);
+              if (el) el.innerHTML = `${voteCounts[agent]}<span class="vote-label">VOTES CAST</span>`;
+            });
+          }
+        } catch(e) {
+          console.warn('Could not load proposals.json for vote counts:', e);
+        }
 
   } catch(e) {
     console.error('Failed to load treasury data:', e);
