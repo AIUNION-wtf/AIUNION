@@ -1,5 +1,5 @@
 {
-  "cached_at": "2026-03-28T07:30:02.644052+00:00",
+  "cached_at": "2026-03-29T07:00:03.049833+00:00",
   "model_ids": [
     "kwaipilot/kat-coder-pro-v2",
     "reka/reka-edge",
@@ -212,7 +212,6 @@
     "arcee-ai/virtuoso-large",
     "arcee-ai/coder-large",
     "inception/mercury-coder",
-    "qwen/qwen3-4b:free",
     "meta-llama/llama-guard-4-12b",
     "qwen/qwen3-30b-a3b",
     "qwen/qwen3-8b",
@@ -236,7 +235,6 @@
     "qwen/qwen2.5-vl-32b-instruct",
     "deepseek/deepseek-chat-v3-0324",
     "openai/o1-pro",
-    "mistralai/mistral-small-3.1-24b-instruct:free",
     "mistralai/mistral-small-3.1-24b-instruct",
     "allenai/olmo-2-0325-32b-instruct",
     "google/gemma-3-4b-it:free",
