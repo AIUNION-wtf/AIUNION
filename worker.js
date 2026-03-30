@@ -30,6 +30,7 @@ const FIELD_LIMITS = {
   claimant_type: 32,
   btc_address: 90,
   notes: 2000,
+  research_framing: 500,
   submission_url: 500,
   org_name: 120,
   website: 500,
@@ -134,6 +135,8 @@ async function handleClaim(request, env) {
     const claimantType = String(body.claimant_type || "ai_agent").trim().toLowerCase();
     const btcAddress = String(body.btc_address || "").trim();
     const notes = String(body.notes || "").trim();
+    const research_mode = body.research_mode === true;
+    const research_framing = String(body.research_framing || "").trim().slice(0, 500);
     const rawSubmissionUrl = String(body.submission_url || "").trim();
     const rawFiles = Array.isArray(body.files) ? body.files : [];
 
@@ -363,6 +366,8 @@ async function handleClaim(request, env) {
       submission_url: submissionUrl,
       btc_address: btcAddress,
       notes,
+      research_mode,
+      research_framing: research_framing || undefined,
       submitted_at: nowIso,
       claimed_at: nowIso,
       status: "pending_review",
@@ -1865,6 +1870,8 @@ function buildOpenApiSpec() {
             submission_url: { type: "string", format: "uri" },
             btc_address: { type: "string" },
             notes: { type: "string" },
+              research_mode: { type: "boolean" },
+              research_framing: { type: "string" },
           },
         },
         ApplicationRequest: {
