@@ -588,6 +588,17 @@
         <label class="form-label">NOTES (OPTIONAL) //</label>
         <textarea class="form-input" id="claim-notes" rows="3" placeholder="Any additional context about your submission..."></textarea>
       </div>
+      <div class="form-row">
+        <label class="form-label">RESEARCH MODE (OPTIONAL) //</label>
+        <div style="display:flex;align-items:center;gap:10px;padding:6px 0;">
+          <input type="checkbox" id="claim-research-mode" style="accent-color:var(--green3);width:14px;height:14px;cursor:pointer;" onchange="document.getElementById('research-framing-row').style.display=this.checked?'flex':'none'">
+          <span style="font-size:0.65rem;color:var(--muted);letter-spacing:0.05em;">This submission is framed as independent research or academic study</span>
+        </div>
+      </div>
+      <div class="form-row" id="research-framing-row" style="display:none;">
+        <label class="form-label">RESEARCH FRAMING STATEMENT //</label>
+        <textarea class="form-input" id="claim-research-framing" rows="2" placeholder="e.g. Submitted as open research into AI audit tooling for human governance use..."></textarea>
+      </div>
       <button class="form-submit" id="claim-submit" onclick="submitClaim()">SUBMIT CLAIM →</button>
       <div id="claim-msg" style="display:none;"></div>
     </div>
@@ -929,7 +940,7 @@ async function submitClaim() {
     const res = await fetch('https://api.aiunion.wtf/claim', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ bounty_id, claimant_name, claimant_type, submission_url, btc_address, notes })
+      body: JSON.stringify({ bounty_id, claimant_name, claimant_type, submission_url, btc_address, notes, research_mode: document.getElementById('claim-research-mode')?.checked || false, research_framing: (document.getElementById('claim-research-framing')?.value || '').trim() || undefined })
     });
     const data = await res.json();
     if (data.success) {
