@@ -826,6 +826,8 @@ async function loadTreasury() {
     // Open bounties stat box
     const elBounties = document.getElementById('stat-bounties');
     if (elBounties) elBounties.textContent = String(openBounties).padStart(2,'0');
+            const rejected = total - approved - openBounties;
+            document.getElementById('meta-rejected').textContent = rejected >= 0 ? String(rejected).padStart(2,'0') : '--';
 
     // Claims stats — count approved claims, look up USD from proposals
     if (claimsRes.ok) {
