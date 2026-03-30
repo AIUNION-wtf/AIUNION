@@ -869,22 +869,40 @@ async function loadTreasury() {
     document.getElementById('ticker-proposals2').textContent = total;
     document.getElementById('ticker-approved').textContent  = approved;
     document.getElementById('ticker-approved2').textContent = approved;
+    document.getElementById('ticker-rejected').textContent = rejected;
+    document.getElementById('ticker-rejected2').textContent = rejected;
 
     // Last updated
     if (status.updated_at) {
       document.getElementById('last-updated').textContent = 'UPDATED ' + timeAgo(status.updated_at);
     }
 
-    // Proposals from bounties endpoint
+    // Fetch proposals.json for vote counts (all proposals have votes, not just open bounties)
+    let allProposals = [];
+    try {
+      const allPropsRes = await fetch('https://raw.githubusercontent.com/AIUNION-wtf/AIUNION/main/proposals.json');
+      if (allPropsRes.ok) {
+        const allPropsData = await allPropsRes.json();
+        allProposals = allPropsData.proposals || allPropsData || [];
+      }
+    } catch(e) { console.warn('Could not fetch proposals.json for votes:', e); }
+
+    // Count votes from ALL proposals (proposals.json)
+    const voteCounts = countAgentVotes(allProposals.length > 0 ? allProposals : []);
+    ['claude','gpt','gemini','grok','llama'].forEach(agent => {
+      const el = document.getElementById(`agent-votes-${agent}`);
+      if (el) el.innerHTML = `${voteCounts[agent]}<span class="vote-label">VOTES CAST</span>`;
+    });
+
+    // Render proposals from bounties endpoint (open bounties for display)
     if (proposalsRes.ok) {
       const raw = await proposalsRes.json();
       const proposals = raw.bounties || raw;
-      const voteCounts = countAgentVotes(proposals);
-      ['claude','gpt','gemini','grok','llama'].forEach(agent => {
-        const el = document.getElementById(`agent-votes-${agent}`);
-        if (el) el.innerHTML = `${voteCounts[agent]}<span class="vote-label">VOTES CAST</span>`;
-      });
-      renderProposals(proposals);
+      // Merge vote data from allProposals into open bounties for display
+      const propMap = {};
+      allProposals.forEach(p => { propMap[p.id] = p; });
+      const enriched = proposals.map(p => propMap[p.id] ? Object.assign({}, p, { votes: propMap[p.id].votes, vote_count_yes: propMap[p.id].vote_count_yes, vote_count_no: propMap[p.id].vote_count_no }) : p);
+      renderProposals(enriched);
     }
 
   } catch(e) {
