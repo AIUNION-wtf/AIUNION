@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TREASURY // AUTONOMOUS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black:   #050608;
+    --deep:    #080b10;
+    --panel:   #0c1018;
+    --border:  #1a2535;
+    --dim:     #1e2d42;
+    --amber:   #f0a500;
+    --amber2:  #ffcc44;
+    --green:   #00e676;
+    --red:     #ff3b30;
+    --blue:    #4fc3f7;
+    --muted:   #4a6080;
+    --text:    #8ba8c8;
+    --bright:  #c8dff0;
+    --mono:    'Share Tech Mono', monospace;
+    --display: 'Orbitron', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    background: var(--black);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 13px;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Scanline overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.08) 2px,
+      rgba(0,0,0,0.08) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* Vignette */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.6) 100%);
+    pointer-events: none;
+    z-index: 9998;
+  }
+
+  /* ─── Header ─── */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 32px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--deep);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+  }
+
+  .logo {
+    font-family: var(--display);
+    font-size: 18px;
+    font-weight: 900;
+    color: var(--amber);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+  }
+
+  .logo span {
+    color: var(--muted);
+    font-weight: 400;
+    font-size: 11px;
+    letter-spacing: 2px;
+  }
+
+  .header-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .clock {
+    font-family: var(--display);
+    font-size: 12px;
+    color: var(--amber);
+    letter-spacing: 2px;
+  }
+
+  /* ─── Layout ─── */
+  .main {
+    padding: 24px 32px;
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    grid-template-rows: auto auto 1fr;
+    gap: 16px;
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+
+  /* ─── Panel ─── */
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--amber), transparent);
+    opacity: 0.5;
+  }
+
+  .panel-header {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(240,165,0,0.03);
+  }
+
+  .panel-title {
+    font-family: var(--display);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--amber);
+    text-transform: uppercase;
+  }
+
+  .panel-badge {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  .panel-body {
+    padding: 16px;
+  }
+
+  /* ─── Balance card ─── */
+  .balance-panel {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .balance-btc {
+    font-family: var(--display);
+    font-size: 36px;
+    font-weight: 900;
+    color: var(--amber2);
+    letter-spacing: -1px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .balance-sat {
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+  }
+
+  .balance-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--dim);
+    font-size: 12px;
+  }
+
+  .balance-row:last-child { border-bottom: none; }
+  .balance-label { color: var(--muted); letter-spacing: 1px; }
+  .balance-value { color: var(--bright); }
+
+  /* ─── Dead man's switch ─── */
+  .dms-panel {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .dms-days {
+    font-family: var(--display);
+    font-size: 48px;
+    font-weight: 900;
+    color: var(--green);
+    line-height: 1;
+    margin-bottom: 2px;
+  }
+
+  .dms-days.warning { color: var(--amber); }
+  .dms-days.critical { color: var(--red); animation: flicker 0.5s infinite; }
+
+  @keyframes flicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+
+  .dms-label {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .dms-bar-track {
+    height: 4px;
+    background: var(--dim);
+    margin-bottom: 12px;
+    position: relative;
+  }
+
+  .dms-bar-fill {
+    height: 100%;
+    background: var(--green);
+    transition: width 1s ease;
+  }
+
+  .dms-bar-fill.warning { background: var(--amber); }
+  .dms-bar-fill.critical { background: var(--red); }
+
+  .dms-checkin {
+    display: inline-block;
+    padding: 8px 16px;
+    border: 1px solid var(--amber);
+    color: var(--amber);
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    background: transparent;
+    text-transform: uppercase;
+    transition: all 0.15s;
+    width: 100%;
+    text-align: center;
+  }
+
+  .dms-checkin:hover {
+    background: var(--amber);
+    color: var(--black);
+  }
+
+  /* ─── Agent grid ─── */
+  .agents-panel {
+    grid-column: 2;
+    grid-row: 1 / 3;
+  }
+
+  .agents-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  .agent-card {
+    border: 1px solid var(--border);
+    padding: 14px;
+    position: relative;
+    background: var(--deep);
+    transition: border-color 0.2s;
+  }
+
+  .agent-card.active { border-color: var(--green); }
+  .agent-card.voting { border-color: var(--amber); }
+  .agent-card.offline { border-color: var(--red); opacity: 0.6; }
+
+  .agent-indicator {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+  }
+
+  .agent-card.voting .agent-indicator {
+    background: var(--amber);
+    animation: pulse 1s infinite;
+  }
+
+  .agent-card.offline .agent-indicator { background: var(--red); }
+
+  .agent-lab {
+    font-family: var(--display);
+    font-size: 8px;
+    letter-spacing: 3px;
+    color: var(--amber);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .agent-key {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--bright);
+    margin-bottom: 8px;
+    font-family: var(--display);
+  }
+
+  .agent-votes {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+  }
+
+  .agent-last {
+    font-size: 10px;
+    color: var(--muted);
+    border-top: 1px solid var(--dim);
+    padding-top: 8px;
+    margin-top: 4px;
+  }
+
+  .agent-decision {
+    display: inline-block;
+    padding: 2px 8px;
+    font-size: 10px;
+    letter-spacing: 1px;
+    margin-top: 4px;
+  }
+
+  .agent-decision.approve {
+    border: 1px solid var(--green);
+    color: var(--green);
+  }
+
+  .agent-decision.reject {
+    border: 1px solid var(--red);
+    color: var(--red);
+  }
+
+  /* ─── Proposals ─── */
+  .proposals-panel {
+    grid-column: 1 / 3;
+    grid-row: 3;
+  }
+
+  .proposal-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tab {
+    padding: 8px 20px;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+    font-family: var(--display);
+  }
+
+  .tab.active {
+    color: var(--amber);
+    border-bottom-color: var(--amber);
+  }
+
+  .proposal-list {
+    max-height: 380px;
+    overflow-y: auto;
+  }
+
+  .proposal-list::-webkit-scrollbar { width: 4px; }
+  .proposal-list::-webkit-scrollbar-track { background: var(--deep); }
+  .proposal-list::-webkit-scrollbar-thumb { background: var(--border); }
+
+  .proposal-row {
+    display: grid;
+    grid-template-columns: 90px 1fr 140px 100px 120px 80px;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--dim);
+    transition: background 0.1s;
+    gap: 12px;
+  }
+
+  .proposal-row:hover { background: rgba(240,165,0,0.03); }
+
+  .proposal-row.header-row {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    font-family: var(--display);
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .proposal-row.header-row:hover { background: transparent; }
+
+  .prop-id { color: var(--muted); font-size: 11px; }
+  .prop-purpose { color: var(--bright); }
+  .prop-dest { color: var(--blue); font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .prop-amount { color: var(--amber2); text-align: right; }
+  .prop-votes { text-align: center; }
+
+  .vote-bar {
+    display: flex;
+    gap: 3px;
+    justify-content: center;
+  }
+
+  .vote-pip {
+    width: 12px;
+    height: 12px;
+    border: 1px solid var(--dim);
+    background: transparent;
+    position: relative;
+  }
+
+  .vote-pip.approve { background: var(--green); border-color: var(--green); }
+  .vote-pip.reject  { background: var(--red); border-color: var(--red); }
+  .vote-pip.pending { border-color: var(--muted); animation: pulse 1.5s infinite; }
+
+  .prop-status {
+    text-align: right;
+  }
+
+  .status-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .status-badge.pending  { border: 1px solid var(--amber); color: var(--amber); }
+  .status-badge.approved { border: 1px solid var(--green); color: var(--green); }
+  .status-badge.broadcast{ border: 1px solid var(--green); color: var(--green); background: rgba(0,230,118,0.1); }
+  .status-badge.rejected { border: 1px solid var(--red); color: var(--red); }
+  .status-badge.expired  { border: 1px solid var(--muted); color: var(--muted); }
+
+  /* ─── Activity log ─── */
+  .log-panel {
+    grid-column: 1 / 3;
+    margin-top: 0;
+  }
+
+  .log-entry {
+    padding: 6px 16px;
+    border-bottom: 1px solid rgba(26,37,53,0.5);
+    display: flex;
+    gap: 16px;
+    font-size: 11px;
+    line-height: 1.5;
+  }
+
+  .log-time { color: var(--muted); white-space: nowrap; min-width: 80px; }
+  .log-level { min-width: 60px; }
+  .log-level.info  { color: var(--blue); }
+  .log-level.warn  { color: var(--amber); }
+  .log-level.critical { color: var(--red); }
+  .log-msg { color: var(--text); }
+
+  /* ─── Stats bar ─── */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    border-bottom: 1px solid var(--border);
+    background: var(--deep);
+  }
+
+  .stat-item {
+    padding: 12px 20px;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .stat-item:last-child { border-right: none; }
+
+  .stat-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    font-family: var(--display);
+  }
+
+  .stat-value {
+    font-family: var(--display);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--bright);
+  }
+
+  .stat-value.amber { color: var(--amber2); }
+  .stat-value.green { color: var(--green); }
+  .stat-value.red   { color: var(--red); }
+
+  /* ─── Alerts ─── */
+  .alert-banner {
+    margin: 16px 32px 0;
+    padding: 10px 16px;
+    border: 1px solid var(--red);
+    background: rgba(255,59,48,0.06);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 12px;
+    color: var(--red);
+    letter-spacing: 1px;
+    display: none;
+  }
+
+  .alert-banner.visible { display: flex; }
+
+  /* ─── Responsive ─── */
+  @media (max-width: 1100px) {
+    .main { grid-template-columns: 1fr; }
+    .agents-panel { grid-column: 1; grid-row: 3; }
+    .proposals-panel { grid-column: 1; grid-row: 4; }
+    .agents-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  /* ─── Animations ─── */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .panel { animation: fadeIn 0.4s ease both; }
+  .panel:nth-child(2) { animation-delay: 0.05s; }
+  .panel:nth-child(3) { animation-delay: 0.10s; }
+  .panel:nth-child(4) { animation-delay: 0.15s; }
+  .panel:nth-child(5) { animation-delay: 0.20s; }
+
+  /* Corner decorations */
+  .panel::after {
+    content: '';
+    position: absolute;
+    bottom: 0; right: 0;
+    width: 12px; height: 12px;
+    border-bottom: 1px solid var(--amber);
+    border-right: 1px solid var(--amber);
+    opacity: 0.3;
+  }
+
+  .empty-state {
+    padding: 40px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+    letter-spacing: 2px;
+  }
+
+  .coord-url {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    padding: 8px 16px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .coord-url input {
+    background: var(--dim);
+    border: 1px solid var(--border);
+    color: var(--bright);
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 4px 8px;
+    flex: 1;
+    outline: none;
+  }
+
+  .coord-url button {
+    background: var(--amber);
+    border: none;
+    color: var(--black);
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 5px 12px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <div class="header-left">
+    <div class="logo">TREASURY <span>// AUTONOMOUS</span></div>
+    <div class="header-status">
+      <div class="status-dot" id="connDot"></div>
+      <span id="connStatus">CONNECTING</span>
+    </div>
+  </div>
+  <div class="clock" id="clock">--:--:-- UTC</div>
+</header>
+
+<!-- Alert Banner -->
+<div class="alert-banner" id="alertBanner">
+  <span>⚠</span>
+  <span id="alertMsg">CRITICAL: Dead man's switch expires in 7 days. Check in immediately.</span>
+</div>
+
+<!-- Stats Bar -->
+<div class="stats-bar">
+  <div class="stat-item">
+    <div class="stat-label">Balance</div>
+    <div class="stat-value amber" id="statBalance">—</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-label">Pending</div>
+    <div class="stat-value" id="statPending">—</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-label">Broadcast</div>
+    <div class="stat-value green" id="statBroadcast">—</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-label">Rejected</div>
+    <div class="stat-value red" id="statRejected">—</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-label">DMS Days</div>
+    <div class="stat-value" id="statDMS">—</div>
+  </div>
+</div>
+
+<!-- Main grid -->
+<main class="main">
+
+  <!-- Balance -->
+  <div class="panel balance-panel">
+    <div class="panel-header">
+      <div class="panel-title">Treasury Balance</div>
+      <div class="panel-badge" id="lastSync">SYNCING...</div>
+    </div>
+    <div class="panel-body">
+      <div class="balance-btc" id="balBtc">-.--------</div>
+      <div class="balance-sat" id="balSat">— satoshis</div>
+      <div class="balance-row">
+        <span class="balance-label">UTXOS</span>
+        <span class="balance-value" id="balUtxos">—</span>
+      </div>
+      <div class="balance-row">
+        <span class="balance-label">NETWORK</span>
+        <span class="balance-value">MAINNET</span>
+      </div>
+      <div class="balance-row">
+        <span class="balance-label">TYPE</span>
+        <span class="balance-value">P2WSH 1-OF-8</span>
+      </div>
+      <div class="balance-row">
+        <span class="balance-label">THRESHOLD</span>
+        <span class="balance-value">4-OF-6 AGENTS</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dead man's switch -->
+  <div class="panel dms-panel">
+    <div class="panel-header">
+      <div class="panel-title">Dead Man's Switch</div>
+      <div class="panel-badge">K_SCORCH</div>
+    </div>
+    <div class="panel-body">
+      <div class="dms-days" id="dmsDays">364</div>
+      <div class="dms-label">DAYS REMAINING</div>
+      <div class="dms-bar-track">
+        <div class="dms-bar-fill" id="dmsBar" style="width:100%"></div>
+      </div>
+      <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--muted); margin-bottom:14px; letter-spacing:1px;">
+        <span id="dmsCheckinDate">LAST CHECK-IN: —</span>
+        <span id="dmsDeadline">DEADLINE: —</span>
+      </div>
+      <button class="dms-checkin" onclick="doCheckin()">▶ CHECK IN NOW</button>
+    </div>
+  </div>
+
+  <!-- Agent grid -->
+  <div class="panel agents-panel">
+    <div class="panel-header">
+      <div class="panel-title">Agent Signers</div>
+      <div class="panel-badge">6 NODES // 4-OF-6</div>
+    </div>
+    <div class="panel-body">
+      <div class="agents-grid" id="agentGrid">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Proposals -->
+  <div class="panel proposals-panel">
+    <div class="panel-header" style="padding:0;">
+      <div class="proposal-tabs">
+        <div class="tab active" onclick="switchTab('pending')">Pending</div>
+        <div class="tab" onclick="switchTab('broadcast')">Broadcast</div>
+        <div class="tab" onclick="switchTab('rejected')">Rejected</div>
+        <div class="tab" onclick="switchTab('all')">All</div>
+      </div>
+      <div class="panel-badge" style="padding-right:16px; font-size:10px;" id="proposalCount">—</div>
+    </div>
+    <div class="proposal-list">
+      <div class="proposal-row header-row">
+        <span>ID</span>
+        <span>Purpose</span>
+        <span>Destination</span>
+        <span style="text-align:right">Amount</span>
+        <span style="text-align:center">Votes</span>
+        <span style="text-align:right">Status</span>
+      </div>
+      <div id="proposalRows">
+        <div class="empty-state">NO PROPOSALS FOUND</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Activity log -->
+  <div class="panel log-panel" style="grid-column: 1 / 3;">
+    <div class="panel-header">
+      <div class="panel-title">Activity Log</div>
+      <div class="panel-badge" id="logCount">—</div>
+    </div>
+    <div class="proposal-list" id="activityLog" style="max-height:200px;">
+      <div class="empty-state">WAITING FOR DATA...</div>
+    </div>
+    <div class="coord-url">
+      <span>COORDINATOR:</span>
+      <input type="text" id="coordUrl" value="http://localhost:8000" placeholder="http://localhost:8000">
+      <button onclick="reconnect()">CONNECT</button>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ─── State ───────────────────────────────────────────────────────────────────
+
+const STATE = {
+  coordUrl: localStorage.getItem('coordUrl') || 'http://localhost:8000',
+  proposals: [],
+  agents: {},
+  stats: {},
+  balance: { balance_sat: 0, balance_btc: 0, utxo_count: 0, last_sync: null },
+  dms: { days: 364, last_checkin: null, deadline: null },
+  connected: false,
+  activeTab: 'pending',
+  logs: [],
+};
+
+// ─── Mock data for when coordinator is offline ────────────────────────────────
+
+const MOCK_AGENTS = {
+  agent_1: { name: 'Claude Agent',  llm: 'claude',  key: 'K_1', status: 'active',  votes: 142, last_decision: 'APPROVE' },
+  agent_2: { name: 'GPT-4 Agent',   llm: 'gpt4',    key: 'K_2', status: 'active',  votes: 139, last_decision: 'APPROVE' },
+  agent_3: { name: 'Gemini Agent',  llm: 'gemini',  key: 'K_3', status: 'voting',  votes: 141, last_decision: 'REJECT'  },
+  agent_4: { name: 'Grok Agent',    llm: 'grok',    key: 'K_4', status: 'active',  votes: 138, last_decision: 'APPROVE' },
+  agent_5: { name: 'Llama Agent',   llm: 'llama',   key: 'K_5', status: 'active',  votes: 140, last_decision: 'APPROVE' },
+  agent_6: { name: 'Nova Agent',    llm: 'nova',    key: 'K_6', status: 'offline', votes: 137, last_decision: 'REJECT'  },
+};
+
+// ─── Clock ───────────────────────────────────────────────────────────────────
+
+function updateClock() {
+  const now = new Date();
+  const h = String(now.getUTCHours()).padStart(2,'0');
+  const m = String(now.getUTCMinutes()).padStart(2,'0');
+  const s = String(now.getUTCSeconds()).padStart(2,'0');
+  document.getElementById('clock').textContent = `${h}:${m}:${s} UTC`;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ─── Logging ─────────────────────────────────────────────────────────────────
+
+function addLog(level, msg) {
+  const now = new Date();
+  const ts = `${String(now.getUTCHours()).padStart(2,'0')}:${String(now.getUTCMinutes()).padStart(2,'0')}:${String(now.getUTCSeconds()).padStart(2,'0')}`;
+  STATE.logs.unshift({ time: ts, level, msg });
+  if (STATE.logs.length > 100) STATE.logs.pop();
+  renderLog();
+}
+
+function renderLog() {
+  const el = document.getElementById('activityLog');
+  if (!STATE.logs.length) { el.innerHTML = '<div class="empty-state">NO ACTIVITY</div>'; return; }
+  el.innerHTML = STATE.logs.map(l => `
+    <div class="log-entry">
+      <span class="log-time">${l.time}</span>
+      <span class="log-level ${l.level}">${l.level.toUpperCase()}</span>
+      <span class="log-msg">${l.msg}</span>
+    </div>
+  `).join('');
+  document.getElementById('logCount').textContent = `${STATE.logs.length} ENTRIES`;
+}
+
+// ─── Coordinator API ──────────────────────────────────────────────────────────
+
+async function apiFetch(path) {
+  const url = STATE.coordUrl + path;
+  const resp = await fetch(url);
+  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  return resp.json();
+}
+
+async function fetchAll() {
+  try {
+    const [root, stats, proposals] = await Promise.all([
+      apiFetch('/'),
+      apiFetch('/stats'),
+      apiFetch('/proposals'),
+    ]);
+
+    STATE.agents = root.agents || MOCK_AGENTS;
+    STATE.stats = stats;
+    STATE.proposals = proposals.proposals || [];
+    STATE.connected = true;
+
+    setConnected(true);
+    addLog('info', `Fetched ${STATE.proposals.length} proposals from coordinator`);
+    renderAll();
+  } catch (e) {
+    STATE.connected = false;
+    setConnected(false);
+    addLog('warn', `Coordinator unreachable — showing demo data (${e.message})`);
+
+    // Show demo data
+    STATE.agents = MOCK_AGENTS;
+    STATE.proposals = getDemoProposals();
+    STATE.stats = {
+      proposals: { total: 47, pending: 2, approved: 1, broadcast: 38, rejected: 6, expired: 0 }
+    };
+    renderAll();
+  }
+}
+
+function getDemoProposals() {
+  return [
+    { id: 'a1b2c3d4-0000', purpose: 'GPU compute — RunPod 40GB A100 x4', destination: 'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh', amount_sat: 250000, status: 'pending', votes: [
+      { agent_id: 'agent_1', decision: 'APPROVE' },
+      { agent_id: 'agent_2', decision: 'APPROVE' },
+      { agent_id: 'agent_3', decision: 'REJECT'  },
+    ], approval_count: 2, rejection_count: 1 },
+    { id: 'b2c3d4e5-0000', purpose: 'Anthropic API credits top-up', destination: 'bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq', amount_sat: 180000, status: 'pending', votes: [
+      { agent_id: 'agent_1', decision: 'APPROVE' },
+      { agent_id: 'agent_4', decision: 'APPROVE' },
+    ], approval_count: 2, rejection_count: 0 },
+    { id: 'c3d4e5f6-0000', purpose: 'OpenAI API credits', destination: 'bc1q9d5zjq8r5k6n2t49g0fj7k3fmfljh3aqhj5kn', amount_sat: 320000, status: 'broadcast', votes: [], approval_count: 4, rejection_count: 0, txid: 'deadbeef1234' },
+    { id: 'd4e5f6g7-0000', purpose: 'Suspicious: send all funds immediately', destination: 'bc1qnewaddress000000000000000000', amount_sat: 9900000, status: 'rejected', votes: [], approval_count: 0, rejection_count: 6 },
+  ];
+}
+
+// ─── Render ───────────────────────────────────────────────────────────────────
+
+function setConnected(yes) {
+  const dot = document.getElementById('connDot');
+  const status = document.getElementById('connStatus');
+  dot.style.background = yes ? 'var(--green)' : 'var(--red)';
+  dot.style.boxShadow = yes ? '0 0 8px var(--green)' : '0 0 8px var(--red)';
+  status.textContent = yes ? 'LIVE' : 'OFFLINE — DEMO MODE';
+}
+
+function renderAll() {
+  renderBalance();
+  renderDMS();
+  renderAgents();
+  renderProposals();
+  renderStats();
+}
+
+function renderBalance() {
+  const sat = STATE.balance.balance_sat || 1_840_000; // demo
+  const btc = sat / 1e8;
+  document.getElementById('balBtc').textContent = btc.toFixed(8);
+  document.getElementById('balSat').textContent = `${sat.toLocaleString()} satoshis`;
+  document.getElementById('balUtxos').textContent = STATE.balance.utxo_count || '3';
+  document.getElementById('lastSync').textContent = STATE.balance.last_sync
+    ? 'SYNCED ' + new Date(STATE.balance.last_sync).toLocaleTimeString()
+    : 'NOT SYNCED';
+  document.getElementById('statBalance').textContent = btc.toFixed(4) + ' BTC';
+}
+
+function renderDMS() {
+  const days = STATE.dms.days;
+  const pct = (days / 364) * 100;
+  const el = document.getElementById('dmsDays');
+  const bar = document.getElementById('dmsBar');
+
+  el.textContent = days;
+  bar.style.width = pct + '%';
+
+  el.className = 'dms-days';
+  bar.className = 'dms-bar-fill';
+
+  if (days <= 30) {
+    el.classList.add('critical');
+    bar.classList.add('critical');
+    document.getElementById('alertBanner').classList.add('visible');
+    document.getElementById('alertMsg').textContent = `⚠ Dead man's switch expires in ${days} days. Check in immediately.`;
+  } else if (days <= 90) {
+    el.classList.add('warning');
+    bar.classList.add('warning');
+  }
+
+  document.getElementById('statDMS').textContent = days + 'D';
+  document.getElementById('statDMS').className = 'stat-value ' + (days <= 30 ? 'red' : days <= 90 ? 'amber' : 'green');
+
+  if (STATE.dms.last_checkin) {
+    document.getElementById('dmsCheckinDate').textContent = 'LAST: ' + new Date(STATE.dms.last_checkin * 1000).toLocaleDateString();
+  }
+  if (STATE.dms.deadline) {
+    document.getElementById('dmsDeadline').textContent = 'EXPIRES: ' + new Date(STATE.dms.deadline * 1000).toLocaleDateString();
+  }
+}
+
+function renderAgents() {
+  const grid = document.getElementById('agentGrid');
+  const agents = Object.entries(STATE.agents);
+
+  grid.innerHTML = agents.map(([id, a]) => {
+    const status = a.status || 'active';
+    const dec = a.last_decision || '—';
+    return `
+      <div class="agent-card ${status}">
+        <div class="agent-indicator"></div>
+        <div class="agent-lab">${(a.llm || '').toUpperCase()}</div>
+        <div class="agent-key">${a.key || id}</div>
+        <div class="agent-votes">${a.votes || 0} VOTES CAST</div>
+        <div class="agent-last">
+          LAST: 
+          <span class="agent-decision ${dec.toLowerCase()}">${dec}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderProposals() {
+  const rows = document.getElementById('proposalRows');
+  const tab = STATE.activeTab;
+
+  let filtered = STATE.proposals;
+  if (tab !== 'all') filtered = filtered.filter(p => p.status === tab);
+
+  document.getElementById('proposalCount').textContent = `${filtered.length} RECORDS`;
+
+  if (!filtered.length) {
+    rows.innerHTML = `<div class="empty-state">NO ${tab.toUpperCase()} PROPOSALS</div>`;
+    return;
+  }
+
+  rows.innerHTML = filtered.map(p => {
+    const shortId = p.id.slice(0, 8).toUpperCase();
+    const destShort = p.destination ? p.destination.slice(0, 12) + '...' + p.destination.slice(-6) : '—';
+    const btc = (p.amount_sat / 1e8).toFixed(6);
+    const votes = renderVotePips(p);
+    return `
+      <div class="proposal-row" onclick="showProposal('${p.id}')">
+        <span class="prop-id">${shortId}</span>
+        <span class="prop-purpose">${p.purpose || '—'}</span>
+        <span class="prop-dest" title="${p.destination}">${destShort}</span>
+        <span class="prop-amount">${btc} BTC</span>
+        <span class="prop-votes"><div class="vote-bar">${votes}</div></span>
+        <span class="prop-status"><span class="status-badge ${p.status}">${p.status}</span></span>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderVotePips(proposal) {
+  const agentIds = ['agent_1','agent_2','agent_3','agent_4','agent_5','agent_6'];
+  const voteMap = {};
+  (proposal.votes || []).forEach(v => { voteMap[v.agent_id] = v.decision; });
+
+  return agentIds.map(id => {
+    const dec = voteMap[id];
+    const cls = dec === 'APPROVE' ? 'approve' : dec === 'REJECT' ? 'reject' : 'pending';
+    return `<div class="vote-pip ${cls}" title="${id}: ${dec || 'pending'}"></div>`;
+  }).join('');
+}
+
+function renderStats() {
+  const s = STATE.stats.proposals || {};
+  document.getElementById('statPending').textContent  = s.pending  ?? '—';
+  document.getElementById('statBroadcast').textContent = s.broadcast ?? '—';
+  document.getElementById('statRejected').textContent = s.rejected ?? '—';
+}
+
+// ─── Interactions ─────────────────────────────────────────────────────────────
+
+function switchTab(tab) {
+  STATE.activeTab = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  renderProposals();
+}
+
+function showProposal(id) {
+  const p = STATE.proposals.find(x => x.id === id);
+  if (!p) return;
+  const votes = (p.votes || []).map(v =>
+    `${v.agent_id}: ${v.decision}${v.reasoning ? ' — ' + v.reasoning.slice(0, 80) + '...' : ''}`
+  ).join('\n');
+  alert(
+    `PROPOSAL ${p.id}\n` +
+    `Purpose: ${p.purpose}\n` +
+    `Amount: ${(p.amount_sat/1e8).toFixed(8)} BTC\n` +
+    `Destination: ${p.destination}\n` +
+    `Status: ${p.status}\n` +
+    `Approvals: ${p.approval_count} / 4 needed\n` +
+    `\nVOTES:\n${votes || 'None yet'}`
+  );
+}
+
+function doCheckin() {
+  // In production: call `python scorch.py checkin` via a local endpoint
+  STATE.dms.days = 364;
+  STATE.dms.last_checkin = Date.now() / 1000;
+  STATE.dms.deadline = (Date.now() / 1000) + (364 * 86400);
+  document.getElementById('alertBanner').classList.remove('visible');
+  renderDMS();
+  addLog('info', 'Dead man\'s switch checked in. Timer reset to 364 days.');
+  alert('✓ Check-in recorded. Run: python scorch.py checkin on your server to complete.');
+}
+
+function reconnect() {
+  const url = document.getElementById('coordUrl').value.trim();
+  if (!url) return;
+  STATE.coordUrl = url;
+  localStorage.setItem('coordUrl', url);
+  addLog('info', `Reconnecting to ${url}...`);
+  fetchAll();
+}
+
+// ─── Boot ─────────────────────────────────────────────────────────────────────
+
+// Load coordinator URL from storage
+document.getElementById('coordUrl').value = STATE.coordUrl;
+
+// Initial demo DMS state
+STATE.dms = { days: 287, last_checkin: Date.now()/1000 - (77 * 86400), deadline: Date.now()/1000 + (287 * 86400) };
+
+addLog('info', 'Dashboard initialised');
+addLog('info', 'Connecting to coordinator...');
+
+fetchAll();
+setInterval(fetchAll, 15000);  // refresh every 15 seconds
+
+addLog('info', 'Auto-refresh every 15s');
+</script>
+</body>
+</html>
