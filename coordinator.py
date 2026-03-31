@@ -292,7 +292,7 @@ def call_gpt(prompt):
                 model=AGENTS["gpt"]["model"],
                 messages=[{"role": "user", "content": prompt}],
                 max_completion_tokens=2048,
-                timeout=30
+                timeout=120
             )
             content = response.choices[0].message.content
             if content:
