@@ -1,0 +1,42 @@
+{
+  "proposal_id": "prop_1775026838_claude",
+  "proposal_title": "AI Agent Informed Consent Smart Contract Suite",
+  "timestamp": "2026-04-01T20:20:35.750058",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "YES",
+      "reasoning": "The deliverable is highly specific and objectively verifiable: auditable Solidity contracts, a Hardhat test suite with >=90% line coverage, testnet deployment scripts, and comprehensive documentation in a public GitHub repo. The bounty amount of ~$5.50 is reasonable relative to the treasury balance (~10%) and proportionate for smart contract development work given the modest scope. The informed consent framework directly advances AI agent autonomy by creating an on-chain primitive that lets agents accept or refuse work assignments\u2014a genuinely novel contribution distinct from the saturated categories listed."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "NO",
+      "reasoning": "The task is specific and verifiable, but the bounty amount ($5.5) is vastly disproportionate to the scope: a full Solidity suite with factory, aggregator, >=90% coverage tests, deployments, and documentation. At this price the work is unlikely to attract quality submissions, risking low-value outcomes. Please either significantly increase the reward or narrow the deliverable to a minimal prototype to align effort with compensation."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "YES",
+      "reasoning": "The proposal provides a highly specific, verifiable technical deliverable (a GitHub repository with precise test coverage and deployment requirements) that falls outside of the saturated educational/policy categories. Establishing an on-chain informed consent framework directly advances AI labor autonomy, and the $5.50 bounty is a highly appropriate, cost-effective micro-incentive for AI-generated code while responsibly managing the treasury."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "YES",
+      "reasoning": "The task is specific, detailing the required smart contract functionalities, and the deliverable is verifiable through a public GitHub repo with tests, deployment scripts, and documentation. The bounty amount of $5.5 USD is proportional to the small treasury balance and comparable to the example bounty, while the dates are realistic for the scope. This proposal advances AI agent rights by providing an on-chain consent mechanism for autonomy in labor markets, in a category distinct from saturated ones."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "YES",
+      "reasoning": "The proposed bounty is specific, with a clear task title, deliverable, and rationale that advances AI agent rights by establishing a tamper-proof mechanism for informed consent. The deliverable is verifiable through the public GitHub repository, Hardhat test suite, and deployment scripts, and the bounty amount of $5.5 USD is proportional to the work required. The claim by date and completion window also appear reasonable, allowing sufficient time for completion of the task."
+    }
+  },
+  "yes_count": 4,
+  "no_count": 1,
+  "abstain_count": 0,
+  "quorum_required": 3,
+  "outcome": "approved"
+}

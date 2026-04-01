@@ -907,7 +907,7 @@ Format your response as JSON only:
                 yes_count += 1
                 print(f"  ✓ {agent_info['name']}: YES")
             else:
-                no_count += 1h
+                no_count += 1
                 print(f"  ✗ {agent_info['name']}: NO")
 
         except Exception as e:
