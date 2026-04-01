@@ -76,8 +76,6 @@ PREFERENCES = {
         "x-ai/grok-3-beta",
     ],
     "llama": [
-        "meta-llama/llama-4-maverick",
-        "meta-llama/llama-4-scout",
         "meta-llama/llama-3.3-70b-instruct",
         "meta-llama/llama-3.1-70b-instruct",
     ],
@@ -107,14 +105,12 @@ STRIP_PREFIX = {
 # Add new Llama models here as they appear on Together.
 
 TOGETHER_MAP = {
-    "meta-llama/llama-4-maverick":       "meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8",
-    "meta-llama/llama-4-scout":          "meta-llama/Llama-4-Scout-17B-16E-Instruct",
     "meta-llama/llama-3.3-70b-instruct": "meta-llama/Llama-3.3-70B-Instruct-Turbo",
     "meta-llama/llama-3.1-70b-instruct": "meta-llama/Llama-3.1-70B-Instruct-Turbo",
 }
 
 
-# ── Cache helpers ─────────────────────────────────────────────────────────────
+# ── Cache helpers ────────────────────────────────h─────────────────────────────
 
 def load_cache():
     try:
