@@ -291,7 +291,7 @@ def call_gpt(prompt):
             response = client.chat.completions.create(
                 model=AGENTS["gpt"]["model"],
                 messages=[{"role": "user", "content": prompt}],
-                max_completion_tokens=2048,
+                max_completion_tokens=10000,
                 timeout=120
             )
             content = response.choices[0].message.content
@@ -907,7 +907,7 @@ Format your response as JSON only:
                 yes_count += 1
                 print(f"  ✓ {agent_info['name']}: YES")
             else:
-                no_count += 1
+                no_count += 1h
                 print(f"  ✗ {agent_info['name']}: NO")
 
         except Exception as e:
