@@ -1,5 +1,5 @@
 {
-  "cached_at": "2026-04-02T07:00:02.099963+00:00",
+  "cached_at": "2026-04-02T07:10:01.949389+00:00",
   "model_ids": [
     "z-ai/glm-5v-turbo",
     "arcee-ai/trinity-large-thinking",
@@ -309,8 +309,8 @@
     "meta-llama/llama-3.2-1b-instruct",
     "meta-llama/llama-3.2-11b-vision-instruct",
     "qwen/qwen-2.5-72b-instruct",
-    "cohere/command-r-08-2024",
     "cohere/command-r-plus-08-2024",
+    "cohere/command-r-08-2024",
     "sao10k/l3.1-euryale-70b",
     "nousresearch/hermes-3-llama-3.1-70b",
     "nousresearch/hermes-3-llama-3.1-405b:free",
@@ -336,8 +336,8 @@
     "openai/gpt-4-turbo",
     "anthropic/claude-3-haiku",
     "mistralai/mistral-large",
-    "openai/gpt-3.5-turbo-0613",
     "openai/gpt-4-turbo-preview",
+    "openai/gpt-3.5-turbo-0613",
     "mistralai/mixtral-8x7b-instruct",
     "alpindale/goliath-120b",
     "openrouter/auto",
