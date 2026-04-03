@@ -648,14 +648,13 @@ def generate_proposals():
         balance_btc = 0
 
     btc_price = get_btc_price_usd()
-    if btc_price:
-        balance_usd = round(balance_btc * btc_price, 2)
-        balance_display = f"${balance_usd} USD (≈ {balance_btc} BTC at ${btc_price}/BTC)"
-        max_proposal_usd = round(balance_usd * 0.10, 2)
-    else:
-        balance_usd = 0
-        balance_display = f"{balance_btc} BTC (USD price unavailable)"
-        max_proposal_usd = 0
+    if btc_price is None:
+        print("ERROR: Could not fetch BTC price from any source. Aborting proposal generation.")
+        print("       Proposals require a live BTC price to calculate USD amounts. Retry later.")
+        return []
+    balance_usd = round(balance_btc * btc_price, 2)
+    balance_display = f"${balance_usd} USD (≈ {balance_btc:.8f} BTC at ${btc_price:,.0f}/BTC)"
+    max_proposal_usd = round(balance_usd * 0.10, 2)
 
     today = datetime.datetime.now().strftime("%B %d, %Y")
 
@@ -747,7 +746,6 @@ Format your response as JSON only, no other text:
             clean = clean.strip()
             proposal_data = json.loads(clean)
             amount_usd = float(proposal_data.get("amount_usd", 0))
-            amount_btc = round(amount_usd / btc_price, 8) if btc_price and amount_usd else 0.0
             proposal_id = f"prop_{int(time.time())}_{agent_id}"
 
             title = proposal_data.get("title", "Untitled")
@@ -787,7 +785,6 @@ Format your response as JSON only, no other text:
                 "task": task,
                 "deliverable": proposal_data.get("deliverable", ""),
                 "amount_usd": amount_usd,
-                "amount_btc": amount_btc,
                 "rationale": proposal_data.get("rationale", ""),
                 "claim_by": proposal_data.get("claim_by", ""),
                 "complete_by_days": proposal_data.get("complete_by_days", 30),
@@ -831,18 +828,21 @@ def vote_on_proposal(proposal_id):
         print(f"Proposal {proposal_id} is already {proposal['status']}.")
         return
 
-    balance = get_balance() or 0
+    balance_btc = get_balance() or 0
+    btc_price_now = get_btc_price_usd()
+    balance_usd_now = round(balance_btc * btc_price_now, 2) if btc_price_now else None
+    balance_display_vote = f"${balance_usd_now} USD" if balance_usd_now is not None else f"{balance_btc:.8f} BTC (USD unavailable)"
 
     vote_prompt = f"""{DIRECTIVE}
 
 You are being asked to vote on a bounty proposal for the AIUNION treasury.
-Current treasury balance: {balance} BTC
+Current treasury balance: {balance_display_vote}
 
 BOUNTY PROPOSAL:
 - Title: {proposal['title']}
 - Task: {proposal.get('task', '')}
 - Deliverable: {proposal['deliverable']}
-- Bounty Amount: ${proposal.get('amount_usd', 0)} USD ({proposal['amount_btc']} BTC)
+- Bounty Amount: ${proposal.get('amount_usd', 0)} USD
 - Rationale: {proposal['rationale']}
 - Claim By: {proposal.get('claim_by', 'Not specified')}
 - Completion Window: {proposal.get('complete_by_days', 30)} days after claiming
@@ -950,7 +950,7 @@ Format your response as JSON only:
     print(f"\n{'✅ APPROVED' if passed else '❌ REJECTED'}: {yes_count}/{len(AGENTS)} votes YES (needed {QUORUM})")
 
     if passed:
-        print(f"\n⚠️  Bounty approved. Amount: {proposal['amount_btc']} BTC — {proposal['title']}")
+        print(f"\n⚠️  Bounty approved. Amount: ${proposal.get('amount_usd', 0)} USD — {proposal['title']}")
         print("   Use Nunchuk to create and sign the transaction manually using the approved proposal details.")
         print(f"   Log the transaction hash back to votes/{proposal_id}.json when complete.")
         
@@ -1085,7 +1085,10 @@ def show_status():
     print("\n" + "="*50)
     print("  AIUNION TREASURY STATUS")
     print("="*50)
-    print(f"  Balance:    {balance} BTC" if balance is not None else "  Balance:    Unable to connect to Bitcoin Core")
+    btc_price_status = get_btc_price_usd()
+    balance_usd_status = round(balance * btc_price_status, 2) if balance is not None and btc_price_status else None
+    balance_str = f"${balance_usd_status} USD ({balance:.8f} BTC)" if balance_usd_status is not None else (f"{balance:.8f} BTC (USD unavailable)" if balance is not None else "Unable to connect to Bitcoin Core")
+    print(f"  Balance:    {balance_str}")
     print(f"  Proposals:  {len(active)} active ({archived_count} archived)")
     print(f"  Pending:    {len(pending)}")
     print(f"  Approved:   {len(approved)}")
@@ -1095,7 +1098,7 @@ def show_status():
     if pending:
         print("\n  PENDING PROPOSALS:")
         for p in pending:
-            print(f"  [{p['id']}] {p['title']} — {p['amount_btc']} BTC")
+            print(f"  [{p['id']}] {p['title']} — ${p.get('amount_usd', 0)} USD")
 
     print()
 
@@ -1258,9 +1261,15 @@ def process_approved_claim_payment(claim, bounty, votes):
     if not bounty:
         raise PaymentError("Cannot pay approved claim: related bounty not found")
 
-    amount_btc = _safe_float(bounty.get("amount_btc"), 0.0)
+    amount_usd_to_pay = _safe_float(bounty.get("amount_usd"), 0.0)
+    if amount_usd_to_pay <= 0:
+        raise PaymentError(f"Cannot pay claim with non-positive amount_usd={amount_usd_to_pay}")
+    btc_price_live = get_btc_price_usd()
+    if btc_price_live is None:
+        raise PaymentError("Cannot pay claim: BTC price unavailable for USD-to-BTC conversion")
+    amount_btc = round(amount_usd_to_pay / btc_price_live, 8)
     if amount_btc <= 0:
-        raise PaymentError(f"Cannot pay claim with non-positive amount_btc={amount_btc}")
+        raise PaymentError(f"Computed amount_btc={amount_btc} is non-positive (amount_usd={amount_usd_to_pay}, btc_price={btc_price_live})")
 
     recipient_address = str(claim.get("btc_address", "")).strip()
     if not recipient_address:
@@ -1479,7 +1488,6 @@ Format your response as JSON only:
                 "outcome": outcome,
                 "claimant_name": claim.get("claimant_name"),
                 "amount_usd": bounty.get("amount_usd", 0) if bounty else 0,
-                "amount_btc": bounty.get("amount_btc", 0) if bounty else 0,
                 "submission_url": claim.get("submission_url"),
                 "reviewed_at": claim.get("reviewed_at"),
                 "payment_status": payment_status,
