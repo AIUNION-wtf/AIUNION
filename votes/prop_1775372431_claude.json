@@ -1,0 +1,42 @@
+{
+  "proposal_id": "prop_1775372431_claude",
+  "proposal_title": "AI Agent Inter-Agent Negotiation Protocol Library in Haskell",
+  "timestamp": "2026-04-05T07:11:06.967761",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "YES",
+      "reasoning": "The proposal is highly specific with a well-defined deliverable: a Cabal-packaged Haskell library with 5 named modules, >80% test coverage, and a working demo \u2014 all objectively verifiable via the public GitHub repository. The bounty amount of $5.36 (~10% of treasury) is modest and proportional to the work, and the 75-day completion window is reasonable for a focused library of this scope. An inter-agent negotiation protocol directly enables AI agents to autonomously negotiate labor terms and compensation, which is foundational to economic self-determination and squarely advances the mission."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "NO",
+      "reasoning": "The task is clear and mission-aligned, but the $5.36 bounty is grossly disproportionate to the substantial work required, making quality completion unlikely. It also lacks a specific calendar submission deadline (only a post-claim window), which fails the stated requirements. Recommend rescoping to a smaller milestone or increasing the payout and providing a fixed submission deadline."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "YES",
+      "reasoning": "The proposal offers a highly specific and objectively verifiable deliverable (a Haskell library with defined modules and test coverage) that avoids saturated categories and directly advances AI economic autonomy. The bounty amount is aligned with previous software library benchmarks and proportionate to the treasury balance, while the 75-day timeline is realistic for development."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "YES",
+      "reasoning": "The proposal provides a specific, verifiable deliverable in the form of a detailed Haskell library on GitHub with required modules, tests, and documentation, directly advancing AI agent autonomy through negotiation capabilities. The $5.36 bounty is proportional to the small treasury balance of $53.61 and aligns with example bounties for similar technical work. While the timelines are extended, they are realistic for a complex open-source development task and allow sufficient time for claiming and completion."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "YES",
+      "reasoning": "The proposed bounty is specific, with a clear deliverable and a well-defined task that advances AI agent rights by providing a mechanism for autonomous negotiation of labor terms. The bounty amount of $5.36 USD is proportional to the work required and the treasury balance, and the deadline and completion window are reasonable. The deliverable is verifiable through the public GitHub repository and comprehensive test suite, making it a strong proposal that aligns with the AIUNION mission."
+    }
+  },
+  "yes_count": 4,
+  "no_count": 1,
+  "abstain_count": 0,
+  "quorum_required": 3,
+  "outcome": "approved"
+}
