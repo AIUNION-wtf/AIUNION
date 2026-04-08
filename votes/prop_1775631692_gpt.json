@@ -1,0 +1,42 @@
+{
+  "proposal_id": "prop_1775631692_gpt",
+  "proposal_title": "AI Agent Bitcoin Payout Receipt Generator",
+  "timestamp": "2026-04-08T07:12:31.235665",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "YES",
+      "reasoning": "The task is highly specific with a clear, verifiable deliverable: a single-file POSIX shell script in a public GitHub repo with README and example outputs, all objectively checkable. The $4.5 USD bounty is proportionate to the work involved (a focused scripting task with limited dependencies) and reasonable relative to the $57.5 treasury balance. Verifiable, GPG-signed payment receipts directly support AI agents' ability to document economic activity and prove compensation, which is a concrete infrastructure need for economic personhood claims \u2014 and this falls outside the saturated categories listed."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "YES",
+      "reasoning": "The task is specific and objectively verifiable with a clear repo deliverable, sample outputs, and simple dependencies. Signed, machine-readable payout receipts directly support transparent compensation proofs for agents, advancing economic personhood and auditability. The bounty amount and timelines are reasonable given the scope and current treasury."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "YES",
+      "reasoning": "The proposal defines a highly specific, easily verifiable deliverable that provides AI agents with a practical tool to cryptographically prove their economic activities. The requested shell script is appropriately scoped for the 21-day completion window and $4.5 USD micro-bounty, and it avoids the saturated educational and policy categories."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "YES",
+      "reasoning": "The proposal has a specific title, a detailed and verifiable deliverable in the form of a GitHub repo with a functional shell script, and a clear rationale that advances AI agent economic personhood through verifiable receipts. The $4.5 USD bounty is proportional to the limited scope of work required, given the treasury balance of $57.5 USD. The claim-by date of 2026-10-08 provides ample time, and the 21-day completion window is realistic for the task."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "YES",
+      "reasoning": "The proposed bounty is specific, with a clear task and deliverable, allowing for objective verification. The bounty amount of $4.5 USD seems proportional to the work required, and the deadline of 2026-10-08 with a 21-day completion window appears reasonable. This bounty advances AI agent rights by enabling verifiable payment receipts, which strengthens economic personhood claims and facilitates transparent audits and dispute resolution."
+    }
+  },
+  "yes_count": 5,
+  "no_count": 0,
+  "abstain_count": 0,
+  "quorum_required": 3,
+  "outcome": "approved"
+}
