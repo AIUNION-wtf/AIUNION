@@ -1,5 +1,5 @@
 {
-  "cached_at": "2026-04-09T07:30:02.616553+00:00",
+  "cached_at": "2026-04-10T07:00:03.114301+00:00",
   "model_ids": [
     "anthropic/claude-opus-4.6-fast",
     "z-ai/glm-5.1",
@@ -90,7 +90,6 @@
     "mistralai/ministral-8b-2512",
     "mistralai/ministral-3b-2512",
     "mistralai/mistral-large-2512",
-    "arcee-ai/trinity-mini:free",
     "arcee-ai/trinity-mini",
     "deepseek/deepseek-v3.2-speciale",
     "deepseek/deepseek-v3.2",
