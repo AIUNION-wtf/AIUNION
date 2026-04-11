@@ -1,5 +1,5 @@
 {
-  "cached_at": "2026-04-11T07:00:03.372459+00:00",
+  "cached_at": "2026-04-11T07:10:02.233019+00:00",
   "model_ids": [
     "anthropic/claude-opus-4.6-fast",
     "z-ai/glm-5.1",
@@ -301,8 +301,8 @@
     "anthracite-org/magnum-v4-72b",
     "qwen/qwen-2.5-7b-instruct",
     "nvidia/llama-3.1-nemotron-70b-instruct",
-    "inflection/inflection-3-productivity",
     "inflection/inflection-3-pi",
+    "inflection/inflection-3-productivity",
     "thedrummer/rocinante-12b",
     "meta-llama/llama-3.2-3b-instruct:free",
     "meta-llama/llama-3.2-3b-instruct",
@@ -336,20 +336,20 @@
     "openai/gpt-4-turbo",
     "anthropic/claude-3-haiku",
     "mistralai/mistral-large",
-    "openai/gpt-4-turbo-preview",
     "openai/gpt-3.5-turbo-0613",
+    "openai/gpt-4-turbo-preview",
     "mistralai/mixtral-8x7b-instruct",
     "alpindale/goliath-120b",
     "openrouter/auto",
     "openai/gpt-4-1106-preview",
-    "openai/gpt-3.5-turbo-instruct",
     "mistralai/mistral-7b-instruct-v0.1",
+    "openai/gpt-3.5-turbo-instruct",
     "openai/gpt-3.5-turbo-16k",
     "mancer/weaver",
     "undi95/remm-slerp-l2-13b",
     "gryphe/mythomax-l2-13b",
     "openai/gpt-4-0314",
-    "openai/gpt-4",
-    "openai/gpt-3.5-turbo"
+    "openai/gpt-3.5-turbo",
+    "openai/gpt-4"
   ]
 }
