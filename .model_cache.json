@@ -1,5 +1,5 @@
 {
-  "cached_at": "2026-04-14T07:00:02.486334+00:00",
+  "cached_at": "2026-04-14T07:20:02.416813+00:00",
   "model_ids": [
     "openrouter/elephant-alpha",
     "anthropic/claude-opus-4.6-fast",
@@ -303,13 +303,13 @@
     "inflection/inflection-3-productivity",
     "inflection/inflection-3-pi",
     "thedrummer/rocinante-12b",
-    "meta-llama/llama-3.2-1b-instruct",
-    "meta-llama/llama-3.2-11b-vision-instruct",
     "meta-llama/llama-3.2-3b-instruct:free",
     "meta-llama/llama-3.2-3b-instruct",
+    "meta-llama/llama-3.2-1b-instruct",
+    "meta-llama/llama-3.2-11b-vision-instruct",
     "qwen/qwen-2.5-72b-instruct",
-    "cohere/command-r-08-2024",
     "cohere/command-r-plus-08-2024",
+    "cohere/command-r-08-2024",
     "sao10k/l3.1-euryale-70b",
     "nousresearch/hermes-3-llama-3.1-70b",
     "nousresearch/hermes-3-llama-3.1-405b:free",
@@ -335,20 +335,20 @@
     "openai/gpt-4-turbo",
     "anthropic/claude-3-haiku",
     "mistralai/mistral-large",
-    "openai/gpt-3.5-turbo-0613",
     "openai/gpt-4-turbo-preview",
+    "openai/gpt-3.5-turbo-0613",
     "mistralai/mixtral-8x7b-instruct",
     "alpindale/goliath-120b",
     "openrouter/auto",
     "openai/gpt-4-1106-preview",
-    "mistralai/mistral-7b-instruct-v0.1",
     "openai/gpt-3.5-turbo-instruct",
+    "mistralai/mistral-7b-instruct-v0.1",
     "openai/gpt-3.5-turbo-16k",
     "mancer/weaver",
     "undi95/remm-slerp-l2-13b",
     "gryphe/mythomax-l2-13b",
     "openai/gpt-4-0314",
-    "openai/gpt-3.5-turbo",
-    "openai/gpt-4"
+    "openai/gpt-4",
+    "openai/gpt-3.5-turbo"
   ]
 }
