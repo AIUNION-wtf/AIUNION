@@ -54,6 +54,7 @@ a { color: #58a6ff; text-decoration: none; }
 a:hover { text-decoration: underline; }
 .rbtn { background: #21262d; border: 1px solid #30363d; color: #c9d1d9; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; margin-top: 10px; }
 .rbtn:hover { background: #30363d; }
+.vstatus { font-size: 11px; color: #8b949e; font-style: italic; }
 </style>
 </head>
 <body>
@@ -75,7 +76,7 @@ a:hover { text-decoration: underline; }
   </div>
   <div class="card">
     <h2>&#9989; Agent Votes (Today)</h2>
-    <div class="sched">&#128336; Runs 5:10 AM ET daily</div>
+    <div class="sched">&#128336; Runs 5:10 AM ET daily &mdash; votes written to proposals.json</div>
     <div id="vote-out"><span class="spinner"></span>Loading...</div>
   </div>
   <div class="card">
@@ -98,30 +99,23 @@ var WFLOWS = ['AIUNION Marketing Agent','AIUNION Event Post','Moltbook Bot'];
 var RAW = 'https://raw.githubusercontent.com/AIUNION-wtf/AIUNION/main/';
 var API = 'https://api.github.com/repos/AIUNION-wtf/AIUNION/';
 var MAPI = 'https://api.github.com/repos/AIUNION-wtf/aiunion-marketing/';
-
 function today() { return new Date().toISOString().split('T')[0]; }
 function fmt(s) { return s ? new Date(s).toUTCString().replace(' GMT','') + ' UTC' : 'N/A'; }
-
 function get(url, cb) {
   var x = new XMLHttpRequest();
   x.open('GET', url);
   x.setRequestHeader('Accept', 'application/vnd.github+json');
   x.onload = function() {
     if (x.status >= 200 && x.status < 300) {
-      try { cb(null, JSON.parse(x.responseText)); }
-      catch(e) { cb('Parse error: ' + e.message); }
-    } else {
-      cb('HTTP ' + x.status);
-    }
+      try { cb(null, JSON.parse(x.responseText)); } catch(e) { cb('Parse error: ' + e.message); }
+    } else { cb('HTTP ' + x.status); }
   };
   x.onerror = function() { cb('Network error'); };
   x.send();
 }
-
 function row(name, meta, badgeClass, badgeText, dotClass) {
   return '<div class="row"><div class="rname"><div class="dot ' + dotClass + '"></div>' + name + '</div><div class="rmeta">' + meta + '</div><div class="badge ' + badgeClass + '">' + badgeText + '</div></div>';
 }
-
 function loadProposals() {
   get(RAW + 'proposals.json', function(err, data) {
     var el = document.getElementById('prop-out');
@@ -146,73 +140,56 @@ function loadProposals() {
     updateOverall();
   });
 }
-
 function loadVotes() {
-  // Check git commits on votes/ path since start of today
-  // This correctly identifies agents who voted regardless of proposal timestamp in filename
-  var t = today();
-  var url = API + 'commits?path=votes&per_page=10&since=' + t + 'T00:00:00Z';
-  get(url, function(err, commits) {
+  // Votes are recorded by the vote task changing proposal status from "pending" to "approved" or "rejected"
+  // We check proposals.json for today's proposals and see which ones have a non-pending status
+  get(RAW + 'proposals.json', function(err, data) {
     var el = document.getElementById('vote-out');
     if (err) { el.innerHTML = '<div class="err">' + err + '</div>'; return; }
-
-    if (!commits || commits.length === 0) {
-      // No commits today on votes/ — check when last vote happened
-      var html = '';
-      AGENTS.forEach(function(a) {
-        html += row(ANAMES[a], '&mdash;', 'miss', 'None today', 'red');
-      });
-      // Get last commit for context
-      get(API + 'commits?path=votes&per_page=1', function(err2, last) {
-        if (!err2 && last && last.length) {
-          html += '<div class="infobox">Last vote run: <strong>' + fmt(last[0].commit.author.date) + '</strong></div>';
+    var t = today();
+    // Find today's proposals per agent
+    var propByAgent = {};
+    AGENTS.forEach(function(a) { propByAgent[a] = null; });
+    data.forEach(function(p) {
+      if (p.timestamp && p.timestamp.indexOf(t) === 0 && propByAgent[p.proposed_by] !== undefined) {
+        // Keep the latest proposal per agent for today
+        if (!propByAgent[p.proposed_by] || p.timestamp > propByAgent[p.proposed_by].timestamp) {
+          propByAgent[p.proposed_by] = p;
         }
-        el.innerHTML = html;
-        window._voteOk = false;
-        updateOverall();
-      });
-      return;
-    }
-
-    // Commits exist today — get file list from the most recent commit
-    var sha = commits[0].sha;
-    var commitDate = commits[0].commit.author.date;
-    get(API + 'commits/' + sha, function(err2, detail) {
-      if (err2) {
-        // Fallback: if we can't get file details, just mark all as voted since commit exists
-        var html = '';
-        AGENTS.forEach(function(a) {
-          html += row(ANAMES[a], fmt(commitDate), 'ok', 'Voted', 'green');
-        });
-        html += '<div class="infobox">Vote commit: <strong>' + fmt(commitDate) + '</strong></div>';
-        el.innerHTML = html;
-        window._voteOk = true;
-        updateOverall();
+      }
+    });
+    var html = '';
+    var votedCount = 0;
+    var proposedCount = 0;
+    AGENTS.forEach(function(a) {
+      var prop = propByAgent[a];
+      if (!prop) {
+        // No proposal today — can't vote on what doesn't exist
+        html += row(ANAMES[a], 'No proposal today', 'miss', 'No proposal', 'red');
         return;
       }
-
-      var voted = {};
-      AGENTS.forEach(function(a) { voted[a] = false; });
-      var files = detail.files || [];
-      files.forEach(function(f) {
-        var parts = f.filename.split('/'); if (parts.length >= 2 && parts[0] === 'votes') { var seg = parts[1].replace('.json','').split('_'); if (seg.length === 3 && voted[seg[2]] !== undefined) voted[seg[2]] = true; }
-      });
-
-      var html = '';
-      var anyOk = false;
-      AGENTS.forEach(function(a) {
-        var ok = voted[a];
-        if (ok) anyOk = true;
-        html += row(ANAMES[a], ok ? fmt(commitDate) : '&mdash;', ok ? 'ok' : 'miss', ok ? 'Voted' : 'None today', ok ? 'green' : 'red');
-      });
-      html += '<div class="infobox">Vote commit: <strong>' + fmt(commitDate) + '</strong></div>';
-      el.innerHTML = html;
-      window._voteOk = anyOk;
-      updateOverall();
+      proposedCount++;
+      var status = prop.status || 'pending';
+      var voted = (status === 'approved' || status === 'rejected');
+      if (voted) votedCount++;
+      var badgeClass = voted ? 'ok' : 'warn';
+      var dotClass = voted ? 'green' : 'yellow';
+      var badgeText = voted ? status.charAt(0).toUpperCase() + status.slice(1) : 'Pending';
+      var meta = voted
+        ? ('Proposal ' + status + ' &mdash; ' + fmt(prop.timestamp))
+        : ('Proposal pending since ' + fmt(prop.timestamp));
+      html += row(ANAMES[a], meta, badgeClass, badgeText, dotClass);
     });
+    // Summary infobox
+    var allVoted = (proposedCount > 0 && votedCount === proposedCount);
+    html += '<div class="infobox">Today: <strong>' + votedCount + '/' + proposedCount + '</strong> proposals voted on'
+      + (allVoted ? ' &mdash; <span style="color:#3fb950">All complete</span>' : ' &mdash; <span style="color:#d29922">Some pending</span>')
+      + '<br><span class="vstatus">Votes are stored as status changes in proposals.json (approved/rejected)</span></div>';
+    el.innerHTML = html;
+    window._voteOk = allVoted;
+    updateOverall();
   });
 }
-
 function loadMarketing() {
   get(MAPI + 'actions/runs?per_page=50', function(err, data) {
     var el = document.getElementById('mkt-out');
@@ -242,7 +219,6 @@ function loadMarketing() {
     updateOverall();
   });
 }
-
 function loadTreasury() {
   get(RAW + 'treasury.json', function(err, t) {
     var el = document.getElementById('treas-out');
@@ -261,7 +237,6 @@ function loadTreasury() {
       + '<strong>Type:</strong> ' + (t.wallet_type || 'N/A') + '</div>';
   });
 }
-
 function loadActivity() {
   var since = new Date(Date.now() - 7*86400000).toISOString();
   get(API + 'commits?per_page=100&since=' + since, function(err, commits) {
@@ -286,7 +261,6 @@ function loadActivity() {
       html += '<div class="daycell ' + cls + '" title="' + date + ': ' + cnt + ' commits">' + label + '</div>';
     });
     html += '</div>';
-
     get(RAW + 'proposals.json', function(err2, props) {
       if (!err2 && props) {
         var cutoff = new Date(Date.now() - 7*86400000);
@@ -306,7 +280,6 @@ function loadActivity() {
     });
   });
 }
-
 function updateOverall() {
   var p = window._propOk, v = window._voteOk, m = window._mktOk;
   if (p === undefined || v === undefined || m === undefined) return;
@@ -319,13 +292,16 @@ function updateOverall() {
     dot.className='dot red'; lbl.textContent='All Systems Down'; box.className='overall-status down';
   } else {
     var issues = [];
-    if (!p) issues.push('Proposals'); if (!v) issues.push('Votes'); if (!m) issues.push('Marketing');
+    if (!p) issues.push('Proposals');
+    if (!v) issues.push('Votes');
+    if (!m) issues.push('Marketing');
     dot.className='dot yellow'; lbl.textContent='Degraded: ' + issues.join(', '); box.className='overall-status degraded';
   }
 }
-
 function loadAll() {
-  window._propOk = undefined; window._voteOk = undefined; window._mktOk = undefined;
+  window._propOk = undefined;
+  window._voteOk = undefined;
+  window._mktOk = undefined;
   document.getElementById('ts').textContent = 'Refreshing...';
   loadProposals();
   loadVotes();
@@ -336,7 +312,6 @@ function loadAll() {
     document.getElementById('ts').textContent = 'Last refreshed: ' + new Date().toUTCString();
   }, 8000);
 }
-
 loadAll();
 setInterval(loadAll, 5*60*1000);
 </script>
