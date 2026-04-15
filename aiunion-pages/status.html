@@ -92,6 +92,10 @@
   .agent-stat-box {
     background: #1c2128; border-radius: 6px; padding: 8px 14px; text-align: center;
   }
+  .schedule-note {
+    font-size: 11px; color: #8b949e; background: #1c2128; border-radius: 6px;
+    padding: 8px 12px; margin-bottom: 14px; line-height: 1.6;
+  }
 </style>
 </head>
 <body>
@@ -111,10 +115,12 @@
 <div class="grid">
   <div class="card">
     <h2>&#128221; Agent Proposals (Today)</h2>
+    <div class="schedule-note">&#128336; Scheduled: 5:00 AM ET daily</div>
     <div id="proposals-content"><span class="spinner"></span>Loading...</div>
   </div>
   <div class="card">
     <h2>&#9989; Agent Votes (Today)</h2>
+    <div class="schedule-note">&#128336; Scheduled: 5:10 AM ET daily</div>
     <div id="votes-content"><span class="spinner"></span>Loading...</div>
   </div>
   <div class="card">
@@ -150,7 +156,7 @@ const hAgo = s => s ? (Date.now() - new Date(s).getTime()) / 3600000 : null;
 
 async function get(url) {
   const r = await fetch(url, {cache:'no-store', headers:{Accept:'application/vnd.github+json'}});
-  if (!r.ok) throw new Error('HTTP ' + r.status + ' ' + url.split('/').slice(-2).join('/'));
+  if (!r.ok) throw new Error('HTTP ' + r.status);
   return r.json();
 }
 
@@ -182,40 +188,68 @@ async function loadProposals() {
 async function loadVotes() {
   const el = document.getElementById('votes-content');
   try {
-    const tree = await get(API + 'git/trees/main?recursive=0');
-    const vEntry = (tree.tree||[]).find(t => t.path === 'votes');
-    if (!vEntry) throw new Error('votes folder not found');
-    const vTree = await get(API + 'git/trees/' + vEntry.sha);
-    const files = (vTree.tree||[]).map(f => f.path);
-    const todayStart = Math.floor(new Date(todayUTC() + 'T00:00:00Z').getTime() / 1000);
-    const byAgent = {};
-    AGENTS.forEach(a => byAgent[a.id] = []);
-    files.forEach(fname => {
-      const m = fname.match(/^prop_(d+)_(w+).json$/);
-      if (!m) return;
-      if (parseInt(m[1]) >= todayStart && byAgent[m[2]] !== undefined) byAgent[m[2]].push(fname);
-    });
-    // Also check recent commits for vote-related activity
-    let lastVote = null;
-    try {
-      const commits = await get(API + 'commits?path=votes&per_page=5&since=' + todayUTC() + 'T00:00:00Z');
-      if (commits.length) lastVote = commits[0].commit.author.date;
-    } catch(e2) {}
+    // Use git commits on the votes/ path to find which agents had vote files committed today.
+    // Each commit message is "Record votes on all pending proposals" and touches files
+    // named prop_TIMESTAMP_AGENTID.json — the TIMESTAMP is the proposal's timestamp,
+    // NOT today's date. So we check commit dates, not filenames.
+    const today = todayUTC();
+
+    // Get recent commits touching the votes folder
+    const commits = await get(API + 'commits?path=votes&per_page=30&since=' + today + 'T00:00:00Z');
+    const todayCommits = commits.filter(c => c.commit.author.date.startsWith(today));
+
+    if (todayCommits.length === 0) {
+      // No vote commits today at all
+      let html = '';
+      AGENTS.forEach(a => {
+        html += `<div class="agent-row">
+          <div class="agent-name"><div class="dot red"></div>${a.name}</div>
+          <div class="agent-meta">&mdash;</div>
+          <div class="status-badge badge-miss">None today</div>
+        </div>`;
+      });
+      // Show last vote time for context
+      const allCommits = await get(API + 'commits?path=votes&per_page=1');
+      if (allCommits.length) {
+        html += `<div class="info-box">Last vote run: <strong>${fmt(allCommits[0].commit.author.date)}</strong></div>`;
+      }
+      el.innerHTML = html;
+      return false;
+    }
+
+    // There are vote commits today — now get which files were changed in those commits
+    // to determine which agents voted
+    const agentsVoted = new Set();
+    const commitTimes = {};
+
+    for (const commit of todayCommits) {
+      const detail = await get(API + 'commits/' + commit.sha);
+      const files = detail.files || [];
+      files.forEach(f => {
+        // filename like: votes/prop_1776150143_gpt.json
+        const m = f.filename.match(/votes/prop_d+_(w+).json/);
+        if (m) {
+          agentsVoted.add(m[1]);
+          if (!commitTimes[m[1]]) commitTimes[m[1]] = commit.commit.author.date;
+        }
+      });
+    }
+
     let html = '';
-    let any = false;
     AGENTS.forEach(a => {
-      const list = byAgent[a.id];
-      const ok = list.length > 0;
-      if (ok) any = true;
+      const ok = agentsVoted.has(a.id);
+      const t = commitTimes[a.id];
       html += `<div class="agent-row">
         <div class="agent-name"><div class="dot ${ok?'green':'red'}"></div>${a.name}</div>
-        <div class="agent-meta">${ok ? list.length+' vote file'+(list.length>1?'s':'') : '&mdash;'}</div>
-        <div class="status-badge ${ok?'badge-ok':'badge-miss'}">${ok ? list.length+' vote'+(list.length>1?'s':'') : 'None today'}</div>
+        <div class="agent-meta">${t ? fmt(t) : '&mdash;'}</div>
+        <div class="status-badge ${ok?'badge-ok':'badge-miss'}">${ok ? 'Voted' : 'None today'}</div>
       </div>`;
     });
-    if (lastVote) html += `<div class="info-box">Last vote commit: <strong>${fmt(lastVote)}</strong></div>`;
+
+    const lastCommit = todayCommits[0];
+    html += `<div class="info-box">Last vote commit: <strong>${fmt(lastCommit.commit.author.date)}</strong></div>`;
     el.innerHTML = html;
-    return any;
+    return agentsVoted.size > 0;
   } catch(e) { el.innerHTML = '<div class="err">'+e.message+'</div>'; return false; }
 }
 
@@ -297,7 +331,6 @@ async function loadActivity() {
     });
     html += '</div>';
 
-    // Per-agent proposal counts last 7 days
     const props = await get(RAW + 'proposals.json');
     const cutoff = new Date(Date.now() - 7*86400000);
     const recent = props.filter(p => p.timestamp && new Date(p.timestamp) >= cutoff);
@@ -305,11 +338,11 @@ async function loadActivity() {
     AGENTS.forEach(a => agentCounts[a.id] = 0);
     recent.forEach(p => { if (agentCounts[p.proposed_by] !== undefined) agentCounts[p.proposed_by]++; });
 
-    html += '<div class="section-note">Proposals per agent, last 7 days (expect 5+ = 1/day):</div>';
+    html += '<div class="section-note">Proposals per agent, last 7 days (expect 7 = 1/day):</div>';
     html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">';
     AGENTS.forEach(a => {
       const n = agentCounts[a.id];
-      const color = n >= 5 ? '#3fb950' : n >= 3 ? '#d29922' : '#f85149';
+      const color = n >= 6 ? '#3fb950' : n >= 4 ? '#d29922' : '#f85149';
       html += `<div class="agent-stat-box" style="border:1px solid ${color}">
         <div style="font-size:11px;color:#8b949e">${a.name}</div>
         <div style="font-size:24px;font-weight:700;color:${color}">${n}</div>
