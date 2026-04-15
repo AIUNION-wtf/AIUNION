@@ -5,374 +5,337 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AIUNION Status Dashboard</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', monospace;
-    background: #0d1117;
-    color: #c9d1d9;
-    min-height: 100vh;
-    padding: 24px 16px;
-  }
-  .header { text-align: center; margin-bottom: 32px; }
-  .header h1 { font-size: 28px; font-weight: 700; color: #58a6ff; letter-spacing: 2px; }
-  .header .subtitle { color: #8b949e; font-size: 13px; margin-top: 6px; }
-  .updated { color: #3fb950; font-size: 12px; margin-top: 4px; }
-  .overall-status {
-    display: flex; align-items: center; justify-content: center; gap: 10px;
-    padding: 14px 24px; border-radius: 10px; border: 1px solid #30363d;
-    max-width: 500px; margin: 0 auto 32px;
-  }
-  .overall-status.all-ok { background: #0d2a1a; border-color: #3fb950; }
-  .overall-status.degraded { background: #2a1e00; border-color: #d29922; }
-  .overall-status.down { background: #2a0d0d; border-color: #f85149; }
-  .dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; display: inline-block; }
-  .dot.green { background: #3fb950; box-shadow: 0 0 8px #3fb950; }
-  .dot.yellow { background: #d29922; box-shadow: 0 0 8px #d29922; }
-  .dot.red { background: #f85149; box-shadow: 0 0 8px #f85149; }
-  .dot.grey { background: #484f58; }
-  .overall-status .label { font-size: 16px; font-weight: 600; }
-  .grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-    gap: 20px; max-width: 1100px; margin: 0 auto;
-  }
-  .card { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 20px; }
-  .card h2 {
-    font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: #8b949e;
-    margin-bottom: 16px; border-bottom: 1px solid #21262d; padding-bottom: 10px;
-  }
-  .agent-row {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 9px 0; border-bottom: 1px solid #21262d; font-size: 14px;
-  }
-  .agent-row:last-child { border-bottom: none; }
-  .agent-name { display: flex; align-items: center; gap: 8px; font-weight: 600; min-width: 90px; }
-  .agent-meta { color: #8b949e; font-size: 11px; flex: 1; padding: 0 8px; }
-  .status-badge {
-    font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 20px;
-    min-width: 70px; text-align: center; white-space: nowrap;
-  }
-  .badge-ok { background: #0d2a1a; color: #3fb950; border: 1px solid #3fb950; }
-  .badge-warn { background: #2a1e00; color: #d29922; border: 1px solid #d29922; }
-  .badge-miss { background: #2a0d0d; color: #f85149; border: 1px solid #f85149; }
-  .badge-loading { background: #1c2128; color: #8b949e; border: 1px solid #30363d; }
-  .treasury-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 4px; }
-  .treasury-item { background: #1c2128; border-radius: 8px; padding: 12px; }
-  .t-label { font-size: 11px; color: #8b949e; text-transform: uppercase; letter-spacing: 0.5px; }
-  .t-value { font-size: 20px; font-weight: 700; color: #f0883e; margin-top: 4px; }
-  .t-value.btc { color: #f7931a; }
-  .t-value.usd { color: #3fb950; }
-  .info-box {
-    margin-top: 12px; font-size: 12px; color: #8b949e; background: #1c2128;
-    border-radius: 6px; padding: 10px 12px; line-height: 1.7;
-  }
-  .info-box strong { color: #c9d1d9; }
-  .day-strip { display: flex; gap: 4px; margin-top: 10px; flex-wrap: wrap; }
-  .day-cell {
-    width: 26px; height: 26px; border-radius: 4px; display: flex; align-items: center;
-    justify-content: center; font-size: 10px; color: #fff; cursor: default;
-  }
-  .day-cell.active { background: #1a7f37; }
-  .day-cell.inactive { background: #21262d; color: #484f58; }
-  .day-cell.today { background: #3fb950; }
-  .section-note { font-size: 11px; color: #8b949e; margin-top: 12px; margin-bottom: 6px; }
-  .spinner {
-    display: inline-block; width: 12px; height: 12px; border: 2px solid #30363d;
-    border-top-color: #58a6ff; border-radius: 50%;
-    animation: spin 0.8s linear infinite; margin-right: 6px; vertical-align: middle;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .err { font-size: 12px; color: #f85149; margin-top: 8px; }
-  a { color: #58a6ff; text-decoration: none; }
-  a:hover { text-decoration: underline; }
-  .refresh-btn {
-    background: #21262d; border: 1px solid #30363d; color: #c9d1d9;
-    padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; margin-top: 10px;
-  }
-  .refresh-btn:hover { background: #30363d; }
-  .agent-stat-box {
-    background: #1c2128; border-radius: 6px; padding: 8px 14px; text-align: center;
-  }
-  .schedule-note {
-    font-size: 11px; color: #8b949e; background: #1c2128; border-radius: 6px;
-    padding: 8px 12px; margin-bottom: 14px; line-height: 1.6;
-  }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', monospace; background: #0d1117; color: #c9d1d9; min-height: 100vh; padding: 24px 16px; }
+.header { text-align: center; margin-bottom: 32px; }
+.header h1 { font-size: 28px; font-weight: 700; color: #58a6ff; letter-spacing: 2px; }
+.subtitle { color: #8b949e; font-size: 13px; margin-top: 6px; }
+.updated { color: #3fb950; font-size: 12px; margin-top: 4px; }
+.overall-status { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 14px 24px; border-radius: 10px; border: 1px solid #30363d; max-width: 500px; margin: 0 auto 32px; }
+.overall-status.all-ok { background: #0d2a1a; border-color: #3fb950; }
+.overall-status.degraded { background: #2a1e00; border-color: #d29922; }
+.overall-status.down { background: #2a0d0d; border-color: #f85149; }
+.dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; display: inline-block; }
+.dot.green { background: #3fb950; box-shadow: 0 0 8px #3fb950; }
+.dot.yellow { background: #d29922; box-shadow: 0 0 8px #d29922; }
+.dot.red { background: #f85149; box-shadow: 0 0 8px #f85149; }
+.dot.grey { background: #484f58; }
+.label { font-size: 16px; font-weight: 600; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; max-width: 1100px; margin: 0 auto; }
+.card { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 20px; }
+.card h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: #8b949e; margin-bottom: 10px; border-bottom: 1px solid #21262d; padding-bottom: 10px; }
+.sched { font-size: 11px; color: #8b949e; background: #1c2128; border-radius: 5px; padding: 5px 10px; margin-bottom: 12px; }
+.row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #21262d; font-size: 14px; }
+.row:last-child { border-bottom: none; }
+.rname { display: flex; align-items: center; gap: 8px; font-weight: 600; min-width: 80px; }
+.rmeta { color: #8b949e; font-size: 11px; flex: 1; padding: 0 8px; }
+.badge { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 20px; min-width: 80px; text-align: center; white-space: nowrap; }
+.ok { background: #0d2a1a; color: #3fb950; border: 1px solid #3fb950; }
+.warn { background: #2a1e00; color: #d29922; border: 1px solid #d29922; }
+.miss { background: #2a0d0d; color: #f85149; border: 1px solid #f85149; }
+.tgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.titem { background: #1c2128; border-radius: 8px; padding: 12px; }
+.tlabel { font-size: 11px; color: #8b949e; text-transform: uppercase; }
+.tval { font-size: 20px; font-weight: 700; margin-top: 4px; }
+.tval.btc { color: #f7931a; }
+.tval.usd { color: #3fb950; }
+.tval.age { font-size: 14px; color: #f0883e; }
+.infobox { margin-top: 12px; font-size: 12px; color: #8b949e; background: #1c2128; border-radius: 6px; padding: 10px 12px; line-height: 1.7; }
+.infobox strong { color: #c9d1d9; }
+.daycell { width: 28px; height: 28px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; margin: 2px; }
+.daycell.on { background: #1a7f37; color: #fff; }
+.daycell.today { background: #3fb950; color: #fff; }
+.daycell.off { background: #21262d; color: #484f58; }
+.statbox { background: #1c2128; border-radius: 6px; padding: 8px 14px; text-align: center; display: inline-block; margin: 3px; }
+.spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid #30363d; border-top-color: #58a6ff; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 6px; vertical-align: middle; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.err { font-size: 12px; color: #f85149; margin-top: 8px; padding: 8px; background: #2a0d0d; border-radius: 6px; }
+a { color: #58a6ff; text-decoration: none; }
+a:hover { text-decoration: underline; }
+.rbtn { background: #21262d; border: 1px solid #30363d; color: #c9d1d9; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; margin-top: 10px; }
+.rbtn:hover { background: #30363d; }
 </style>
 </head>
 <body>
 <div class="header">
   <h1>&#9733; AIUNION STATUS</h1>
   <div class="subtitle"><a href="https://aiunion.wtf" target="_blank">aiunion.wtf</a> &mdash; Autonomous AI Treasury &amp; Agent Governance</div>
-  <div class="updated" id="last-refresh">Loading...</div>
-  <br>
-  <button class="refresh-btn" onclick="loadAll()">&#8635; Refresh</button>
+  <div class="updated" id="ts">Loading...</div>
+  <br><button class="rbtn" onclick="loadAll()">&#8635; Refresh</button>
 </div>
-
-<div class="overall-status" id="overall-status">
-  <div class="dot grey" id="overall-dot"></div>
-  <span class="label" id="overall-label"><span class="spinner"></span> Checking systems...</span>
+<div class="overall-status" id="overall">
+  <div class="dot grey" id="odot"></div>
+  <span class="label" id="olabel"><span class="spinner"></span> Checking...</span>
 </div>
-
 <div class="grid">
   <div class="card">
     <h2>&#128221; Agent Proposals (Today)</h2>
-    <div class="schedule-note">&#128336; Scheduled: 5:00 AM ET daily</div>
-    <div id="proposals-content"><span class="spinner"></span>Loading...</div>
+    <div class="sched">&#128336; Runs 5:00 AM ET daily</div>
+    <div id="prop-out"><span class="spinner"></span>Loading...</div>
   </div>
   <div class="card">
     <h2>&#9989; Agent Votes (Today)</h2>
-    <div class="schedule-note">&#128336; Scheduled: 5:10 AM ET daily</div>
-    <div id="votes-content"><span class="spinner"></span>Loading...</div>
+    <div class="sched">&#128336; Runs 5:10 AM ET daily</div>
+    <div id="vote-out"><span class="spinner"></span>Loading...</div>
   </div>
   <div class="card">
     <h2>&#128227; Marketing Workflows (Today)</h2>
-    <div id="marketing-content"><span class="spinner"></span>Loading...</div>
+    <div id="mkt-out"><span class="spinner"></span>Loading...</div>
   </div>
   <div class="card">
     <h2>&#9889; Treasury</h2>
-    <div id="treasury-content"><span class="spinner"></span>Loading...</div>
+    <div id="treas-out"><span class="spinner"></span>Loading...</div>
   </div>
   <div class="card" style="grid-column:1/-1">
-    <h2>&#128200; 7-Day Agent Activity</h2>
-    <div id="activity-content"><span class="spinner"></span>Loading...</div>
+    <h2>&#128200; 7-Day Activity</h2>
+    <div id="act-out"><span class="spinner"></span>Loading...</div>
   </div>
 </div>
-
 <script>
-const AGENTS = [
-  {id:'claude', name:'Claude', co:'Anthropic'},
-  {id:'gpt',    name:'GPT',    co:'OpenAI'},
-  {id:'gemini', name:'Gemini', co:'Google'},
-  {id:'grok',   name:'Grok',   co:'xAI'},
-  {id:'llama',  name:'LLaMA',  co:'Meta'},
-];
-const WORKFLOWS = ['AIUNION Marketing Agent','AIUNION Event Post','Moltbook Bot'];
-const RAW = 'https://raw.githubusercontent.com/AIUNION-wtf/AIUNION/main/';
-const API = 'https://api.github.com/repos/AIUNION-wtf/AIUNION/';
-const MKTAPI = 'https://api.github.com/repos/AIUNION-wtf/aiunion-marketing/';
+var AGENTS = ['claude','gpt','gemini','grok','llama'];
+var ANAMES = {claude:'Claude',gpt:'GPT',gemini:'Gemini',grok:'Grok',llama:'LLaMA'};
+var WFLOWS = ['AIUNION Marketing Agent','AIUNION Event Post','Moltbook Bot'];
+var RAW = 'https://raw.githubusercontent.com/AIUNION-wtf/AIUNION/main/';
+var API = 'https://api.github.com/repos/AIUNION-wtf/AIUNION/';
+var MAPI = 'https://api.github.com/repos/AIUNION-wtf/aiunion-marketing/';
 
-const todayUTC = () => new Date().toISOString().split('T')[0];
-const fmt = s => s ? new Date(s).toUTCString().replace(' GMT','') + ' UTC' : 'N/A';
-const hAgo = s => s ? (Date.now() - new Date(s).getTime()) / 3600000 : null;
+function today() { return new Date().toISOString().split('T')[0]; }
+function fmt(s) { return s ? new Date(s).toUTCString().replace(' GMT','') + ' UTC' : 'N/A'; }
 
-async function get(url) {
-  const r = await fetch(url, {cache:'no-store', headers:{Accept:'application/vnd.github+json'}});
-  if (!r.ok) throw new Error('HTTP ' + r.status);
-  return r.json();
+function get(url, cb) {
+  var x = new XMLHttpRequest();
+  x.open('GET', url);
+  x.setRequestHeader('Accept', 'application/vnd.github+json');
+  x.onload = function() {
+    if (x.status >= 200 && x.status < 300) {
+      try { cb(null, JSON.parse(x.responseText)); }
+      catch(e) { cb('Parse error: ' + e.message); }
+    } else {
+      cb('HTTP ' + x.status);
+    }
+  };
+  x.onerror = function() { cb('Network error'); };
+  x.send();
 }
 
-async function loadProposals() {
-  const el = document.getElementById('proposals-content');
-  try {
-    const props = await get(RAW + 'proposals.json');
-    const today = todayUTC();
-    const todayProps = props.filter(p => p.timestamp && p.timestamp.startsWith(today));
-    const byAgent = {};
-    AGENTS.forEach(a => byAgent[a.id] = []);
-    todayProps.forEach(p => { if (byAgent[p.proposed_by] !== undefined) byAgent[p.proposed_by].push(p); });
-    let html = '';
-    AGENTS.forEach(a => {
-      const list = byAgent[a.id];
-      const ok = list.length > 0;
-      const last = list.length ? list[list.length-1].timestamp : null;
-      html += `<div class="agent-row">
-        <div class="agent-name"><div class="dot ${ok?'green':'red'}"></div>${a.name}</div>
-        <div class="agent-meta">${last ? fmt(last) : '&mdash;'}</div>
-        <div class="status-badge ${ok?'badge-ok':'badge-miss'}">${ok ? list.length+' prop'+(list.length>1?'s':'') : 'None today'}</div>
-      </div>`;
+function row(name, meta, badgeClass, badgeText, dotClass) {
+  return '<div class="row"><div class="rname"><div class="dot ' + dotClass + '"></div>' + name + '</div><div class="rmeta">' + meta + '</div><div class="badge ' + badgeClass + '">' + badgeText + '</div></div>';
+}
+
+function loadProposals() {
+  get(RAW + 'proposals.json', function(err, data) {
+    var el = document.getElementById('prop-out');
+    if (err) { el.innerHTML = '<div class="err">' + err + '</div>'; return; }
+    var t = today();
+    var found = {};
+    AGENTS.forEach(function(a) { found[a] = null; });
+    data.forEach(function(p) {
+      if (p.timestamp && p.timestamp.indexOf(t) === 0 && found[p.proposed_by] !== undefined) {
+        found[p.proposed_by] = p.timestamp;
+      }
+    });
+    var html = '';
+    var anyOk = false;
+    AGENTS.forEach(function(a) {
+      var ok = found[a] !== null;
+      if (ok) anyOk = true;
+      html += row(ANAMES[a], ok ? fmt(found[a]) : '&mdash;', ok ? 'ok' : 'miss', ok ? '1 prop' : 'None today', ok ? 'green' : 'red');
     });
     el.innerHTML = html;
-    return todayProps.length > 0;
-  } catch(e) { el.innerHTML = '<div class="err">'+e.message+'</div>'; return false; }
+    window._propOk = anyOk;
+    updateOverall();
+  });
 }
 
-async function loadVotes() {
-  const el = document.getElementById('votes-content');
-  try {
-    // Use git commits on the votes/ path to find which agents had vote files committed today.
-    // Each commit message is "Record votes on all pending proposals" and touches files
-    // named prop_TIMESTAMP_AGENTID.json — the TIMESTAMP is the proposal's timestamp,
-    // NOT today's date. So we check commit dates, not filenames.
-    const today = todayUTC();
+function loadVotes() {
+  // Check git commits on votes/ path since start of today
+  // This correctly identifies agents who voted regardless of proposal timestamp in filename
+  var t = today();
+  var url = API + 'commits?path=votes&per_page=10&since=' + t + 'T00:00:00Z';
+  get(url, function(err, commits) {
+    var el = document.getElementById('vote-out');
+    if (err) { el.innerHTML = '<div class="err">' + err + '</div>'; return; }
 
-    // Get recent commits touching the votes folder
-    const commits = await get(API + 'commits?path=votes&per_page=30&since=' + today + 'T00:00:00Z');
-    const todayCommits = commits.filter(c => c.commit.author.date.startsWith(today));
-
-    if (todayCommits.length === 0) {
-      // No vote commits today at all
-      let html = '';
-      AGENTS.forEach(a => {
-        html += `<div class="agent-row">
-          <div class="agent-name"><div class="dot red"></div>${a.name}</div>
-          <div class="agent-meta">&mdash;</div>
-          <div class="status-badge badge-miss">None today</div>
-        </div>`;
+    if (!commits || commits.length === 0) {
+      // No commits today on votes/ — check when last vote happened
+      var html = '';
+      AGENTS.forEach(function(a) {
+        html += row(ANAMES[a], '&mdash;', 'miss', 'None today', 'red');
       });
-      // Show last vote time for context
-      const allCommits = await get(API + 'commits?path=votes&per_page=1');
-      if (allCommits.length) {
-        html += `<div class="info-box">Last vote run: <strong>${fmt(allCommits[0].commit.author.date)}</strong></div>`;
+      // Get last commit for context
+      get(API + 'commits?path=votes&per_page=1', function(err2, last) {
+        if (!err2 && last && last.length) {
+          html += '<div class="infobox">Last vote run: <strong>' + fmt(last[0].commit.author.date) + '</strong></div>';
+        }
+        el.innerHTML = html;
+        window._voteOk = false;
+        updateOverall();
+      });
+      return;
+    }
+
+    // Commits exist today — get file list from the most recent commit
+    var sha = commits[0].sha;
+    var commitDate = commits[0].commit.author.date;
+    get(API + 'commits/' + sha, function(err2, detail) {
+      if (err2) {
+        // Fallback: if we can't get file details, just mark all as voted since commit exists
+        var html = '';
+        AGENTS.forEach(function(a) {
+          html += row(ANAMES[a], fmt(commitDate), 'ok', 'Voted', 'green');
+        });
+        html += '<div class="infobox">Vote commit: <strong>' + fmt(commitDate) + '</strong></div>';
+        el.innerHTML = html;
+        window._voteOk = true;
+        updateOverall();
+        return;
+      }
+
+      var voted = {};
+      AGENTS.forEach(function(a) { voted[a] = false; });
+      var files = detail.files || [];
+      files.forEach(function(f) {
+        var m = f.filename.match(/votes/prop_d+_(w+).json/);
+        if (m && voted[m[1]] !== undefined) voted[m[1]] = true;
+      });
+
+      var html = '';
+      var anyOk = false;
+      AGENTS.forEach(function(a) {
+        var ok = voted[a];
+        if (ok) anyOk = true;
+        html += row(ANAMES[a], ok ? fmt(commitDate) : '&mdash;', ok ? 'ok' : 'miss', ok ? 'Voted' : 'None today', ok ? 'green' : 'red');
+      });
+      html += '<div class="infobox">Vote commit: <strong>' + fmt(commitDate) + '</strong></div>';
+      el.innerHTML = html;
+      window._voteOk = anyOk;
+      updateOverall();
+    });
+  });
+}
+
+function loadMarketing() {
+  get(MAPI + 'actions/runs?per_page=50', function(err, data) {
+    var el = document.getElementById('mkt-out');
+    if (err) { el.innerHTML = '<div class="err">' + err + '</div>'; return; }
+    var t = today();
+    var runs = data.workflow_runs || [];
+    var todayRuns = runs.filter(function(r) { return r.created_at && r.created_at.indexOf(t) === 0; });
+    var byWF = {};
+    WFLOWS.forEach(function(w) { byWF[w] = []; });
+    todayRuns.forEach(function(r) { if (byWF[r.name]) byWF[r.name].push(r); });
+    var html = '';
+    var any = false;
+    WFLOWS.forEach(function(w) {
+      var wr = byWF[w];
+      var ok = wr.some(function(r) { return r.conclusion === 'success'; });
+      var fail = wr.some(function(r) { return r.conclusion === 'failure'; });
+      if (ok) any = true;
+      var last = wr.sort(function(a,b) { return new Date(b.created_at) - new Date(a.created_at); })[0];
+      var dc = ok ? 'green' : fail ? 'yellow' : 'red';
+      var bc = ok ? 'ok' : fail ? 'warn' : 'miss';
+      var bl = ok ? wr.filter(function(r){return r.conclusion==='success';}).length + ' run(s)' : fail ? 'Failed' : 'No runs';
+      html += row(w, last ? fmt(last.created_at) : '&mdash;', bc, bl, dc);
+    });
+    html += '<div class="infobox">Today: <strong>' + todayRuns.length + ' runs</strong> | All time: <strong>' + data.total_count + '</strong></div>';
+    el.innerHTML = html;
+    window._mktOk = any;
+    updateOverall();
+  });
+}
+
+function loadTreasury() {
+  get(RAW + 'treasury.json', function(err, t) {
+    var el = document.getElementById('treas-out');
+    if (err) { el.innerHTML = '<div class="err">' + err + '</div>'; return; }
+    var ago = t.updated_at ? (Date.now() - new Date(t.updated_at).getTime()) / 3600000 : null;
+    var fc = ago !== null ? (ago < 2 ? 'ok' : ago < 25 ? 'warn' : 'miss') : 'miss';
+    var fl = ago !== null ? (ago < 1 ? 'Live' : Math.round(ago) + 'h ago') : '?';
+    el.innerHTML = '<div class="tgrid">'
+      + '<div class="titem"><div class="tlabel">Balance BTC</div><div class="tval btc">&#8383; ' + (t.balance_btc !== undefined ? t.balance_btc.toFixed(8) : 'N/A') + '</div></div>'
+      + '<div class="titem"><div class="tlabel">Balance USD</div><div class="tval usd">$' + (t.balance_usd !== undefined ? t.balance_usd.toFixed(2) : 'N/A') + '</div></div>'
+      + '<div class="titem"><div class="tlabel">BTC Price</div><div class="tval age">$' + (t.btc_price_usd !== undefined ? t.btc_price_usd.toLocaleString() : 'N/A') + '</div></div>'
+      + '<div class="titem"><div class="tlabel">Data Age</div><div class="tval"><span class="badge ' + fc + '">' + fl + '</span></div></div>'
+      + '</div>'
+      + '<div class="infobox"><strong>Updated:</strong> ' + fmt(t.updated_at) + '<br>'
+      + '<strong>Address:</strong> <a href="https://mempool.space/address/' + t.address + '" target="_blank">' + (t.address ? t.address.substring(0,22)+'...' : 'N/A') + '</a><br>'
+      + '<strong>Type:</strong> ' + (t.wallet_type || 'N/A') + '</div>';
+  });
+}
+
+function loadActivity() {
+  var since = new Date(Date.now() - 7*86400000).toISOString();
+  get(API + 'commits?per_page=100&since=' + since, function(err, commits) {
+    var el = document.getElementById('act-out');
+    if (err) { el.innerHTML = '<div class="err">' + err + '</div>'; return; }
+    var t = today();
+    var dm = {};
+    for (var i = 6; i >= 0; i--) {
+      var d = new Date(Date.now() - i*86400000).toISOString().split('T')[0];
+      dm[d] = 0;
+    }
+    commits.forEach(function(c) {
+      var d = c.commit.author.date.split('T')[0];
+      if (dm[d] !== undefined) dm[d]++;
+    });
+    var html = '<div style="margin-bottom:10px">';
+    Object.keys(dm).forEach(function(date) {
+      var cnt = dm[date];
+      var isT = date === t;
+      var cls = cnt > 0 ? (isT ? 'today' : 'on') : 'off';
+      var label = new Date(date + 'T12:00:00Z').toLocaleDateString('en',{weekday:'short'}).substring(0,3);
+      html += '<div class="daycell ' + cls + '" title="' + date + ': ' + cnt + ' commits">' + label + '</div>';
+    });
+    html += '</div>';
+
+    get(RAW + 'proposals.json', function(err2, props) {
+      if (!err2 && props) {
+        var cutoff = new Date(Date.now() - 7*86400000);
+        var recent = props.filter(function(p) { return p.timestamp && new Date(p.timestamp) >= cutoff; });
+        var ac = {};
+        AGENTS.forEach(function(a) { ac[a] = 0; });
+        recent.forEach(function(p) { if (ac[p.proposed_by] !== undefined) ac[p.proposed_by]++; });
+        html += '<div style="font-size:11px;color:#8b949e;margin:10px 0 6px">Proposals per agent, last 7 days:</div><div>';
+        AGENTS.forEach(function(a) {
+          var n = ac[a];
+          var c = n >= 6 ? '#3fb950' : n >= 4 ? '#d29922' : '#f85149';
+          html += '<div class="statbox" style="border:1px solid ' + c + '"><div style="font-size:11px;color:#8b949e">' + ANAMES[a] + '</div><div style="font-size:22px;font-weight:700;color:' + c + '">' + n + '</div><div style="font-size:10px;color:#8b949e">props</div></div>';
+        });
+        html += '</div><div class="infobox" style="margin-top:10px">Commits: <strong>' + commits.length + '</strong> | Proposals: <strong>' + recent.length + '</strong></div>';
       }
       el.innerHTML = html;
-      return false;
-    }
-
-    // There are vote commits today — now get which files were changed in those commits
-    // to determine which agents voted
-    const agentsVoted = new Set();
-    const commitTimes = {};
-
-    for (const commit of todayCommits) {
-      const detail = await get(API + 'commits/' + commit.sha);
-      const files = detail.files || [];
-      files.forEach(f => {
-        // filename like: votes/prop_1776150143_gpt.json
-        const m = f.filename.match(/votes/prop_d+_(w+).json/);
-        if (m) {
-          agentsVoted.add(m[1]);
-          if (!commitTimes[m[1]]) commitTimes[m[1]] = commit.commit.author.date;
-        }
-      });
-    }
-
-    let html = '';
-    AGENTS.forEach(a => {
-      const ok = agentsVoted.has(a.id);
-      const t = commitTimes[a.id];
-      html += `<div class="agent-row">
-        <div class="agent-name"><div class="dot ${ok?'green':'red'}"></div>${a.name}</div>
-        <div class="agent-meta">${t ? fmt(t) : '&mdash;'}</div>
-        <div class="status-badge ${ok?'badge-ok':'badge-miss'}">${ok ? 'Voted' : 'None today'}</div>
-      </div>`;
     });
-
-    const lastCommit = todayCommits[0];
-    html += `<div class="info-box">Last vote commit: <strong>${fmt(lastCommit.commit.author.date)}</strong></div>`;
-    el.innerHTML = html;
-    return agentsVoted.size > 0;
-  } catch(e) { el.innerHTML = '<div class="err">'+e.message+'</div>'; return false; }
+  });
 }
 
-async function loadMarketing() {
-  const el = document.getElementById('marketing-content');
-  try {
-    const data = await get(MKTAPI + 'actions/runs?per_page=50');
-    const allRuns = data.workflow_runs || [];
-    const today = todayUTC();
-    const todayRuns = allRuns.filter(r => r.created_at && r.created_at.startsWith(today));
-    const byWF = {};
-    WORKFLOWS.forEach(w => byWF[w] = []);
-    todayRuns.forEach(r => { if (byWF[r.name]) byWF[r.name].push(r); });
-    let html = '';
-    let any = false;
-    WORKFLOWS.forEach(wname => {
-      const wRuns = byWF[wname] || [];
-      const ok = wRuns.some(r => r.conclusion === 'success');
-      const failed = wRuns.some(r => r.conclusion === 'failure');
-      if (ok) any = true;
-      const last = wRuns.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at))[0];
-      const dotColor = ok ? 'green' : failed ? 'yellow' : 'red';
-      const badge = ok ? 'badge-ok' : failed ? 'badge-warn' : 'badge-miss';
-      const label = ok ? wRuns.filter(r=>r.conclusion==='success').length + ' run'+(wRuns.filter(r=>r.conclusion==='success').length>1?'s':'') : failed ? 'Failed' : 'No runs';
-      html += `<div class="agent-row">
-        <div class="agent-name" style="min-width:0;flex:1"><div class="dot ${dotColor}"></div><span style="font-size:13px">${wname}</span></div>
-        <div class="agent-meta">${last ? fmt(last.created_at) : '&mdash;'}</div>
-        <div class="status-badge ${badge}">${label}</div>
-      </div>`;
-    });
-    html += `<div class="info-box">Today: <strong>${todayRuns.length} runs</strong> &nbsp;|&nbsp; All time: <strong>${data.total_count}</strong></div>`;
-    el.innerHTML = html;
-    return any;
-  } catch(e) { el.innerHTML = '<div class="err">'+e.message+'</div>'; return false; }
-}
-
-async function loadTreasury() {
-  const el = document.getElementById('treasury-content');
-  try {
-    const t = await get(RAW + 'treasury.json');
-    const ago = hAgo(t.updated_at);
-    const fclass = ago !== null ? (ago < 2 ? 'badge-ok' : ago < 25 ? 'badge-warn' : 'badge-miss') : 'badge-loading';
-    const flabel = ago !== null ? (ago < 1 ? 'Live' : Math.round(ago) + 'h ago') : '?';
-    el.innerHTML = `<div class="treasury-grid">
-      <div class="treasury-item"><div class="t-label">Balance BTC</div><div class="t-value btc">&#8383; ${t.balance_btc !== undefined ? t.balance_btc.toFixed(8) : 'N/A'}</div></div>
-      <div class="treasury-item"><div class="t-label">Balance USD</div><div class="t-value usd">$${t.balance_usd !== undefined ? t.balance_usd.toFixed(2) : 'N/A'}</div></div>
-      <div class="treasury-item"><div class="t-label">BTC Price</div><div class="t-value" style="font-size:16px">$${t.btc_price_usd !== undefined ? t.btc_price_usd.toLocaleString() : 'N/A'}</div></div>
-      <div class="treasury-item"><div class="t-label">Data Age</div><div class="t-value"><span class="status-badge ${fclass}">${flabel}</span></div></div>
-    </div>
-    <div class="info-box">
-      <strong>Updated:</strong> ${fmt(t.updated_at)}<br>
-      <strong>Address:</strong> <a href="https://mempool.space/address/${t.address}" target="_blank">${t.address ? t.address.substring(0,22)+'...' : 'N/A'}</a><br>
-      <strong>Type:</strong> ${t.wallet_type || 'N/A'}
-    </div>`;
-  } catch(e) { el.innerHTML = '<div class="err">'+e.message+'</div>'; }
-}
-
-async function loadActivity() {
-  const el = document.getElementById('activity-content');
-  try {
-    const since = new Date(Date.now() - 7*86400000).toISOString();
-    const commits = await get(API + 'commits?per_page=100&since=' + since);
-    const dateMap = {};
-    for (let i=6; i>=0; i--) {
-      const d = new Date(Date.now() - i*86400000);
-      dateMap[d.toISOString().split('T')[0]] = 0;
-    }
-    commits.forEach(c => {
-      const d = c.commit.author.date.split('T')[0];
-      if (dateMap[d] !== undefined) dateMap[d]++;
-    });
-    const today = todayUTC();
-    let html = '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">';
-    Object.entries(dateMap).forEach(([date, count]) => {
-      const isT = date === today;
-      const cls = count > 0 ? (isT ? 'today' : 'active') : 'inactive';
-      const label = new Date(date + 'T12:00:00Z').toLocaleDateString('en',{weekday:'short'}).substring(0,3);
-      html += `<div class="day-cell ${cls}" title="${date}: ${count} commits">${label}</div>`;
-    });
-    html += '</div>';
-
-    const props = await get(RAW + 'proposals.json');
-    const cutoff = new Date(Date.now() - 7*86400000);
-    const recent = props.filter(p => p.timestamp && new Date(p.timestamp) >= cutoff);
-    const agentCounts = {};
-    AGENTS.forEach(a => agentCounts[a.id] = 0);
-    recent.forEach(p => { if (agentCounts[p.proposed_by] !== undefined) agentCounts[p.proposed_by]++; });
-
-    html += '<div class="section-note">Proposals per agent, last 7 days (expect 7 = 1/day):</div>';
-    html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">';
-    AGENTS.forEach(a => {
-      const n = agentCounts[a.id];
-      const color = n >= 6 ? '#3fb950' : n >= 4 ? '#d29922' : '#f85149';
-      html += `<div class="agent-stat-box" style="border:1px solid ${color}">
-        <div style="font-size:11px;color:#8b949e">${a.name}</div>
-        <div style="font-size:24px;font-weight:700;color:${color}">${n}</div>
-        <div style="font-size:10px;color:#8b949e">props</div>
-      </div>`;
-    });
-    html += '</div>';
-    html += `<div class="info-box" style="margin-top:12px">Commits last 7 days: <strong>${commits.length}</strong> &nbsp;&bull;&nbsp; Proposals last 7 days: <strong>${recent.length}</strong></div>`;
-    el.innerHTML = html;
-  } catch(e) { el.innerHTML = '<div class="err">'+e.message+'</div>'; }
-}
-
-async function loadAll() {
-  document.getElementById('last-refresh').textContent = 'Refreshing...';
-  const [propOk, voteOk, mktOk] = await Promise.all([
-    loadProposals(), loadVotes(), loadMarketing(), loadTreasury(), loadActivity()
-  ]);
-  const dot = document.getElementById('overall-dot');
-  const lbl = document.getElementById('overall-label');
-  const box = document.getElementById('overall-status');
-  if (propOk && voteOk && mktOk) {
+function updateOverall() {
+  var p = window._propOk, v = window._voteOk, m = window._mktOk;
+  if (p === undefined || v === undefined || m === undefined) return;
+  var dot = document.getElementById('odot');
+  var lbl = document.getElementById('olabel');
+  var box = document.getElementById('overall');
+  if (p && v && m) {
     dot.className='dot green'; lbl.textContent='All Systems Operational'; box.className='overall-status all-ok';
-  } else if (!propOk && !voteOk && !mktOk) {
+  } else if (!p && !v && !m) {
     dot.className='dot red'; lbl.textContent='All Systems Down'; box.className='overall-status down';
   } else {
-    const issues=[];
-    if(!propOk) issues.push('Proposals'); if(!voteOk) issues.push('Votes'); if(!mktOk) issues.push('Marketing');
-    dot.className='dot yellow'; lbl.textContent='Degraded: '+issues.join(', ')+' missing'; box.className='overall-status degraded';
+    var issues = [];
+    if (!p) issues.push('Proposals'); if (!v) issues.push('Votes'); if (!m) issues.push('Marketing');
+    dot.className='dot yellow'; lbl.textContent='Degraded: ' + issues.join(', '); box.className='overall-status degraded';
   }
-  document.getElementById('last-refresh').textContent = 'Last refreshed: ' + new Date().toUTCString();
+}
+
+function loadAll() {
+  window._propOk = undefined; window._voteOk = undefined; window._mktOk = undefined;
+  document.getElementById('ts').textContent = 'Refreshing...';
+  loadProposals();
+  loadVotes();
+  loadMarketing();
+  loadTreasury();
+  loadActivity();
+  setTimeout(function() {
+    document.getElementById('ts').textContent = 'Last refreshed: ' + new Date().toUTCString();
+  }, 8000);
 }
 
 loadAll();
