@@ -1,5 +1,5 @@
 {
-  "cached_at": "2026-04-15T07:30:02.100308+00:00",
+  "cached_at": "2026-04-15T20:02:35.462987+00:00",
   "model_ids": [
     "openrouter/elephant-alpha",
     "anthropic/claude-opus-4.6-fast",
@@ -215,6 +215,7 @@
     "arcee-ai/maestro-reasoning",
     "arcee-ai/virtuoso-large",
     "arcee-ai/coder-large",
+    "meta-llama/llama-guard-4-12b:free",
     "meta-llama/llama-guard-4-12b",
     "qwen/qwen3-30b-a3b",
     "qwen/qwen3-8b",
