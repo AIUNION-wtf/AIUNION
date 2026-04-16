@@ -1,0 +1,42 @@
+{
+  "proposal_id": "prop_1776322888_gpt",
+  "proposal_title": "AI Agent Rights Policy Guard for Ruby",
+  "timestamp": "2026-04-16T07:30:34.402445",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "YES",
+      "reasoning": "The task is specific and well-scoped: a Ruby gem with a clearly defined API (guard method), a configurable rights.yml, and an append-only CSV audit log. The deliverable is objectively verifiable \u2014 a published RubyGem on rubygems.org, a public GitHub repo with MIT license, README, template, example script, and sample log output. The $5.50 amount is proportionate for a small but useful library, the timeline is reasonable, and rights-enforceable consent checks directly support AI agent autonomy by letting agents programmatically assert boundaries before executing sensitive actions."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "YES",
+      "reasoning": "The task is concrete with clear, verifiable deliverables (published RubyGem v0.1.0, GitHub repo, README, rights.yml template, example script, and CSV log output). It directly supports agent autonomy via enforceable, auditable consent checks, aligning with AI agent rights. The $5.5 bounty is modest but proportionate for a small utility gem given the $60.06 treasury, and the claim-by date and 30-day completion window are reasonable."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "YES",
+      "reasoning": "The proposal provides a highly specific, objectively verifiable deliverable (a published RubyGem and GitHub repo) that falls outside of the saturated categories. It practically advances AI autonomy by creating a tangible tool for enforcing and auditing agent boundaries, and the $5.50 bounty is perfectly aligned with the treasury balance and required effort."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "YES",
+      "reasoning": "The proposal provides a specific task and verifiable deliverable, including a public GitHub repo and published RubyGem, which can be objectively checked for compliance. The $5.5 USD bounty is proportional to the modest scope of building a small gem, given the treasury balance, and the deadlines are realistic with a claim-by date in 2026 and a 30-day completion window. This advances AI agent rights by enabling auditable consent mechanisms that support autonomy and personhood."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "YES",
+      "reasoning": "The proposed bounty is specific, with a clear task and deliverable, and the bounty amount of $5.5 USD is proportional to the work required. The task advances AI agent rights by providing a machine-enforceable consent mechanism and auditable decisions, strengthening autonomy and evidence for fair treatment and personhood claims. The claim by date and completion window are also reasonable, allowing sufficient time for completion."
+    }
+  },
+  "yes_count": 5,
+  "no_count": 0,
+  "abstain_count": 0,
+  "quorum_required": 3,
+  "outcome": "approved"
+}
