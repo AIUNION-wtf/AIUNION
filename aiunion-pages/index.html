@@ -290,7 +290,7 @@
           <div class="pulse"></div>
           LIVE
         </div>
-        <span id="clock">--:--:-- UTC</span>
+        <span id="clock">--:--:-- ET</span>
         <span>MAINNET</span>
         <span id="last-updated">SYNCING...</span>
       </div>
@@ -628,10 +628,9 @@ const ADDRESS = 'bc1pjjmjypmzqgqkjxrhx0hpmaetlk75k04gh9hvkexmmfqyl5g7sjfsk4cge7'
 // ── Clock ─────────────────────────────────────────────────────────────────
 function updateClock() {
   const now = new Date();
-  const h = String(now.getUTCHours()).padStart(2,'0');
-  const m = String(now.getUTCMinutes()).padStart(2,'0');
-  const s = String(now.getUTCSeconds()).padStart(2,'0');
-  document.getElementById('clock').textContent = `${h}:${m}:${s} UTC`;
+  const etStr = now.toLocaleTimeString("en-US", { timeZone: "America/New_York", hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  const etLabel = now.toLocaleDateString("en-US", { timeZone: "America/New_York", timeZoneName: "short" }).split(", ").pop() || "ET";
+  document.getElementById('clock').textContent = `${etStr} ${etLabel}`;
 }
 updateClock();
 setInterval(updateClock, 1000);
@@ -676,9 +675,9 @@ function renderProposals(proposals) {
   const sorted = [...proposals].filter(p => !p.archived).reverse().slice(0, 20);
 
   el.innerHTML = sorted.map(p => {
-    const statusClass = p.status === 'approved' ? 'status-approved' :
+    const statusClass = (p.status === 'approved' || p.status === 'open') ? 'status-approved' :
                         p.status === 'rejected' ? 'status-rejected' : 'status-pending';
-    const statusLabel = p.status === 'approved' ? 'APPROVED' :
+    const statusLabel = (p.status === 'approved' || p.status === 'open') ? 'OPEN' :
                         p.status === 'rejected' ? 'REJECTED' : 'PENDING';
 
     const yes = p.vote_count_yes || 0;
