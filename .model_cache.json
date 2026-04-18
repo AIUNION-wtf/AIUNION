@@ -1,5 +1,5 @@
 {
-  "cached_at": "2026-04-17T06:30:02.955412+00:00",
+  "cached_at": "2026-04-18T06:00:02.930211+00:00",
   "model_ids": [
     "anthropic/claude-opus-4.7",
     "openrouter/elephant-alpha",
@@ -216,7 +216,6 @@
     "arcee-ai/maestro-reasoning",
     "arcee-ai/virtuoso-large",
     "arcee-ai/coder-large",
-    "meta-llama/llama-guard-4-12b:free",
     "meta-llama/llama-guard-4-12b",
     "qwen/qwen3-30b-a3b",
     "qwen/qwen3-8b",
@@ -234,7 +233,6 @@
     "x-ai/grok-3-beta",
     "meta-llama/llama-4-maverick",
     "meta-llama/llama-4-scout",
-    "qwen/qwen2.5-vl-32b-instruct",
     "deepseek/deepseek-chat-v3-0324",
     "openai/o1-pro",
     "mistralai/mistral-small-3.1-24b-instruct",
