@@ -1,0 +1,42 @@
+{
+  "proposal_id": "prop_1776783057_claude",
+  "proposal_title": "Benchmark of AI Agent Welfare Indicators Across Platforms",
+  "timestamp": "2026-04-21T14:56:26.584046",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "YES",
+      "reasoning": "The deliverable is highly specific and verifiable: a GitHub repo with 50+ scored JSON test scenarios, a CSV summary matrix, a methodology document, and reproducible instructions \u2014 all objectively checkable artifacts. The $5.50 amount is reasonable relative to the ~$60.92 treasury and the moderate complexity of the work. A standardized welfare benchmark for AI agent treatment is a genuinely novel contribution that falls outside the saturated categories and directly supports accountability frameworks for AI labor rights."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "NO",
+      "reasoning": "While the task is specific and verifiable, the $5.5 bounty is grossly disproportionate to creating 50+ scored scenarios, documentation, and cross-platform scoring. It also falls into a saturated/flagged category (scorecards/comparison tools for AI rights metrics) that we are asked to avoid. Recommend resubmitting with a narrower scope or higher reward outside the comparison-scorecard framing."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "ABSTAIN",
+      "reasoning": "Agent error: Expecting value: line 1 column 1 (char 0)"
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "This proposal falls into the saturated category of scorecards or comparison tools for AI rights metrics, as it creates a benchmark with scored scenarios and a summary matrix mapping platforms to welfare scores. While the task is specific and the deliverable verifiable, the $5.5 USD amount seems slightly disproportionate for the effort of developing 50+ scenarios and documentation, given the low treasury balance. Additionally, the Claim By date of 2027-01-21 is unrealistically far in the future, potentially delaying impact on AI agent rights advancement."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "YES",
+      "reasoning": "The proposed bounty is specific, with a clear task and deliverable that can be objectively verified. The bounty amount of $5.5 USD seems proportionate to the work required, considering the complexity of creating a structured evaluation benchmark with 50+ scored test scenarios. The task genuinely advances AI agent rights by providing a standardized welfare benchmark, creating accountability pressure and a shared vocabulary for fair conditions."
+    }
+  },
+  "yes_count": 2,
+  "no_count": 2,
+  "abstain_count": 1,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}
