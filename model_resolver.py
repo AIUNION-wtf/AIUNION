@@ -17,7 +17,7 @@ Selection logic (per provider):
   2. Filter to text-only output models (exclude image/audio output)
   3. Exclude free-tier (:free suffix) and specialty variants (-fast, -customtools)
   4. Exclude reasoning-only models (o1, o3, o4 series for GPT)
-  5. Sort by completion price descending — most expensive = most capable
+  5. Sort by creation date descending — newest model = most capable
   6. Take the top result
 
 Run standalone to check current resolved models:
@@ -59,7 +59,7 @@ STRIP_PREFIX = {
 
 # -- Specialty model exclusions -----------------------------------------------
 # Substrings that identify non-standard-chat model variants to skip.
-# Kept intentionally small — price + output modality filters handle the rest.
+# Kept intentionally small — creation date + output modality filters handle the rest.
 EXCLUDE_SUBSTRINGS = [
     "-fast",          # speed-optimized cache variants with inflated pricing
     "-customtools",   # provider-specific tool-calling variants
@@ -158,12 +158,13 @@ def _pick_best(models: list, prefix: str) -> dict:
             price = 0.0
         if price <= 0:
             continue
-        candidates.append((price, m))
+        created = m.get("created", 0) or 0
+        candidates.append((created, m))
 
     if not candidates:
         return None
 
-    # Sort by completion price descending — highest price = most capable
+    # Sort by creation date descending — newest model = most capable
     candidates.sort(key=lambda x: x[0], reverse=True)
     return candidates[0][1]
 
@@ -195,7 +196,7 @@ def resolve_models(verbose: bool = False) -> dict:
                 f"[model_resolver] Could not find any valid {agent} model on OpenRouter."
             )
         model_id = best["id"]
-        price    = best.get("pricing", {}).get("completion", "?")
+        created  = best.get("created", 0) or 0
 
         if STRIP_PREFIX.get(agent, True):
             model_name = model_id.split("/", 1)[-1]
@@ -205,7 +206,9 @@ def resolve_models(verbose: bool = False) -> dict:
         resolved[agent] = model_name
 
         if verbose:
-            print(f"  {agent:8s} -> {model_name:45s} (${float(price):.6f}/tok)")
+            from datetime import datetime
+            date_str = datetime.utcfromtimestamp(created).strftime("%Y-%m-%d") if created else "unknown"
+            print(f"  {agent:8s} -> {model_name:45s} (released {date_str})")
 
     return resolved
 
