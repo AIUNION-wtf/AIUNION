@@ -48,12 +48,13 @@ CACHE_TTL_HOURS = 24
 
 PREFERENCES = {
     "claude": [
+        "anthropic/claude-opus-4.7",
         "anthropic/claude-opus-4.6",
         "anthropic/claude-opus-4.5",
         "anthropic/claude-sonnet-4.6",
         "anthropic/claude-sonnet-4.5",
+        "anthropic/claude-sonnet-4",
         "anthropic/claude-3.7-sonnet",
-        "anthropic/claude-3.5-sonnet",
     ],
     "gpt": [
         "openai/gpt-5",
@@ -63,19 +64,21 @@ PREFERENCES = {
         "openai/gpt-4-turbo",
     ],
     "gemini": [
+        "google/gemini-3.1-pro-preview",
         "google/gemini-2.5-pro-preview",
-        "google/gemini-2.5-pro-exp-03-25",
         "google/gemini-2.5-pro",
         "google/gemini-2.5-flash",
         "google/gemini-2.0-flash-001",
     ],
     "grok": [
-        "x-ai/grok-4.20-beta",
+        "x-ai/grok-4.20",
         "x-ai/grok-4",
         "x-ai/grok-3",
         "x-ai/grok-3-beta",
     ],
     "llama": [
+        "meta-llama/llama-4-maverick",
+        "meta-llama/llama-4-scout",
         "meta-llama/llama-3.3-70b-instruct",
         "meta-llama/llama-3.1-70b-instruct",
     ],
@@ -93,7 +96,7 @@ PREFERENCES = {
 STRIP_PREFIX = {
     "claude": True,   # anthropic SDK:  "claude-opus-4.6"
     "gpt":    True,   # openai SDK:     "gpt-5"
-    "gemini": True,   # google SDK:     "gemini-2.5-pro-preview"
+    "gemini": True,   # google SDK:     "gemini-3.1-pro-preview"
     "grok":   True,   # xAI/openai SDK: "grok-4"
     "llama":  False,  # Together SDK:   keep full path, mapped below
 }
@@ -105,6 +108,8 @@ STRIP_PREFIX = {
 # Add new Llama models here as they appear on Together.
 
 TOGETHER_MAP = {
+    "meta-llama/llama-4-maverick": "meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8",
+    "meta-llama/llama-4-scout": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
     "meta-llama/llama-3.3-70b-instruct": "meta-llama/Llama-3.3-70B-Instruct-Turbo",
     "meta-llama/llama-3.1-70b-instruct": "meta-llama/Llama-3.1-70B-Instruct-Turbo",
 }
