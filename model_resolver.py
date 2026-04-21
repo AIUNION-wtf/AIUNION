@@ -15,7 +15,7 @@ Usage:
     # {
     #   "claude":  "claude-opus-4.6",
     #   "gpt":     "gpt-5",
-    #   "gemini":  "gemini-3.1-pro-preview",
+    #   "gemini":  "gemini-2.5-pro-preview",
     #   "grok":    "grok-4",
     #   "llama":   "meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8",
     # }
@@ -63,8 +63,8 @@ PREFERENCES = {
         "openai/gpt-4-turbo",
     ],
     "gemini": [
-        "google/gemini-3.1-pro-preview",
-        "google/gemini-3-pro-preview",
+        "google/gemini-2.5-pro-preview",
+        "google/gemini-2.5-pro-exp-03-25",
         "google/gemini-2.5-pro",
         "google/gemini-2.5-flash",
         "google/gemini-2.0-flash-001",
@@ -93,7 +93,7 @@ PREFERENCES = {
 STRIP_PREFIX = {
     "claude": True,   # anthropic SDK:  "claude-opus-4.6"
     "gpt":    True,   # openai SDK:     "gpt-5"
-    "gemini": True,   # google SDK:     "gemini-3.1-pro-preview"
+    "gemini": True,   # google SDK:     "gemini-2.5-pro-preview"
     "grok":   True,   # xAI/openai SDK: "grok-4"
     "llama":  False,  # Together SDK:   keep full path, mapped below
 }
@@ -179,7 +179,7 @@ def resolve_models(verbose: bool = False) -> dict:
         {
             "claude": "claude-opus-4.6",
             "gpt":    "gpt-5",
-            "gemini": "gemini-3.1-pro-preview",
+            "gemini": "gemini-2.5-pro-preview",
             "grok":   "grok-4",
             "llama":  "meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8",
         }
