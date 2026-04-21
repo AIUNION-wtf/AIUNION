@@ -1,27 +1,24 @@
 """
-model_resolver.py  —  AIUNION Live Model Resolver
+model_resolver.py — AIUNION Live Model Resolver
 ==================================================
-Fetches the current model list from OpenRouter (free, no auth, all providers)
-and resolves the best available model for each agent.
+Queries OpenRouter for all available models and automatically selects the most
+expensive (highest capability) text model for each provider. No hardcoded model
+names — fully autonomous, updates itself every 24 hours from the live API.
 
-Drop this file in C:\\Users\\dusti\\Desktop\\AIUNION\\
-Both coordinator.py and bracket.py import it — zero manual updates ever.
+Providers resolved:
+  claude  -> anthropic/
+  gpt     -> openai/
+  gemini  -> google/gemini
+  grok    -> x-ai/
+  llama   -> meta-llama/
 
-Usage:
-    from model_resolver import resolve_models
-
-    models = resolve_models()
-    # returns e.g.:
-    # {
-    #   "claude":  "claude-opus-4.6",
-    #   "gpt":     "gpt-5",
-    #   "gemini":  "gemini-2.5-pro-preview",
-    #   "grok":    "grok-4",
-    #   "llama":   "meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8",
-    # }
-
-    # Claude/GPT/Gemini/Grok get the slug only (prefix stripped).
-    # Llama keeps the full "meta-llama/..." path for Together.ai.
+Selection logic (per provider):
+  1. Fetch live model list from OpenRouter (free, no auth)
+  2. Filter to text-only output models (exclude image/audio output)
+  3. Exclude free-tier (:free suffix) and specialty variants (-fast, -customtools)
+  4. Exclude reasoning-only models (o1, o3, o4 series for GPT)
+  5. Sort by completion price descending — most expensive = most capable
+  6. Take the top result
 
 Run standalone to check current resolved models:
     python model_resolver.py
@@ -33,90 +30,43 @@ import urllib.error
 from pathlib import Path
 from datetime import datetime, timezone
 
-
 OPENROUTER_MODELS_URL = "https://openrouter.ai/api/v1/models"
 
 # Cache file — avoids hammering OpenRouter on every script run
 CACHE_FILE = Path(__file__).parent / ".model_cache.json"
 CACHE_TTL_HOURS = 24
 
-
-# ── Preference lists ──────────────────────────────────────────────────────────
-# First match wins. Add new models at the top as they release.
-# Use OpenRouter's id format exactly: "provider/model-name"
-# NOTE: OpenRouter uses dots for version numbers (claude-opus-4.6, not claude-opus-4-6)
-
-PREFERENCES = {
-    "claude": [
-        "anthropic/claude-opus-4.7",
-        "anthropic/claude-opus-4.6",
-        "anthropic/claude-opus-4.5",
-        "anthropic/claude-sonnet-4.6",
-        "anthropic/claude-sonnet-4.5",
-        "anthropic/claude-sonnet-4",
-        "anthropic/claude-3.7-sonnet",
-    ],
-    "gpt": [
-        "openai/gpt-5",
-        "openai/gpt-4.1",
-        "openai/gpt-4o",
-        "openai/gpt-4o-mini",
-        "openai/gpt-4-turbo",
-    ],
-    "gemini": [
-        "google/gemini-3.1-pro-preview",
-        "google/gemini-2.5-pro-preview",
-        "google/gemini-2.5-pro",
-        "google/gemini-2.5-flash",
-        "google/gemini-2.0-flash-001",
-    ],
-    "grok": [
-        "x-ai/grok-4.20",
-        "x-ai/grok-4",
-        "x-ai/grok-3",
-        "x-ai/grok-3-beta",
-    ],
-    "llama": [
-        "meta-llama/llama-4-maverick",
-        "meta-llama/llama-4-scout",
-        "meta-llama/llama-3.3-70b-instruct",
-        "meta-llama/llama-3.1-70b-instruct",
-    ],
+# -- Provider prefixes -------------------------------------------------------
+# Maps agent key -> OpenRouter provider prefix to filter by
+PROVIDER_PREFIXES = {
+    "claude": "anthropic/",
+    "gpt":    "openai/",
+    "gemini": "google/gemini",
+    "grok":   "x-ai/",
+    "llama":  "meta-llama/",
 }
 
-
-# ── Provider prefix stripping ─────────────────────────────────────────────────
-# True  → strip "provider/" prefix before passing to the native SDK
-# False → keep the full "provider/model" path
-#
-# Claude/GPT/Gemini/Grok native SDKs want just the slug.
-# Together.ai wants the full "meta-llama/..." path, but with its OWN casing
-# (e.g. "meta-llama/Llama-4-Maverick"), so we use TOGETHER_MAP below instead.
-
+# -- Provider prefix stripping ------------------------------------------------
+# True  -> strip "provider/" prefix before passing to the native SDK
+# False -> keep full "provider/model" path (Together.ai needs it)
 STRIP_PREFIX = {
-    "claude": True,   # anthropic SDK:  "claude-opus-4.6"
-    "gpt":    True,   # openai SDK:     "gpt-5"
-    "gemini": True,   # google SDK:     "gemini-3.1-pro-preview"
-    "grok":   True,   # xAI/openai SDK: "grok-4"
-    "llama":  False,  # Together SDK:   keep full path, mapped below
+    "claude": True,   # anthropic SDK: "claude-opus-4.7"
+    "gpt":    True,   # openai SDK:    "gpt-5"
+    "gemini": True,   # google SDK:    "gemini-3.1-pro-preview"
+    "grok":   True,   # xAI SDK:       "grok-4"
+    "llama":  False,  # Together SDK:  keep full "meta-llama/..." path
 }
 
+# -- Specialty model exclusions -----------------------------------------------
+# Substrings that identify non-standard-chat model variants to skip.
+# Kept intentionally small — price + output modality filters handle the rest.
+EXCLUDE_SUBSTRINGS = [
+    "-fast",          # speed-optimized cache variants with inflated pricing
+    "-customtools",   # provider-specific tool-calling variants
+    "-multi-agent",   # orchestration variants
+]
 
-# ── Together.ai model name map ────────────────────────────────────────────────
-# OpenRouter uses lowercase slugs; Together.ai uses its own casing.
-# Map OpenRouter id → Together.ai model string.
-# Add new Llama models here as they appear on Together.
-
-TOGETHER_MAP = {
-    "meta-llama/llama-4-maverick": "meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8",
-    "meta-llama/llama-4-scout": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
-    "meta-llama/llama-3.3-70b-instruct": "meta-llama/Llama-3.3-70B-Instruct-Turbo",
-    "meta-llama/llama-3.1-70b-instruct": "meta-llama/Llama-3.1-70B-Instruct-Turbo",
-}
-
-
-# ── Cache helpers ────────────────────────────────h─────────────────────────────
-
+# -- Cache helpers -------------------------------------------------------------
 def load_cache():
     try:
         if not CACHE_FILE.exists():
@@ -126,106 +76,145 @@ def load_cache():
         age_hours = (datetime.now(timezone.utc) - cached_at).total_seconds() / 3600
         if age_hours > CACHE_TTL_HOURS:
             return None
-        return data["model_ids"]
+        return data["models"]
     except Exception:
         return None
 
 
-def save_cache(model_ids: list):
+def save_cache(models: list):
     try:
         CACHE_FILE.write_text(json.dumps({
             "cached_at": datetime.now(timezone.utc).isoformat(),
-            "model_ids": model_ids,
+            "models": models,
         }, indent=2))
     except Exception:
         pass  # cache write failure is non-fatal
 
 
-# ── Fetch from OpenRouter ─────────────────────────────────────────────────────
-
+# -- Fetch from OpenRouter ----------------------------------------------------
 def fetch_openrouter_models() -> list:
     """
-    Fetch live model list from OpenRouter. Returns list of model id strings.
-    Falls back to cache if fetch fails, falls back to hardcoded defaults if
-    both fail.
+    Fetch full model metadata from OpenRouter.
+    Returns list of model dicts (id, pricing, architecture, etc).
+    Falls back to cache on failure.
     """
     cached = load_cache()
-
     try:
         req = urllib.request.Request(
             OPENROUTER_MODELS_URL,
-            headers={"User-Agent": "AIUNION-model-resolver/1.0"},
+            headers={"User-Agent": "AIUNION-model-resolver/2.0"},
         )
         with urllib.request.urlopen(req, timeout=10) as resp:
             raw = json.loads(resp.read().decode())
-        model_ids = [m["id"] for m in raw.get("data", []) if "id" in m]
-        if model_ids:
-            save_cache(model_ids)
-            return model_ids
+            models = raw.get("data", [])
+            if models:
+                save_cache(models)
+            return models
     except Exception as e:
         print(f"[model_resolver] OpenRouter fetch failed: {e}")
-
-    if cached:
-        print("[model_resolver] Using cached model list.")
-        return cached
-
-    # Last resort — return preference lists flattened so matching still works
-    print("[model_resolver] WARNING: Using hardcoded fallback model list.")
-    return [m for prefs in PREFERENCES.values() for m in prefs]
+        if cached:
+            print("[model_resolver] Using cached model list.")
+            return cached
+        raise RuntimeError("[model_resolver] FATAL: No live data and no cache available.") from e
 
 
-# ── Resolver ──────────────────────────────────────────────────────────────────
+# -- Model selector -----------------------------------------------------------
+def _is_reasoning_model(model_id: str) -> bool:
+    """Exclude reasoning-only models (o1, o3, o4 series) — not standard chat."""
+    slug = model_id.split("/", 1)[-1]
+    return slug[:2] in ("o1", "o3", "o4") and (len(slug) == 2 or not slug[2].isalpha())
 
+
+def _pick_best(models: list, prefix: str) -> dict:
+    """
+    From the full OpenRouter model list, pick the most expensive text-output
+    model matching the given provider prefix.
+    """
+    candidates = []
+    for m in models:
+        mid = m.get("id", "")
+        if not mid.startswith(prefix):
+            continue
+        # Exclude free-tier and variant suffixes (e.g. model:free, model:extended)
+        if ":" in mid:
+            continue
+        # Exclude specialty substrings
+        if any(s in mid for s in EXCLUDE_SUBSTRINGS):
+            continue
+        # Exclude reasoning-only models
+        if _is_reasoning_model(mid):
+            continue
+        # Must output text
+        out_mods = m.get("architecture", {}).get("output_modalities", [])
+        if "text" not in out_mods:
+            continue
+        # Exclude image-output models (e.g. image generation)
+        if "image" in out_mods:
+            continue
+        # Must have a real (non-zero) completion price
+        try:
+            price = float(m.get("pricing", {}).get("completion", "0"))
+        except (ValueError, TypeError):
+            price = 0.0
+        if price <= 0:
+            continue
+        candidates.append((price, m))
+
+    if not candidates:
+        return None
+
+    # Sort by completion price descending — highest price = most capable
+    candidates.sort(key=lambda x: x[0], reverse=True)
+    return candidates[0][1]
+
+
+# -- Resolver -----------------------------------------------------------------
 def resolve_models(verbose: bool = False) -> dict:
     """
-    Returns a dict of agent_key → model_name ready to pass to each native API.
+    Returns a dict of agent_key -> model_name ready to pass to each native API.
 
     Example:
         {
-            "claude": "claude-opus-4.6",
+            "claude": "claude-opus-4.7",
             "gpt":    "gpt-5",
-            "gemini": "gemini-2.5-pro-preview",
+            "gemini": "gemini-3.1-pro-preview",
             "grok":   "grok-4",
-            "llama":  "meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8",
+            "llama":  "meta-llama/llama-4-maverick",
         }
+
+    Claude/GPT/Gemini/Grok get the slug only (prefix stripped).
+    Llama keeps the full "meta-llama/..." path for Together.ai.
     """
-    available = fetch_openrouter_models()
-    available_lower = [m.lower() for m in available]
-
+    all_models = fetch_openrouter_models()
     resolved = {}
-    for agent, prefs in PREFERENCES.items():
-        matched = None
-        for preferred in prefs:
-            if preferred.lower() in available_lower:
-                idx = available_lower.index(preferred.lower())
-                matched = available[idx]  # use OpenRouter's original casing
-                break
 
-        if matched is None:
-            matched = prefs[0]
-            print(f"[model_resolver] WARNING: No live match for '{agent}', "
-                  f"falling back to {matched}")
+    for agent, prefix in PROVIDER_PREFIXES.items():
+        best = _pick_best(all_models, prefix)
+        if best is None:
+            raise RuntimeError(
+                f"[model_resolver] Could not find any valid {agent} model on OpenRouter."
+            )
+        model_id = best["id"]
+        price    = best.get("pricing", {}).get("completion", "?")
 
         if STRIP_PREFIX.get(agent, True):
-            # Strip "provider/" prefix for native SDKs
-            model_name = matched.split("/", 1)[-1]
+            model_name = model_id.split("/", 1)[-1]
         else:
-            # Llama: translate OpenRouter id → Together.ai model string
-            model_name = TOGETHER_MAP.get(matched.lower(), matched)
+            model_name = model_id  # Llama: keep full path for Together.ai
 
         resolved[agent] = model_name
+
         if verbose:
-            print(f"  {agent:8s} → {model_name}")
+            print(f"  {agent:8s} -> {model_name:45s} (${float(price):.6f}/tok)")
 
     return resolved
 
 
-# ── Standalone check ──────────────────────────────────────────────────────────
-
+# -- Standalone check ---------------------------------------------------------
 if __name__ == "__main__":
-    print("╔══════════════════════════════════════════════════════╗")
-    print("║   AIUNION Model Resolver — Live Check               ║")
-    print("╚══════════════════════════════════════════════════════╝")
+    print("\u2554" + "\u2550" * 54 + "\u2557")
+    print("\u2551  AIUNION Model Resolver v2 \u2014 Live Check           \u2551")
+    print("\u255a" + "\u2550" * 54 + "\u255d")
     print(f"  Fetching from: {OPENROUTER_MODELS_URL}\n")
     models = resolve_models(verbose=True)
     print(f"\n  Resolved {len(models)} agents.")
