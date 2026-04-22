@@ -42,16 +42,20 @@ except ImportError:
 try:
     from model_resolver import resolve_models
     _resolved = resolve_models()
-    # Anthropic API uses dashes (claude-opus-4-6); OpenRouter uses dots (claude-opus-4.6)
-    _resolved["claude"] = _resolved["claude"].replace(".", "-")
+        "claude": "anthropic/claude-opus-4.7",
+    _resolved["claude"] = "anthropic/" + _resolved["claude"]
+    _resolved["gpt"]    = "openai/"    + _resolved["gpt"]
+    _resolved["gemini"] = "google/"    + _resolved["gemini"]
+    _resolved["grok"]   = "x-ai/"     + _resolved["grok"]
+    # llama already keeps full path from model_resolver
 except Exception as e:
     print(f"[coordinator] model_resolver unavailable ({e}), using hardcoded fallbacks.")
     _resolved = {
         "claude": "claude-opus-4-6",
-        "gpt":    "gpt-4o",
-        "gemini": "gemini-2.5-flash",
-        "grok":   "grok-3-latest",
-        "llama":  "meta-llama/Llama-3.3-70B-Instruct-Turbo",
+        "gpt":    "openai/gpt-5",
+        "gemini": "google/gemini-3.1-pro-preview",
+        "grok":   "x-ai/grok-4",
+        "llama":  "meta-llama/llama-4-maverick",
     }
 
 try:
@@ -266,93 +270,41 @@ def sanitize_transactions(txs):
 
 
 # ── AI Agent API calls ────────────────────────────────────────────────────────
-def call_claude(prompt):
-    """Call Anthropic Claude API."""
+def call_openrouter(agent_key, prompt):
+    """Call any agent through OpenRouter — single API key for all providers."""
     try:
-        import anthropic
-        client = anthropic.Anthropic(api_key=config.ANTHROPIC_API_KEY)
-        message = client.messages.create(
-            model=AGENTS["claude"]["model"],
-            max_tokens=1024,
-            messages=[{"role": "user", "content": prompt}]
+        from openai import OpenAI
+        client = OpenAI(
+            api_key=config.AIUNION_OPENROUTER_API_KEY,
+            base_url="https://openrouter.ai/api/v1"
         )
-        return message.content[0].text
+        response = client.chat.completions.create(
+            model=AGENTS[agent_key]["model"],
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=1024
+        )
+        return response.choices[0].message.content
     except Exception as e:
         return f"ERROR: {e}"
 
 
+def call_claude(prompt):
+    return call_openrouter("claude", prompt)
+
 def call_gpt(prompt):
-    """Call OpenAI GPT API with retry on empty response."""
-    import time
-    for attempt in range(3):
-        try:
-            from openai import OpenAI
-            client = OpenAI(api_key=config.OPENAI_API_KEY)
-            response = client.chat.completions.create(
-                model=AGENTS["gpt"]["model"],
-                messages=[{"role": "user", "content": prompt}],
-                max_completion_tokens=10000,
-                timeout=120
-            )
-            content = response.choices[0].message.content
-            if content:
-                return content
-            print(f"  [gpt] Empty response on attempt {attempt+1}, retrying...")
-            time.sleep(5)
-        except Exception as e:
-            print(f"  [gpt] Error on attempt {attempt+1}: {e}")
-            time.sleep(5)
-    return "ERROR: GPT failed after 3 attempts"
+    return call_openrouter("gpt", prompt)
 
 
 def call_gemini(prompt):
-    try:
-        from google import genai
-        client = genai.Client(api_key=config.GOOGLE_API_KEY)
-        response = client.models.generate_content(
-            model=AGENTS["gemini"]["model"],
-            contents=prompt
-        )
-        return response.text
-    except Exception as e:
-        return f"ERROR: {e}"
+    return call_openrouter("gemini", prompt)
 
 
 def call_grok(prompt):
-    """Call xAI Grok API."""
-    try:
-        from openai import OpenAI
-        client = OpenAI(
-            api_key=config.XAI_API_KEY,
-            base_url="https://api.x.ai/v1"
-        )
-        response = client.chat.completions.create(
-            model=AGENTS["grok"]["model"],
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=1024
-        )
-        return response.choices[0].message.content
-    except Exception as e:
-        return f"ERROR: {e}"
+    return call_openrouter("grok", prompt)
 
 
 def call_llama(prompt):
-    """Call Meta LLaMA via Together.ai API."""
-    try:
-        from openai import OpenAI
-        client = OpenAI(
-            api_key=config.TOGETHER_API_KEY,
-            base_url="https://api.together.ai/v1"
-        )
-        response = client.chat.completions.create(
-            model=AGENTS["llama"]["model"],
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=1024
-        )
-        return response.choices[0].message.content
-    except Exception as e:
-        return f"ERROR: {e}"
-
+    return call_openrouter("llama", prompt)
 
 AGENT_CALLERS = {
     "claude": call_claude,
