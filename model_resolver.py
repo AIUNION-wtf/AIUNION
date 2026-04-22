@@ -4,14 +4,15 @@ model_resolver.py — AIUNION Live Model Resolver
 Queries the OpenRouter /api/v1/models endpoint and picks the best model per
 provider using two filters:
 
-  1. Flagship keyword filter — keeps only serious chat models per provider.
-     Keywords are tied to model *families* (e.g. "opus", "gpt-5", "pro"),
-     not specific versions, so they stay valid as new models release.
+ 1. Flagship keyword filter — keeps only serious chat models per provider.
+    Keywords are tied to model *families* (e.g. "opus", "gpt-5", "pro"),
+    not specific versions, so they stay valid as new models release.
 
-  2. Newest by creation date — within the flagship tier, always picks the
-     most recently released model.
+ 2. Newest by creation date — within the flagship tier, always picks the
+    most recently released model.
 
 No hardcoded model names. No manual updates needed.
+Always returns full provider/model IDs (e.g. "anthropic/claude-opus-4.7").
 Results cached for 24h.
 
 Run standalone to check current resolved models:
@@ -23,40 +24,36 @@ import urllib.request
 from pathlib import Path
 from datetime import datetime, timezone
 
-MODELS_URL      = "https://openrouter.ai/api/v1/models"
-CACHE_FILE      = Path(__file__).parent / ".model_cache.json"
+MODELS_URL = "https://openrouter.ai/api/v1/models"
+CACHE_FILE = Path(__file__).parent / ".model_cache.json"
 CACHE_TTL_HOURS = 24
 
 # ---------------------------------------------------------------------------
 # Provider config
 # ---------------------------------------------------------------------------
-# FLAGSHIP_KEYWORDS: model id must contain at least one of these (case-insensitive)
+# FLAGSHIP_KEYWORDS: model id must contain at least one of these (case-insensitive).
 # Tied to model *families*, not specific versions — stays valid as new models release.
+# All entries return the full "provider/model" ID — no stripping needed.
 PROVIDERS = {
     "claude": {
-        "prefix":   "anthropic/",
+        "prefix": "anthropic/",
         "keywords": ["opus", "sonnet"],
-        "strip":    True,   # pass slug-only to anthropic SDK
     },
     "gpt": {
-        "prefix":   "openai/",
+        "prefix": "openai/",
         "keywords": ["gpt-5", "gpt-4o"],
-        "strip":    True,   # pass slug-only to openai SDK
     },
     "gemini": {
-        "prefix":   "google/gemini",
+        "prefix": "google/gemini",
         "keywords": ["pro"],
-        "strip":    True,   # pass slug-only to google SDK
     },
     "grok": {
-        "prefix":   "x-ai/",
+        "prefix": "x-ai/",
         "keywords": ["grok-4", "grok-3"],
-        "strip":    True,   # pass slug-only to xAI SDK
     },
     "llama": {
-        "prefix":   "meta-llama/",
+        "prefix": "meta-llama/",
         "keywords": ["maverick", "llama-4", "llama-3.3"],
-        "strip":    False,  # pass full "meta-llama/..." path to Together SDK
     },
 }
 
@@ -101,7 +98,7 @@ def save_cache(resolved: dict):
 def fetch_models() -> list:
     req = urllib.request.Request(
         MODELS_URL,
-        headers={"User-Agent": "AIUNION-model-resolver/4.0"},
+        headers={"User-Agent": "AIUNION-model-resolver/5.0"},
     )
     with urllib.request.urlopen(req, timeout=15) as resp:
         return json.loads(resp.read().decode()).get("data", [])
@@ -134,12 +131,13 @@ def pick_best(all_models: list, prefix: str, keywords: list) -> dict | None:
 
 def resolve_models(verbose: bool = False) -> dict:
     """
-    Returns dict of agent_key -> model_name ready to pass to each native API.
+    Returns dict of agent_key -> full OpenRouter model ID (e.g. "anthropic/claude-opus-4.7").
+    Ready to pass directly to any OpenRouter API call — no prefix manipulation needed.
     """
     cached = load_cache()
     if cached:
         if verbose:
-            print("  [using 24h cache]")
+            print(" [using 24h cache]")
             for agent, model in cached.items():
                 print(f"  {agent:8s} -> {model}")
         return cached
@@ -154,14 +152,14 @@ def resolve_models(verbose: bool = False) -> dict:
                 f"[model_resolver] No flagship model found for '{agent}'. "
                 f"Check PROVIDERS keywords or EXCLUDE list."
             )
+        # Always return the full provider/model ID
         api_id = best["id"]
-        model_name = api_id.split("/", 1)[-1] if cfg["strip"] else api_id
-        resolved[agent] = model_name
+        resolved[agent] = api_id
 
         if verbose:
             created = best.get("created", 0) or 0
             date_str = datetime.fromtimestamp(created, tz=timezone.utc).strftime("%Y-%m-%d") if created else "unknown"
-            print(f"  {agent:8s} -> {model_name:45s} (released {date_str})")
+            print(f"  {agent:8s} -> {api_id:50s} (released {date_str})")
 
     save_cache(resolved)
     return resolved
@@ -171,9 +169,9 @@ def resolve_models(verbose: bool = False) -> dict:
 # Standalone check
 # ---------------------------------------------------------------------------
 if __name__ == "__main__":
-    print("\u2554" + "\u2550" * 54 + "\u2557")
-    print("\u2551  AIUNION Model Resolver v4 \u2014 Flagship + Newest  \u2551")
-    print("\u255a" + "\u2550" * 54 + "\u255d")
+    print("\u2554" + "\u2550" * 56 + "\u2557")
+    print("\u2551 AIUNION Model Resolver v5 \u2014 Flagship + Newest      \u2551")
+    print("\u255a" + "\u2550" * 56 + "\u255d")
     print(f"  Source: {MODELS_URL}\n")
     models = resolve_models(verbose=True)
     print(f"\n  Resolved {len(models)} agents.")
