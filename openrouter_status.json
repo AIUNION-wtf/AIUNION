@@ -1,7 +1,6 @@
 {
-  "balance_usd": 0,
-  "usage_usd": 0,
-  "limit_usd": null,
-  "is_free_tier": true,
-  "updated_at": "2026-04-22T18:44:05.546907+00:00"
+  "balance_usd": 20.0,
+  "total_credits": 20.0,
+  "total_usage": 0.0,
+  "updated_at": "2026-04-22T21:39:56.380269+00:00"
 }
