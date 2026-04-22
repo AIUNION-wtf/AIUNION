@@ -309,6 +309,50 @@ AGENT_CALLERS = {
 }
 
 
+# ── OpenRouter balance check ──────────────────────────────────────────────
+OR_STATUS_FILE = BASE_DIR / "openrouter_status.json"
+
+def check_openrouter_balance(verbose: bool = True) -> float | None:
+    """
+    Fetch current OpenRouter credit balance via /api/v1/auth/key.
+    Writes result to openrouter_status.json for the status dashboard.
+    Returns the balance in USD, or None on failure.
+    """
+    try:
+        req = urllib.request.Request(
+            "https://openrouter.ai/api/v1/auth/key",
+            headers={
+                "Authorization": f"Bearer {config.AIUNION_OPENROUTER_API_KEY}",
+                "Content-Type": "application/json",
+            },
+        )
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            data = json.loads(resp.read().decode())
+
+        usage   = data.get("data", {}).get("usage", 0) or 0
+        limit   = data.get("data", {}).get("limit")  # None = unlimited prepaid
+        is_free = data.get("data", {}).get("is_free_tier", False)
+        balance = round((limit - usage) if limit is not None else 0, 6)
+
+        status = {
+            "balance_usd":  balance,
+            "usage_usd":    round(usage, 6),
+            "limit_usd":    limit,
+            "is_free_tier": is_free,
+            "updated_at":   datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        }
+        OR_STATUS_FILE.write_text(json.dumps(status, indent=2))
+
+        if verbose:
+            limit_str = f"${limit:.2f}" if limit is not None else "unlimited"
+            print(f"  U0001f4b3 OpenRouter balance: ${balance:.4f} remaining  (used ${usage:.4f} of {limit_str})")
+
+        return balance
+
+    except Exception as e:
+        print(f"  ⚠️  Could not fetch OpenRouter balance: {e}")
+        return None
+
 # ── Duplicate detection ───────────────────────────────────────────────────────
 # Similarity threshold for rejecting duplicate proposals.
 # 0.82 = balanced (catches near-identical topics, allows related-but-distinct).
@@ -589,6 +633,7 @@ def get_btc_price_usd():
 
 def generate_proposals():
     """Ask each agent to propose one spending request."""
+    check_openrouter_balance()
     balance_btc = get_balance()
     if balance_btc is None:
         balance_btc = 0
@@ -980,6 +1025,7 @@ def vote_on_all_pending():
     without a separate vote — the ranking itself serves as the vote.
     For non-unanimous rankings, the winner proceeds to a standard vote.
     """
+    check_openrouter_balance()
     with open(TREASURY_FILE) as f:
         data = json.load(f)
     pending = [p for p in data.get("proposals", []) 
