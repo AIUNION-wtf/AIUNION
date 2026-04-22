@@ -823,6 +823,7 @@ def show_status():
     print(f"  Approved:   {len(approved)}")
     print(f"  Rejected:   {len(rejected)}")
     print("="*50)
+    check_openrouter_balance()
 
     if pending:
         print("\n  PENDING PROPOSALS:")
