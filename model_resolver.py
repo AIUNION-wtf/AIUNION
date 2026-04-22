@@ -160,7 +160,7 @@ def resolve_models(verbose: bool = False) -> dict:
 
         if verbose:
             created = best.get("created", 0) or 0
-            date_str = datetime.utcfromtimestamp(created).strftime("%Y-%m-%d") if created else "unknown"
+            date_str = datetime.fromtimestamp(created, tz=timezone.utc).strftime("%Y-%m-%d") if created else "unknown"
             print(f"  {agent:8s} -> {model_name:45s} (released {date_str})")
 
     save_cache(resolved)
