@@ -42,18 +42,12 @@ except ImportError:
 try:
     from model_resolver import resolve_models
     _resolved = resolve_models()
-        "claude": "anthropic/claude-opus-4.7",
-    _resolved["claude"] = "anthropic/" + _resolved["claude"]
-    _resolved["gpt"]    = "openai/"    + _resolved["gpt"]
-    _resolved["gemini"] = "google/"    + _resolved["gemini"]
-    _resolved["grok"]   = "x-ai/"     + _resolved["grok"]
-    # llama already keeps full path from model_resolver
 except Exception as e:
     print(f"[coordinator] model_resolver unavailable ({e}), using hardcoded fallbacks.")
     _resolved = {
-        "claude": "claude-opus-4-6",
+        "claude": "anthropic/claude-opus-4.7",
         "gpt":    "openai/gpt-5",
-        "gemini": "google/gemini-3.1-pro-preview",
+        "gemini": "google/gemini-2.5-pro-preview",
         "grok":   "x-ai/grok-4",
         "llama":  "meta-llama/llama-4-maverick",
     }
