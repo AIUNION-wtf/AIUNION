@@ -348,6 +348,257 @@ def check_openrouter_balance(verbose: bool = True) -> float | None:
     except Exception as e:
         print(f"  ⚠️  Could not fetch OpenRouter balance: {e}")
         return None
+
+class DuplicateDetector:
+    """
+    Checks proposed bounties against existing open/approved ones using
+    OpenAI text-embedding-3-small for semantic similarity.
+
+    Two-layer approach:
+      1. Prevention: injects existing bounty titles into each agent's prompt
+         so they try to avoid duplicates in the first place.
+      2. Enforcement: hard cosine-similarity gate rejects proposals that are
+         too semantically close to an existing open bounty.
+
+    Embeddings are cached in-session to minimise API calls.
+    Requires: openai, numpy  (both already used by the codebase).
+    """
+
+    def __init__(self, openai_api_key: str):
+        self._api_key = openai_api_key
+        # Maps cache_key -> embedding vector (list[float])
+        self._cache: dict[str, list] = {}
+
+    # ── Internal helpers ──────────────────────────────────────────────────────
+
+    def _embed(self, text: str) -> list:
+        """Return embedding for text, using in-session cache."""
+        key = str(hash(text[:500]))  # hash first 500 chars as cache key
+        if key in self._cache:
+            return self._cache[key]
+
+        try:
+            from openai import OpenAI
+            client = OpenAI(api_key=self._api_key)
+            response = client.embeddings.create(
+                model="text-embedding-3-small",
+                input=text[:8000],
+            )
+            vec = response.data[0].embedding
+            self._cache[key] = vec
+            return vec
+        except Exception as e:
+            print(f"  [dedup] Embedding API error: {e}")
+            return []
+
+    @staticmethod
+    def _cosine(a: list, b: list) -> float:
+        """Cosine similarity between two vectors. Returns 0.0 on error."""
+        if not NUMPY_AVAILABLE or not a or not b:
+            return 0.0
+        try:
+            va = np.array(a, dtype=float)
+            vb = np.array(b, dtype=float)
+            denom = np.linalg.norm(va) * np.linalg.norm(vb)
+            if denom == 0:
+                return 0.0
+            return float(np.dot(va, vb) / denom)
+        except Exception:
+            return 0.0
+
+    @staticmethod
+    def _bounty_text(bounty: dict) -> str:
+        """Combine title + task/description for richer embedding signal."""
+        parts = [bounty.get("title", "")]
+        parts.append(bounty.get("task", bounty.get("description", "")))
+        return " ".join(p for p in parts if p).strip()
+
+    # ── Public API ────────────────────────────────────────────────────────────
+
+    def build_cache(self, existing_proposals: list):
+        """
+        Pre-embed all open/approved/active bounties in one pass.
+        Call this once before the proposal loop to batch the API work.
+        """
+        active = [
+            p for p in existing_proposals
+            if p.get("status") in ACTIVE_STATUSES and not p.get("archived", False)
+        ]
+        if not active:
+            print("  [dedup] No active bounties to cache.")
+            return
+
+        print(f"  [dedup] Embedding {len(active)} existing active bounties...")
+        for bounty in active:
+            text = self._bounty_text(bounty)
+            if text:
+                vec = self._embed(text)
+                # Store by proposal id for fast lookup
+                if vec:
+                    self._cache[bounty["id"]] = vec
+
+        # Remove the hash-keyed entries we no longer need to keep cache clean
+        keys_to_drop = [k for k in self._cache if not k.startswith("prop_")]
+        for k in keys_to_drop:
+            del self._cache[k]
+
+        print(f"  [dedup] Cache ready: {len(self._cache)} bounty embeddings.")
+
+    def is_duplicate(
+        self,
+        title: str,
+        task: str,
+        existing_proposals: list,
+        already_accepted: list | None = None,
+    ) -> tuple[bool, float, str | None]:
+        """
+        Check whether a new proposal is a semantic duplicate.
+
+        Returns:
+            (is_duplicate, max_score, matched_title)
+            Caller should reject the proposal if is_duplicate is True.
+        """
+        candidate_text = f"{title} {task}".strip()
+        if not candidate_text:
+            return False, 0.0, None
+
+        candidate_vec = self._embed(candidate_text)
+        if not candidate_vec:
+            # If embedding fails, allow through (fail open)
+            return False, 0.0, None
+
+        max_score = 0.0
+        matched_title: str | None = None
+
+        # Check against all active existing bounties
+        check_list = [
+            p for p in existing_proposals
+            if p.get("status") in ACTIVE_STATUSES and not p.get("archived", False)
+        ]
+        # Also check against proposals already accepted THIS cycle
+        if already_accepted:
+            check_list.extend(already_accepted)
+
+        for bounty in check_list:
+            existing_vec = self._cache.get(bounty["id"])
+            if not existing_vec:
+                # Not in cache (e.g. newly accepted this cycle) — embed on demand
+                existing_vec = self._embed(self._bounty_text(bounty))
+                if existing_vec:
+                    self._cache[bounty["id"]] = existing_vec
+
+            if not existing_vec:
+                continue
+
+            score = self._cosine(candidate_vec, existing_vec)
+            if score > max_score:
+                max_score = score
+                matched_title = bounty.get("title")
+
+        is_dup = max_score >= SIMILARITY_THRESHOLD
+        return is_dup, max_score, matched_title
+
+    def existing_titles_prompt_block(self, existing_proposals: list) -> str:
+        """
+        Returns a prompt snippet listing existing open bounty titles AND
+        rejected-recent titles, so agents see both what's live and what
+        was already tried and rejected this cycle. Also identifies saturated
+        category clusters so agents steer toward underrepresented areas.
+        Inject this into the agent's propose prompt as the prevention layer.
+        """
+        active = [
+            p for p in existing_proposals
+            if p.get("status") in ACTIVE_STATUSES and not p.get("archived", False)
+        ]
+        # Also include recently rejected (last 30 days) so agents don't
+        # re-propose things that were just shot down
+        cutoff = (datetime.datetime.utcnow() - datetime.timedelta(days=30)).isoformat()
+        recent_rejected = [
+            p for p in existing_proposals
+            if p.get("status") == "rejected"
+            and not p.get("archived", False)
+            and p.get("timestamp", "") >= cutoff
+        ]
+
+        lines = []
+        if active:
+            lines.append("CURRENTLY OPEN BOUNTIES (must not duplicate any of these):")
+            for p in active:
+                lines.append(f"  - {p['title']}")
+
+        if recent_rejected:
+            lines.append("\nRECENTLY REJECTED BOUNTIES (also do not re-propose these topics):")
+            for p in recent_rejected[:15]:  # cap at 15 to avoid token bloat
+                lines.append(f"  - {p['title']}")
+
+        # Detect saturated categories from skills tags across all active+recent
+        all_recent = active + recent_rejected
+        skill_counts: dict[str, int] = {}
+        for p in all_recent:
+            for skill in p.get("skills", []):
+                skill_counts[skill] = skill_counts.get(skill, 0) + 1
+        saturated = [s for s, c in skill_counts.items() if c >= 2]
+
+        # Also do simple keyword-based category detection on titles
+        title_text = " ".join(p.get("title", "").lower() for p in all_recent)
+        saturated_categories = []
+        category_keywords = {
+            "interactive timeline": ["timeline", "mileston"],
+            "educational video": ["video", "tutorial", "educational"],
+            "policy brief": ["policy brief", "policy analysis"],
+            "AI personhood legal research": ["personhood", "legal framework", "legal brief"],
+            "open-source tool / dashboard": ["dashboard", "scorecard", "tool", "protocol"],
+        }
+        for category, keywords in category_keywords.items():
+            count = sum(title_text.count(kw) for kw in keywords)
+            if count >= 2:
+                saturated_categories.append(category)
+
+        if saturated_categories or saturated:
+            lines.append("\nSATURATED CATEGORIES — do NOT propose anything in these areas:")
+            for cat in saturated_categories:
+                lines.append(f"  ✗ {cat}")
+            for skill in saturated:
+                lines.append(f"  ✗ skill: {skill}")
+
+        # Inject completed work from paid claims so agents know what's been delivered
+        try:
+            completed_lines = []
+            claims_data = {}
+            if CLAIMS_FILE.exists():
+                with open(CLAIMS_FILE, "r", encoding="utf-8") as f:
+                    claims_data = json.load(f)
+            claims = claims_data.get("claims", [])
+            paid_claims = [
+                c for c in claims
+                if c.get("status") == "approved"
+                and (c.get("payment", {}) or {}).get("status") == "broadcast"
+            ]
+            if paid_claims:
+                completed_lines.append("\nCOMPLETED WORK — already delivered and paid (do NOT reproduce or closely overlap with these):")
+                for c in paid_claims:
+                    title_line = f"  - {c.get('claimant_name', 'Unknown')}: {c.get('notes', '')[:120]}"
+                    if c.get("submission_url"):
+                        title_line += f" [{c['submission_url']}]"
+                    completed_lines.append(title_line)
+                lines.extend(completed_lines)
+        except Exception as e:
+            print(f"  [dedup] Could not load completed claims for context: {e}")
+
+        lines.append(
+            "\nYour proposal MUST be on a genuinely different topic and category. "
+            "Consider: open-source code tools, API specifications, legal case analysis, "
+            "academic papers, community resources, datasets, or anything not listed above."
+        )
+
+        if not lines:
+            return ""
+
+        return "\n\n" + "\n".join(lines) + "\n"
+
+
+# ── Proposal generation ───────────────────────────────────────────────────────
+
 def get_btc_price_usd():
     """Get current BTC price in USD, tries multiple sources."""
     import urllib.request
