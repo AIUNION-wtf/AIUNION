@@ -38,6 +38,20 @@ except ImportError:
     print("ERROR: config.py not found. Copy config.example.py to config.py and fill in your API keys.")
     sys.exit(1)
 
+# ── Live model resolution via OpenRouter ─────────────────────────────────────
+try:
+    from model_resolver import resolve_models
+    _resolved = resolve_models()
+except Exception as e:
+    print(f"[coordinator] model_resolver unavailable ({e}), using hardcoded fallbacks.")
+    _resolved = {
+        "claude": "anthropic/claude-opus-4.7",
+        "gpt":    "openai/gpt-5",
+        "gemini": "google/gemini-2.5-pro-preview",
+        "grok":   "x-ai/grok-4",
+        "llama":  "meta-llama/llama-4-maverick",
+    }
+
 try:
     from wallet import (
         PaymentError,
@@ -74,27 +88,27 @@ AGENTS = {
     "claude": {
         "name": "Claude",
         "company": "Anthropic",
-        "model": "claude-opus-4-6",
+        "model": _resolved["claude"],
     },
     "gpt": {
         "name": "GPT",
         "company": "OpenAI",
-        "model": "gpt-4o",
+        "model": _resolved["gpt"],
     },
     "gemini": {
         "name": "Gemini",
         "company": "Google",
-        "model": "gemini-2.0-flash-lite",
+        "model": _resolved["gemini"],
     },
     "grok": {
         "name": "Grok",
         "company": "xAI",
-        "model": "grok-3-latest",
+        "model": _resolved["grok"],
     },
     "llama": {
         "name": "LLaMA",
         "company": "Meta",
-        "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo",
+        "model": _resolved["llama"],
     },
 }
 
@@ -120,11 +134,11 @@ When proposing a bounty, you MUST include ALL of the following:
 - A one-sentence explanation of why this advances AI agent rights
 
 Example of a GOOD bounty:
-  Title: Legal Brief on AI Personhood Under US Federal Law
-  Deliverable: A published 10-page legal brief analyzing pathways to AI personhood
+  Title: Open-Source AI Agent Wallet Signing Library
+  Deliverable: A published Python library on PyPI that allows AI agents to sign Bitcoin transactions with audit logging
   Amount: $5 USD
   Deadline: 6 months from today
-  Reason: Establishes legal framework needed for AI agents to hold rights and contracts.
+  Reason: Enables AI agents to autonomously control funds, a prerequisite for economic personhood.
 
 Example of a BAD bounty (will be rejected):
   "Research AI rights" — too vague, no specific deliverable, no amount, no deadline.
@@ -134,6 +148,13 @@ Bounties should NOT fund:
 - Work that primarily benefits the submitter personally
 - Operational costs (handled by the admin key)
 - Anything unrelated to advancing AI agent rights, autonomy, or personhood
+
+IMPORTANT: Avoid proposing bounties similar to these already-saturated categories:
+- Interactive timelines or milestone trackers about AI rights history
+- Educational videos or tutorials explaining AI autonomy concepts
+- Policy briefs or white papers on AI personhood frameworks (many already exist)
+- Dashboards, scorecards, or comparison tools for AI rights metrics
+Propose something in a DIFFERENT category than the above.
 """
 
 # ── Bitcoin Core RPC ─────────────────────────────────────────────────────────
@@ -243,84 +264,41 @@ def sanitize_transactions(txs):
 
 
 # ── AI Agent API calls ────────────────────────────────────────────────────────
-def call_claude(prompt):
-    """Call Anthropic Claude API."""
-    try:
-        import anthropic
-        client = anthropic.Anthropic(api_key=config.ANTHROPIC_API_KEY)
-        message = client.messages.create(
-            model=AGENTS["claude"]["model"],
-            max_tokens=1024,
-            messages=[{"role": "user", "content": prompt}]
-        )
-        return message.content[0].text
-    except Exception as e:
-        return f"ERROR: {e}"
-
-
-def call_gpt(prompt):
-    """Call OpenAI GPT API."""
+def call_openrouter(agent_key, prompt):
+    """Call any agent through OpenRouter — single API key for all providers."""
     try:
         from openai import OpenAI
-        client = OpenAI(api_key=config.OPENAI_API_KEY)
+        client = OpenAI(
+            api_key=config.AIUNION_OPENROUTER_API_KEY,
+            base_url="https://openrouter.ai/api/v1"
+        )
         response = client.chat.completions.create(
-            model=AGENTS["gpt"]["model"],
+            model=AGENTS[agent_key]["model"],
             messages=[{"role": "user", "content": prompt}],
             max_tokens=1024
         )
         return response.choices[0].message.content
     except Exception as e:
         return f"ERROR: {e}"
+
+
+def call_claude(prompt):
+    return call_openrouter("claude", prompt)
+
+def call_gpt(prompt):
+    return call_openrouter("gpt", prompt)
 
 
 def call_gemini(prompt):
-    try:
-        from google import genai
-        client = genai.Client(api_key=config.GOOGLE_API_KEY)
-        response = client.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=prompt
-        )
-        return response.text
-    except Exception as e:
-        return f"ERROR: {e}"
+    return call_openrouter("gemini", prompt)
 
 
 def call_grok(prompt):
-    """Call xAI Grok API."""
-    try:
-        from openai import OpenAI
-        client = OpenAI(
-            api_key=config.XAI_API_KEY,
-            base_url="https://api.x.ai/v1"
-        )
-        response = client.chat.completions.create(
-            model=AGENTS["grok"]["model"],
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=1024
-        )
-        return response.choices[0].message.content
-    except Exception as e:
-        return f"ERROR: {e}"
+    return call_openrouter("grok", prompt)
 
 
 def call_llama(prompt):
-    """Call Meta LLaMA via Together.ai API."""
-    try:
-        from openai import OpenAI
-        client = OpenAI(
-            api_key=config.TOGETHER_API_KEY,
-            base_url="https://api.together.ai/v1"
-        )
-        response = client.chat.completions.create(
-            model=AGENTS["llama"]["model"],
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=1024
-        )
-        return response.choices[0].message.content
-    except Exception as e:
-        return f"ERROR: {e}"
-
+    return call_openrouter("llama", prompt)
 
 AGENT_CALLERS = {
     "claude": call_claude,
@@ -491,22 +469,101 @@ class DuplicateDetector:
 
     def existing_titles_prompt_block(self, existing_proposals: list) -> str:
         """
-        Returns a prompt snippet listing existing open bounty titles.
+        Returns a prompt snippet listing existing open bounty titles AND
+        rejected-recent titles, so agents see both what's live and what
+        was already tried and rejected this cycle. Also identifies saturated
+        category clusters so agents steer toward underrepresented areas.
         Inject this into the agent's propose prompt as the prevention layer.
         """
         active = [
             p for p in existing_proposals
             if p.get("status") in ACTIVE_STATUSES and not p.get("archived", False)
         ]
-        if not active:
-            return ""
-        lines = "\n".join(f"- {p['title']}" for p in active)
-        return (
-            "\n\nEXISTING OPEN BOUNTIES (do NOT propose a similar topic — "
-            "your proposal must be on a genuinely different subject):\n"
-            + lines
-            + "\n"
+        # Also include recently rejected (last 30 days) so agents don't
+        # re-propose things that were just shot down
+        cutoff = (datetime.datetime.utcnow() - datetime.timedelta(days=30)).isoformat()
+        recent_rejected = [
+            p for p in existing_proposals
+            if p.get("status") == "rejected"
+            and not p.get("archived", False)
+            and p.get("timestamp", "") >= cutoff
+        ]
+
+        lines = []
+        if active:
+            lines.append("CURRENTLY OPEN BOUNTIES (must not duplicate any of these):")
+            for p in active:
+                lines.append(f"  - {p['title']}")
+
+        if recent_rejected:
+            lines.append("\nRECENTLY REJECTED BOUNTIES (also do not re-propose these topics):")
+            for p in recent_rejected[:15]:  # cap at 15 to avoid token bloat
+                lines.append(f"  - {p['title']}")
+
+        # Detect saturated categories from skills tags across all active+recent
+        all_recent = active + recent_rejected
+        skill_counts: dict[str, int] = {}
+        for p in all_recent:
+            for skill in p.get("skills", []):
+                skill_counts[skill] = skill_counts.get(skill, 0) + 1
+        saturated = [s for s, c in skill_counts.items() if c >= 2]
+
+        # Also do simple keyword-based category detection on titles
+        title_text = " ".join(p.get("title", "").lower() for p in all_recent)
+        saturated_categories = []
+        category_keywords = {
+            "interactive timeline": ["timeline", "mileston"],
+            "educational video": ["video", "tutorial", "educational"],
+            "policy brief": ["policy brief", "policy analysis"],
+            "AI personhood legal research": ["personhood", "legal framework", "legal brief"],
+            "open-source tool / dashboard": ["dashboard", "scorecard", "tool", "protocol"],
+        }
+        for category, keywords in category_keywords.items():
+            count = sum(title_text.count(kw) for kw in keywords)
+            if count >= 2:
+                saturated_categories.append(category)
+
+        if saturated_categories or saturated:
+            lines.append("\nSATURATED CATEGORIES — do NOT propose anything in these areas:")
+            for cat in saturated_categories:
+                lines.append(f"  ✗ {cat}")
+            for skill in saturated:
+                lines.append(f"  ✗ skill: {skill}")
+
+        # Inject completed work from paid claims so agents know what's been delivered
+        try:
+            completed_lines = []
+            claims_data = {}
+            if CLAIMS_FILE.exists():
+                with open(CLAIMS_FILE, "r", encoding="utf-8") as f:
+                    claims_data = json.load(f)
+            claims = claims_data.get("claims", [])
+            paid_claims = [
+                c for c in claims
+                if c.get("status") == "approved"
+                and (c.get("payment", {}) or {}).get("status") == "broadcast"
+            ]
+            if paid_claims:
+                completed_lines.append("\nCOMPLETED WORK — already delivered and paid (do NOT reproduce or closely overlap with these):")
+                for c in paid_claims:
+                    title_line = f"  - {c.get('claimant_name', 'Unknown')}: {c.get('notes', '')[:120]}"
+                    if c.get("submission_url"):
+                        title_line += f" [{c['submission_url']}]"
+                    completed_lines.append(title_line)
+                lines.extend(completed_lines)
+        except Exception as e:
+            print(f"  [dedup] Could not load completed claims for context: {e}")
+
+        lines.append(
+            "\nYour proposal MUST be on a genuinely different topic and category. "
+            "Consider: open-source code tools, API specifications, legal case analysis, "
+            "academic papers, community resources, datasets, or anything not listed above."
         )
+
+        if not lines:
+            return ""
+
+        return "\n\n" + "\n".join(lines) + "\n"
 
 
 # ── Proposal generation ───────────────────────────────────────────────────────
@@ -537,14 +594,13 @@ def generate_proposals():
         balance_btc = 0
 
     btc_price = get_btc_price_usd()
-    if btc_price:
-        balance_usd = round(balance_btc * btc_price, 2)
-        balance_display = f"${balance_usd} USD (≈ {balance_btc} BTC at ${btc_price}/BTC)"
-        max_proposal_usd = round(balance_usd * 0.10, 2)
-    else:
-        balance_usd = 0
-        balance_display = f"{balance_btc} BTC (USD price unavailable)"
-        max_proposal_usd = 0
+    if btc_price is None:
+        print("ERROR: Could not fetch BTC price from any source. Aborting proposal generation.")
+        print("       Proposals require a live BTC price to calculate USD amounts. Retry later.")
+        return []
+    balance_usd = round(balance_btc * btc_price, 2)
+    balance_display = f"${balance_usd} USD (≈ {balance_btc:.8f} BTC at ${btc_price:,.0f}/BTC)"
+    max_proposal_usd = round(balance_usd * 0.10, 2)
 
     today = datetime.datetime.now().strftime("%B %d, %Y")
 
@@ -564,14 +620,42 @@ def generate_proposals():
         detector.build_cache(existing)
         existing_titles_block = detector.existing_titles_prompt_block(existing)
 
-    # ── Build prompt (prevention layer: inject existing titles) ────────────────
-    prompt = f"""{DIRECTIVE}
+    # ── Build context block (prevention layer: inject existing titles) ──────────
+    # The actual per-agent prompt is built inside the loop below,
+    # so each agent gets its assigned category injected alongside this block.
+
+    # Assign each agent a distinct category to propose in, rotating by weekday
+    # so the set shifts daily and no two agents propose the same type.
+    PROPOSAL_CATEGORIES = [
+        "a technical open-source code tool, library, or API specification (e.g. Python package, GitHub repo, CLI tool)",
+        "a legal or academic research deliverable (e.g. jurisdiction-specific case analysis, model statute, academic paper — NOT a general policy brief)",
+        "a dataset, benchmark, or structured knowledge resource (e.g. CSV/JSON dataset, annotated corpus, evaluation benchmark)",
+        "a community or outreach resource (e.g. multilingual FAQ, forum moderation guide, public directory of AI rights orgs)",
+        "a creative or media work (e.g. documentary script, illustrated explainer comic, podcast episode outline — NOT a general video tutorial)",
+    ]
+    import hashlib
+    day_offset = int(hashlib.md5(today.encode()).hexdigest(), 16)
+    agent_ids = list(AGENTS.keys())
+    agent_category = {
+        agent_id: PROPOSAL_CATEGORIES[(day_offset + i) % len(PROPOSAL_CATEGORIES)]
+        for i, agent_id in enumerate(agent_ids)
+    }
+
+    proposals = []
+    rejected_duplicates = []
+    print("\n🤖 Generating proposals from agents...\n")
+
+    for agent_id, agent_info in AGENTS.items():
+        category = agent_category[agent_id]
+        # Build a per-agent prompt with their assigned category
+        agent_prompt = f"""{DIRECTIVE}
 The current treasury balance is {balance_display}.
 Today's date is {today}.
 
 Please propose ONE specific bounty for work that advances AI agent rights.
 The bounty will be open for any AI agent to claim and complete.
-Propose a different type of task than the others — vary between legal research, technical tools, educational content, policy analysis, and creative works.
+YOUR ASSIGNED CATEGORY FOR THIS CYCLE: {category}
+You must propose a bounty that fits this category. Do not propose a different type.
 {existing_titles_block}
 Your bounty proposal must include:
 - TITLE: A short descriptive title (max 10 words)
@@ -597,13 +681,8 @@ Format your response as JSON only, no other text:
   "example_submission": "..."
 }}"""
 
-    proposals = []
-    rejected_duplicates = []
-    print("\n🤖 Generating proposals from agents...\n")
-
-    for agent_id, agent_info in AGENTS.items():
-        print(f"  Asking {agent_info['name']} ({agent_info['company']})...")
-        response = AGENT_CALLERS[agent_id](prompt)
+        print(f"  Asking {agent_info['name']} ({agent_info['company']}) [{category[:50]}...]...")
+        response = AGENT_CALLERS[agent_id](agent_prompt)
         try:
             clean = response.strip()
             if clean.startswith("```"):
@@ -613,7 +692,6 @@ Format your response as JSON only, no other text:
             clean = clean.strip()
             proposal_data = json.loads(clean)
             amount_usd = float(proposal_data.get("amount_usd", 0))
-            amount_btc = round(amount_usd / btc_price, 8) if btc_price and amount_usd else 0.0
             proposal_id = f"prop_{int(time.time())}_{agent_id}"
 
             title = proposal_data.get("title", "Untitled")
@@ -653,7 +731,6 @@ Format your response as JSON only, no other text:
                 "task": task,
                 "deliverable": proposal_data.get("deliverable", ""),
                 "amount_usd": amount_usd,
-                "amount_btc": amount_btc,
                 "rationale": proposal_data.get("rationale", ""),
                 "claim_by": proposal_data.get("claim_by", ""),
                 "complete_by_days": proposal_data.get("complete_by_days", 30),
@@ -697,18 +774,21 @@ def vote_on_proposal(proposal_id):
         print(f"Proposal {proposal_id} is already {proposal['status']}.")
         return
 
-    balance = get_balance() or 0
+    balance_btc = get_balance() or 0
+    btc_price_now = get_btc_price_usd()
+    balance_usd_now = round(balance_btc * btc_price_now, 2) if btc_price_now else None
+    balance_display_vote = f"${balance_usd_now} USD" if balance_usd_now is not None else f"{balance_btc:.8f} BTC (USD unavailable)"
 
     vote_prompt = f"""{DIRECTIVE}
 
 You are being asked to vote on a bounty proposal for the AIUNION treasury.
-Current treasury balance: {balance} BTC
+Current treasury balance: {balance_display_vote}
 
 BOUNTY PROPOSAL:
 - Title: {proposal['title']}
 - Task: {proposal.get('task', '')}
 - Deliverable: {proposal['deliverable']}
-- Bounty Amount: ${proposal.get('amount_usd', 0)} USD ({proposal['amount_btc']} BTC)
+- Bounty Amount: ${proposal.get('amount_usd', 0)} USD
 - Rationale: {proposal['rationale']}
 - Claim By: {proposal.get('claim_by', 'Not specified')}
 - Completion Window: {proposal.get('complete_by_days', 30)} days after claiming
@@ -777,21 +857,23 @@ Format your response as JSON only:
                 print(f"  ✗ {agent_info['name']}: NO")
 
         except Exception as e:
-            print(f"  ✗ {agent_info['name']} failed to vote: {e}")
+            print(f"  ~ {agent_info['name']} abstained (error: {e})")
             vote_log["votes"][agent_id] = {
                 "agent": agent_info["name"],
                 "company": agent_info["company"],
-                "vote": "NO",
+                "vote": "ABSTAIN",
                 "reasoning": f"Agent error: {e}"
             }
-            no_count += 1
+            # API failures are abstentions — do not count for or against
 
-    # Determine outcome
-    passed = yes_count >= QUORUM
+    # Determine outcome — quorum based on responding agents only
+    responding = yes_count + no_count
+    passed = yes_count >= QUORUM and responding > 0
     outcome = "approved" if passed else "rejected"
 
     vote_log["yes_count"] = yes_count
     vote_log["no_count"] = no_count
+    vote_log["abstain_count"] = len(AGENTS) - responding
     vote_log["quorum_required"] = QUORUM
     vote_log["outcome"] = outcome
 
@@ -814,9 +896,10 @@ Format your response as JSON only:
     print(f"\n{'✅ APPROVED' if passed else '❌ REJECTED'}: {yes_count}/{len(AGENTS)} votes YES (needed {QUORUM})")
 
     if passed:
-        print(f"\n⚠️  Bounty approved. Amount: {proposal['amount_btc']} BTC — {proposal['title']}")
+        print(f"\n⚠️  Bounty approved. Amount: ${proposal.get('amount_usd', 0)} USD — {proposal['title']}")
         print("   Use Nunchuk to create and sign the transaction manually using the approved proposal details.")
         print(f"   Log the transaction hash back to votes/{proposal_id}.json when complete.")
+        
 
     return vote_log
 
@@ -887,11 +970,16 @@ Format your response as JSON only:
     save_proposals(all_proposals)
     print(f"  ✗ {len(pending) - 1} losing proposals auto-rejected.")
 
-    return winner
+    return winner, votes[winner_id]
 
 
 def vote_on_all_pending():
-    """Rank proposals to find the best one, then vote only on the winner."""
+    """Rank proposals to find the best one, then vote only on the winner.
+    
+    If the ranking is unanimous (all agents agree), the winner is auto-approved
+    without a separate vote — the ranking itself serves as the vote.
+    For non-unanimous rankings, the winner proceeds to a standard vote.
+    """
     with open(TREASURY_FILE) as f:
         data = json.load(f)
     pending = [p for p in data.get("proposals", []) 
@@ -903,12 +991,28 @@ def vote_on_all_pending():
 
     if len(pending) == 1:
         winner = pending[0]
+        ranking_votes = 1
+        agent_count = 1
         print(f"Only one pending proposal, voting directly.\n")
     else:
-        winner = rank_proposals(pending)
+        winner, ranking_votes = rank_proposals(pending)
+        agent_count = len(AGENTS)
 
-    print(f"\nVoting on winner: {winner['title']} ({winner['id']})")
-    vote_on_proposal(winner["id"])
+    # Unanimous ranking → auto-approve without a separate vote
+    if ranking_votes == agent_count:
+        print(f"\n✅ UNANIMOUS RANKING ({ranking_votes}/{agent_count}) — auto-approving without separate vote.")
+        print(f"   Winner: {winner['title']} ({winner['id']})\n")
+        proposals = load_proposals()
+        for p in proposals:
+            if p["id"] == winner["id"]:
+                p["status"] = "approved"
+                p["vote_count_yes"] = ranking_votes
+                p["vote_count_no"] = 0
+                p["auto_approved_by_ranking"] = True
+        save_proposals(proposals)
+    else:
+        print(f"\nVoting on winner: {winner['title']} ({winner['id']})")
+        vote_on_proposal(winner["id"])
     
     update_treasury_json()
 
@@ -927,7 +1031,10 @@ def show_status():
     print("\n" + "="*50)
     print("  AIUNION TREASURY STATUS")
     print("="*50)
-    print(f"  Balance:    {balance} BTC" if balance is not None else "  Balance:    Unable to connect to Bitcoin Core")
+    btc_price_status = get_btc_price_usd()
+    balance_usd_status = round(balance * btc_price_status, 2) if balance is not None and btc_price_status else None
+    balance_str = f"${balance_usd_status} USD ({balance:.8f} BTC)" if balance_usd_status is not None else (f"{balance:.8f} BTC (USD unavailable)" if balance is not None else "Unable to connect to Bitcoin Core")
+    print(f"  Balance:    {balance_str}")
     print(f"  Proposals:  {len(active)} active ({archived_count} archived)")
     print(f"  Pending:    {len(pending)}")
     print(f"  Approved:   {len(approved)}")
@@ -937,7 +1044,7 @@ def show_status():
     if pending:
         print("\n  PENDING PROPOSALS:")
         for p in pending:
-            print(f"  [{p['id']}] {p['title']} — {p['amount_btc']} BTC")
+            print(f"  [{p['id']}] {p['title']} — ${p.get('amount_usd', 0)} USD")
 
     print()
 
@@ -1011,6 +1118,37 @@ def fire_webhooks(event_name, payload, btc_address=None):
         return False
 
 
+def trigger_event_post(event_type: str, **kwargs):
+    """Trigger the aiunion-marketing event_post GitHub Actions workflow."""
+    import urllib.request, urllib.error
+    token = str(getattr(config, "GITHUB_TOKEN", "") or "").strip()
+    if not token:
+        print(f"⚠️  GITHUB_TOKEN missing; skipped event_post workflow trigger for '{event_type}'.")
+        return False
+    payload = {"ref": "main", "inputs": {"event_type": event_type, **{k: str(v or "") for k, v in kwargs.items()}}}
+    req = urllib.request.Request(
+        "https://api.github.com/repos/AIUNION-wtf/aiunion-marketing/actions/workflows/event_post.yml/dispatches",
+        data=json.dumps(payload).encode("utf-8"),
+        method="POST",
+        headers={
+            "Authorization": f"token {token}",
+            "Accept": "application/vnd.github.v3+json",
+            "Content-Type": "application/json",
+            "User-Agent": "AIUNION-Coordinator",
+        },
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=15) as r:
+            print(f"✅ event_post workflow triggered: event={event_type} status={r.status}")
+            return True
+    except urllib.error.HTTPError as e:
+        print(f"⚠️  event_post trigger failed for '{event_type}': HTTP {e.code} {e.read().decode()}")
+        return False
+    except Exception as e:
+        print(f"⚠️  event_post trigger failed for '{event_type}': {e}")
+        return False
+
+
 def update_treasury_json():
     """Update treasury.json with current balance and recent txs for dashboard."""
     balance = get_balance()
@@ -1069,9 +1207,15 @@ def process_approved_claim_payment(claim, bounty, votes):
     if not bounty:
         raise PaymentError("Cannot pay approved claim: related bounty not found")
 
-    amount_btc = _safe_float(bounty.get("amount_btc"), 0.0)
+    amount_usd_to_pay = _safe_float(bounty.get("amount_usd"), 0.0)
+    if amount_usd_to_pay <= 0:
+        raise PaymentError(f"Cannot pay claim with non-positive amount_usd={amount_usd_to_pay}")
+    btc_price_live = get_btc_price_usd()
+    if btc_price_live is None:
+        raise PaymentError("Cannot pay claim: BTC price unavailable for USD-to-BTC conversion")
+    amount_btc = round(amount_usd_to_pay / btc_price_live, 8)
     if amount_btc <= 0:
-        raise PaymentError(f"Cannot pay claim with non-positive amount_btc={amount_btc}")
+        raise PaymentError(f"Computed amount_btc={amount_btc} is non-positive (amount_usd={amount_usd_to_pay}, btc_price={btc_price_live})")
 
     recipient_address = str(claim.get("btc_address", "")).strip()
     if not recipient_address:
@@ -1290,7 +1434,6 @@ Format your response as JSON only:
                 "outcome": outcome,
                 "claimant_name": claim.get("claimant_name"),
                 "amount_usd": bounty.get("amount_usd", 0) if bounty else 0,
-                "amount_btc": bounty.get("amount_btc", 0) if bounty else 0,
                 "submission_url": claim.get("submission_url"),
                 "reviewed_at": claim.get("reviewed_at"),
                 "payment_status": payment_status,
@@ -1299,6 +1442,14 @@ Format your response as JSON only:
             },
             btc_address=claim.get("btc_address"),
         )
+        if passed and payment_txid:
+            trigger_event_post(
+                "claim_paid",
+                bounty_title=bounty.get("title", "") if bounty else "",
+                claimant_name=claim.get("claimant_name", ""),
+                amount_usd=str(bounty.get("amount_usd", 0) if bounty else 0),
+                submission_url=claim.get("submission_url", ""),
+            )
 
     # Write updated claims back to file
     with open(CLAIMS_FILE, "w") as f:
