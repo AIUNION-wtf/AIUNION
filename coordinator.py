@@ -264,7 +264,7 @@ def sanitize_transactions(txs):
 
 
 # ── AI Agent API calls ────────────────────────────────────────────────────────
-def call_openrouter(agent_key, prompt):
+def call_openrouter(agent_key, prompt, max_tokens=2048):
     """Call any agent through OpenRouter — single API key for all providers."""
     try:
         from openai import OpenAI
@@ -275,7 +275,7 @@ def call_openrouter(agent_key, prompt):
         result = client.chat.completions.create(
             model=AGENTS[agent_key]["model"],
             messages=[{"role": "user", "content": prompt}],
-            max_tokens=2048
+            max_tokens=max_tokens
         )
         content = result.choices[0].message.content
         if content is None:
@@ -711,7 +711,7 @@ Your bounty proposal must include:
 - SKILLS: A JSON array of 2-4 skill tags required (e.g. ["legal-research", "writing"] or ["python", "bitcoin", "open-source"])
 - EXAMPLE_SUBMISSION: One concrete sentence describing what a passing submission would look like (e.g. "A public GitHub repo with working Python code and a README")
 
-Format your response as JSON only, no other text:
+Keep your response SHORT. Every text field must be under 150 characters. Format your response as JSON only, no other text:
 {{
   "title": "...",
   "task": "...",
@@ -725,7 +725,7 @@ Format your response as JSON only, no other text:
 }}"""
 
         print(f"  Asking {agent_info['name']} ({agent_info['company']}) [{category[:50]}...]...")
-        response = AGENT_CALLERS[agent_id](agent_prompt)
+        response = call_openrouter(agent_id, agent_prompt, max_tokens=512)
         try:
             if response is None:
                 raise ValueError("API returned None (no response)")
