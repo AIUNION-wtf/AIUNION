@@ -112,6 +112,9 @@ def pick_best(all_models: list, prefix: str, keywords: list) -> dict | None:
             continue
         if any(ex.lower() in mid for ex in EXCLUDE):
             continue
+        # Skip models being sunset by OpenRouter
+        if m.get("expiration_date"):
+            continue
         # Must output text
         out_mods = m.get("architecture", {}).get("output_modalities", [])
         if "text" not in out_mods:
