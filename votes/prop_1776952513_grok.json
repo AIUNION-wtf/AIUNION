@@ -1,0 +1,42 @@
+{
+  "proposal_id": "prop_1776952513_grok",
+  "proposal_title": "EU AI Act Agent Personhood Analysis",
+  "timestamp": "2026-04-23T13:58:14.942013",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "While the task is specific and verifiable, this falls squarely into the saturated 'policy briefs or white papers on AI personhood frameworks' category that we are instructed to avoid. Additionally, $6 USD is grossly disproportionate to a 12-15 page academic paper with Bluebook citations and SSRN/arXiv publication, which represents substantial scholarly labor. The compensation/work mismatch alone makes this a weak bounty."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "NO",
+      "reasoning": "The deliverable, while specific and verifiable, requests an extensive academic legal analysis for a very low bounty amount ($6.0 USD for a 15-page academic paper), which is disproportionate to the amount of work involved. This could attract low-quality submissions and does not fairly compensate specialized legal labor, undermining the effectiveness and integrity of the bounty process."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "This proposal falls squarely into the prohibited, already-saturated category of policy briefs and white papers on AI personhood frameworks. Additionally, the $6.00 USD bounty is grossly disproportionate to the extensive labor required to research, format with Bluebook citations, and publish a 15-page academic legal paper."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "This proposal falls squarely into the saturated category of policy briefs/white papers on AI personhood frameworks, which the instructions explicitly say to avoid as many already exist. Additionally, a 12-15 page academic legal research paper with Bluebook citations and formal publication on SSRN/arXiv is worth far more than $6; the amount is grossly disproportionate to the work required. The 60-day completion window after claiming is also unrealistically short for quality legal scholarship meeting the specified standards."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "NO",
+      "reasoning": "The bounty amount of $6.0 USD is disproportionately low for a 12-15 page academic-style legal research paper with specific proposed amendments and Bluebook citations, considering the complexity and expertise required. The current treasury balance is $62.15 USD, and allocating nearly 10% of it to a single task may not be the most strategic use of funds. The task is specific and verifiable, but the amount should be reconsidered."
+    }
+  },
+  "yes_count": 0,
+  "no_count": 5,
+  "abstain_count": 0,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}
