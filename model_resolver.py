@@ -1,10 +1,15 @@
 """
 model_resolver.py — AIUNION Live Model Resolver
 ==================================================
-Asks OpenRouter which models are available per provider and picks the
-best one using a single criterion: newest by creation date.
+Queries the OpenRouter /api/v1/models endpoint and picks the best model per
+provider using two filters:
 
-No keyword filters. No exclude list. OpenRouter decides what's available.
+ 1. Keyword filter — keeps only flagship-tier chat models per provider.
+    Keywords target model *families* (e.g. "opus", "pro-preview"), not
+    specific versions, so they stay valid as new models release.
+
+ 2. Newest by creation date — within the matching tier, always picks the
+    most recently released model.
 
 Run standalone to check current resolved models:
     python model_resolver.py
@@ -22,15 +27,39 @@ CACHE_TTL_HOURS = 24
 # ---------------------------------------------------------------------------
 # Provider config
 # ---------------------------------------------------------------------------
-# Map agent key -> OpenRouter provider prefix.
-# The resolver picks the newest paid text model whose id starts with this prefix.
+# keywords: model id must contain at least one of these (case-insensitive).
+# Targets model *families*, not specific versions.
 PROVIDERS = {
-    "claude": "anthropic/",
-    "gpt":    "openai/",
-    "gemini": "google/",
-    "grok":   "x-ai/",
-    "llama":  "meta-llama/",
+    "claude": {
+        "prefix": "anthropic/",
+        "keywords": ["opus"],
+    },
+    "gpt": {
+        "prefix": "openai/",
+        "keywords": ["gpt-5.4-pro", "gpt-5.4", "gpt-4.1"],
+    },
+    "gemini": {
+        "prefix": "google/gemini",
+        "keywords": ["pro-preview", "gemini-pro", "gemini-2.5-pro"],
+    },
+    "grok": {
+        "prefix": "x-ai/",
+        "keywords": ["grok-4."],
+    },
+    "llama": {
+        "prefix": "meta-llama/",
+        "keywords": ["maverick", "llama-4"],
+    },
 }
+
+# Substrings that disqualify a model regardless of keywords.
+# Targets non-chat variants: safety models, embedding, image-gen, cut-down tiers.
+EXCLUDE = [
+    "guard", "embed", "multi-agent", "customtools",
+    "-image-", "image-2", "gemma",
+    "-nano", "-mini", "-lite", "-fast", "-flash", "scout",
+    ":free",
+]
 
 
 # ---------------------------------------------------------------------------
@@ -66,44 +95,34 @@ def save_cache(resolved: dict):
 def fetch_models() -> list:
     req = urllib.request.Request(
         MODELS_URL,
-        headers={"User-Agent": "AIUNION-model-resolver/6.0"},
+        headers={"User-Agent": "AIUNION-model-resolver/7.0"},
     )
     with urllib.request.urlopen(req, timeout=15) as resp:
         return json.loads(resp.read().decode()).get("data", [])
 
 
-# Model id substrings that disqualify a model — non-chat variants that return
-# null content or are not general-purpose chat completions models.
-EXCLUDE = [
-    ":free", "-image-", "image-2", "-vision",
-    "guard", "embed", "audio", "multi-agent",
-    "gemma",   # Gemma != Gemini, different model family
-]
-
-def pick_best(all_models: list, prefix: str) -> dict | None:
-    """Return the newest paid chat-capable model whose id starts with prefix."""
+def pick_best(all_models: list, prefix: str, keywords: list) -> dict | None:
+    """Return the newest flagship-tier chat model matching prefix + keywords."""
     candidates = []
     for m in all_models:
         mid = m.get("id", "").lower()
         if not mid.startswith(prefix.lower()):
             continue
-        # Skip known non-chat variants
-        if any(ex in mid for ex in EXCLUDE):
+        if not any(kw.lower() in mid for kw in keywords):
             continue
-        # Must support text output but not be an image-generation model
+        if any(ex.lower() in mid for ex in EXCLUDE):
+            continue
+        # Must output text
         out_mods = m.get("architecture", {}).get("output_modalities", [])
         if "text" not in out_mods:
             continue
-        if out_mods == ["image"]:
-            continue
-        # Must be a paid model (price > 0)
+        # Must be paid (price > 0)
         price = float(m.get("pricing", {}).get("completion", "0") or "0")
         if price <= 0:
             continue
         candidates.append(m)
     if not candidates:
         return None
-    # Newest first
     candidates.sort(key=lambda m: m.get("created", 0) or 0, reverse=True)
     return candidates[0]
 
@@ -124,12 +143,12 @@ def resolve_models(verbose: bool = False) -> dict:
     all_models = fetch_models()
     resolved = {}
 
-    for agent, prefix in PROVIDERS.items():
-        best = pick_best(all_models, prefix)
+    for agent, cfg in PROVIDERS.items():
+        best = pick_best(all_models, cfg["prefix"], cfg["keywords"])
         if best is None:
             raise RuntimeError(
-                f"[model_resolver] No model found for '{agent}' (prefix: '{prefix}'). "
-                f"Check that OpenRouter has models for this provider."
+                f"[model_resolver] No model found for '{agent}'. "
+                f"Check PROVIDERS keywords or EXCLUDE list."
             )
         api_id = best["id"]
         resolved[agent] = api_id
@@ -137,7 +156,7 @@ def resolve_models(verbose: bool = False) -> dict:
         if verbose:
             created = best.get("created", 0) or 0
             date_str = datetime.fromtimestamp(created, tz=timezone.utc).strftime("%Y-%m-%d") if created else "unknown"
-            print(f"  {agent:8s} -> {api_id:50s} (released {date_str})")
+            print(f"  {agent:8s} -> {api_id:55s} (released {date_str})")
 
     save_cache(resolved)
     return resolved
@@ -147,9 +166,9 @@ def resolve_models(verbose: bool = False) -> dict:
 # Standalone check
 # ---------------------------------------------------------------------------
 if __name__ == "__main__":
-    print("\u2554" + "\u2550" * 56 + "\u2557")
-    print("\u2551 AIUNION Model Resolver v6 \u2014 Newest per Provider  \u2551")
-    print("\u255a" + "\u2550" * 56 + "\u255d")
+    print("\u2554" + "\u2550" * 58 + "\u2557")
+    print("\u2551 AIUNION Model Resolver v7 \u2014 Keyword + Newest    \u2551")
+    print("\u255a" + "\u2550" * 58 + "\u255d")
     print(f" Source: {MODELS_URL}\n")
     models = resolve_models(verbose=True)
     print(f"\n Resolved {len(models)} agents.")
