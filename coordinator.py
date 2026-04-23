@@ -308,8 +308,7 @@ AGENT_CALLERS = {
     "llama": call_llama,
 }
 
-
-# ── OpenRouter balance check ──────────────────────────────────────────────
+# ── OpenRouter balance check ────────────────────────────────────────────────────────────────────────────────
 OR_STATUS_FILE = BASE_DIR / "openrouter_status.json"
 
 def check_openrouter_balance(verbose: bool = True) -> float | None:
@@ -321,9 +320,7 @@ def check_openrouter_balance(verbose: bool = True) -> float | None:
     try:
         req = urllib.request.Request(
             "https://openrouter.ai/api/v1/credits",
-            headers={
-                "Authorization": f"Bearer {config.AIUNION_OPENROUTER_API_KEY}",
-            },
+            headers={"Authorization": f"Bearer {config.AIUNION_OPENROUTER_API_KEY}"},
         )
         with urllib.request.urlopen(req, timeout=10) as resp:
             data = json.loads(resp.read().decode())
@@ -333,10 +330,10 @@ def check_openrouter_balance(verbose: bool = True) -> float | None:
         balance       = round(total_credits - total_usage, 6)
 
         status = {
-            "balance_usd":     balance,
-            "total_credits":   round(total_credits, 6),
-            "total_usage":     round(total_usage, 6),
-            "updated_at":      datetime.datetime.now(datetime.timezone.utc).isoformat(),
+            "balance_usd":   balance,
+            "total_credits": round(total_credits, 6),
+            "total_usage":   round(total_usage, 6),
+            "updated_at":    datetime.datetime.now(datetime.timezone.utc).isoformat(),
         }
         OR_STATUS_FILE.write_text(json.dumps(status, indent=2))
 
@@ -349,13 +346,15 @@ def check_openrouter_balance(verbose: bool = True) -> float | None:
         print(f"  ⚠️  Could not fetch OpenRouter balance: {e}")
         return None
 
-# ── Duplicate detection ────────────────────────────────────────────────────────────────────────────────
+
+# ── Duplicate detection ───────────────────────────────────────────────────────
 # Similarity threshold for rejecting duplicate proposals.
 # 0.82 = balanced (catches near-identical topics, allows related-but-distinct).
 # Increase toward 0.88 to be stricter; decrease toward 0.75 to be looser.
 SIMILARITY_THRESHOLD = 0.82
 
 ACTIVE_STATUSES = ("pending", "approved", "active")
+
 
 class DuplicateDetector:
     """
@@ -438,7 +437,7 @@ class DuplicateDetector:
 
         print(f"  [dedup] Embedding {len(active)} existing active bounties...")
         for bounty in active:
-            text = self._bounty_text(bounty)
+            text = self.bountytext(bounty)
             if text:
                 vec = self._embed(text)
                 # Store by proposal id for fast lookup
@@ -491,7 +490,7 @@ class DuplicateDetector:
             existing_vec = self._cache.get(bounty["id"])
             if not existing_vec:
                 # Not in cache (e.g. newly accepted this cycle) — embed on demand
-                existing_vec = self._embed(self._bounty_text(bounty))
+                existing_vec = self._embed(self.bountytext(bounty))
                 if existing_vec:
                     self._cache[bounty["id"]] = existing_vec
 
@@ -606,7 +605,6 @@ class DuplicateDetector:
 
 
 # ── Proposal generation ───────────────────────────────────────────────────────
-
 def get_btc_price_usd():
     """Get current BTC price in USD, tries multiple sources."""
     import urllib.request
@@ -1062,6 +1060,7 @@ def vote_on_all_pending():
 # ── Treasury status ───────────────────────────────────────────────────────────
 def show_status():
     """Display current treasury status."""
+    check_openrouter_balance()
     balance = get_balance()
     proposals = load_proposals()
     active = [p for p in proposals if not p.get("archived", False)]
@@ -1082,7 +1081,6 @@ def show_status():
     print(f"  Approved:   {len(approved)}")
     print(f"  Rejected:   {len(rejected)}")
     print("="*50)
-    check_openrouter_balance()
 
     if pending:
         print("\n  PENDING PROPOSALS:")
