@@ -723,6 +723,8 @@ Format your response as JSON only, no other text:
         print(f"  Asking {agent_info['name']} ({agent_info['company']}) [{category[:50]}...]...")
         response = AGENT_CALLERS[agent_id](agent_prompt)
         try:
+            if response is None:
+                raise ValueError("API returned None (no response)")
             clean = response.strip()
             if clean.startswith("```"):
                 clean = clean.split("```")[1]
@@ -787,7 +789,7 @@ Format your response as JSON only, no other text:
             print(f"  ✓ {agent_info['name']} proposed: {proposal['title']} (${amount_usd} USD)")
         except Exception as e:
             print(f"  ✗ {agent_info['name']} failed to generate valid proposal: {e}")
-            print(f"    Raw response: {response[:200]}")
+            print(f"    Raw response: {str(response)[:200]}")
 
     existing.extend(proposals)
     save_proposals(existing)
