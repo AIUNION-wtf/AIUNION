@@ -349,6 +349,14 @@ def check_openrouter_balance(verbose: bool = True) -> float | None:
         print(f"  ⚠️  Could not fetch OpenRouter balance: {e}")
         return None
 
+# ── Duplicate detection ────────────────────────────────────────────────────────────────────────────────
+# Similarity threshold for rejecting duplicate proposals.
+# 0.82 = balanced (catches near-identical topics, allows related-but-distinct).
+# Increase toward 0.88 to be stricter; decrease toward 0.75 to be looser.
+SIMILARITY_THRESHOLD = 0.82
+
+ACTIVE_STATUSES = ("pending", "approved", "active")
+
 class DuplicateDetector:
     """
     Checks proposed bounties against existing open/approved ones using
