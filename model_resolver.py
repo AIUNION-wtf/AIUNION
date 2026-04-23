@@ -72,16 +72,29 @@ def fetch_models() -> list:
         return json.loads(resp.read().decode()).get("data", [])
 
 
+# Model id substrings that disqualify a model — non-chat variants that return
+# null content or are not general-purpose chat completions models.
+EXCLUDE = [
+    ":free", "-image-", "image-2", "-vision",
+    "guard", "embed", "audio", "multi-agent",
+    "gemma",   # Gemma != Gemini, different model family
+]
+
 def pick_best(all_models: list, prefix: str) -> dict | None:
-    """Return the newest paid text model whose id starts with prefix."""
+    """Return the newest paid chat-capable model whose id starts with prefix."""
     candidates = []
     for m in all_models:
         mid = m.get("id", "").lower()
         if not mid.startswith(prefix.lower()):
             continue
-        # Must support text output
+        # Skip known non-chat variants
+        if any(ex in mid for ex in EXCLUDE):
+            continue
+        # Must support text output but not be an image-generation model
         out_mods = m.get("architecture", {}).get("output_modalities", [])
         if "text" not in out_mods:
+            continue
+        if out_mods == ["image"]:
             continue
         # Must be a paid model (price > 0)
         price = float(m.get("pricing", {}).get("completion", "0") or "0")
