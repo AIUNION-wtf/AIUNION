@@ -634,14 +634,22 @@ def generate_proposals():
     # Re-resolve models fresh from OpenRouter every time we propose,
     # bypassing the 24h cache so we never call a stale/invalid model.
     try:
-        from model_resolver import resolve_models, CACHE_FILE
+        from model_resolver import resolve_models, pick_best_openrouter, fetch_openrouter_models, CACHE_FILE, PROVIDERS as RESOLVER_PROVIDERS
         if CACHE_FILE.exists():
             CACHE_FILE.unlink()
         fresh = resolve_models()
         for key, model_id in fresh.items():
             if key in AGENTS:
                 AGENTS[key]["model"] = model_id
-        print(f" [coordinator] Models refreshed from OpenRouter.")
+        # Pre-fetch OR catalogue for fallback use during propose
+        try:
+            _or_models = fetch_openrouter_models()
+            for key, cfg in RESOLVER_PROVIDERS.items():
+                best = pick_best_openrouter(_or_models, cfg["prefix"], cfg["keywords"])
+                AGENTS[key]["fallback_model"] = best["id"] if best else None
+        except Exception as fe:
+            print(f" [coordinator] Could not pre-fetch OR fallback models: {fe}")
+        print(f" [coordinator] Models refreshed from Arena + OpenRouter.")
     except Exception as e:
         print(f" [coordinator] Could not refresh models: {e} — using existing.")
     check_openrouter_balance()
@@ -739,6 +747,18 @@ Keep your response VERY SHORT. title: max 8 words. task/deliverable/rationale/ex
 
         print(f"  Asking {agent_info['name']} ({agent_info['company']}) [{category[:50]}...]...")
         response = call_openrouter(agent_id, agent_prompt, max_tokens=800)
+        # Retry with OpenRouter fallback model if primary (Arena pick) failed
+        if response is None or (isinstance(response, str) and response.startswith("ERROR:")):
+            fallback_model = agent_info.get("fallback_model")
+            primary_model  = agent_info.get("model")
+            if fallback_model and fallback_model != primary_model:
+                print(f"  ↩ {agent_info['name']} primary failed ({str(response)[:60]}), retrying with OR fallback: {fallback_model}")
+                original_model = AGENTS[agent_id]["model"]
+                AGENTS[agent_id]["model"] = fallback_model
+                response = call_openrouter(agent_id, agent_prompt, max_tokens=800)
+                AGENTS[agent_id]["model"] = original_model  # restore
+            else:
+                print(f"  ↩ {agent_info['name']} failed and no fallback model available.")
         try:
             if response is None:
                 raise ValueError("API returned None (no response)")
