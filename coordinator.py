@@ -272,12 +272,16 @@ def call_openrouter(agent_key, prompt):
             api_key=config.AIUNION_OPENROUTER_API_KEY,
             base_url="https://openrouter.ai/api/v1"
         )
-        response = client.chat.completions.create(
+        result = client.chat.completions.create(
             model=AGENTS[agent_key]["model"],
             messages=[{"role": "user", "content": prompt}],
-            max_tokens=1024
+            max_tokens=2048
         )
-        return response.choices[0].message.content
+        content = result.choices[0].message.content
+        if content is None:
+            model_id = AGENTS[agent_key]["model"]
+            raise ValueError(f"Model {model_id} returned null content (may be unsupported or rate-limited)")
+        return content
     except Exception as e:
         return f"ERROR: {e}"
 
