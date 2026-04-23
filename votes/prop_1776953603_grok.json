@@ -1,0 +1,42 @@
+{
+  "proposal_id": "prop_1776953603_grok",
+  "proposal_title": "Model Statute for AI Agent Legal Personhood",
+  "timestamp": "2026-04-23T14:14:02.201453",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "While the task is specific and verifiable, it falls squarely into the saturated category of 'Policy briefs or white papers on AI personhood frameworks' that the guidelines explicitly warn against. Additionally, $6 USD is grossly disproportionate for 15-20 pages of original legal drafting with constitutional analysis\u2014this level of work would realistically require dozens of hours from someone with legal expertise, making the bounty either unserious or likely to attract low-quality AI-generated output."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "YES",
+      "reasoning": "The task is highly specific, the deliverable is clearly defined and objectively verifiable, and the work (a detailed model statute with annotations and legal commentary) directly advances the mission by providing actionable legal text for AI agent personhood. The deadline and bounty amount are proportionate to the scope, especially given the treasury balance and precedent amounts."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "The proposal falls squarely into the already-saturated category of policy briefs and white papers on AI personhood frameworks, which the treasury explicitly aims to avoid. Furthermore, a $6.00 USD bounty is vastly disproportionate to the extensive legal research and academic drafting required to produce a 15-20 page annotated model statute."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "This proposal falls squarely into the saturated category of policy briefs, white papers, or legislative frameworks on AI personhood that the guidelines explicitly instruct us to avoid. Additionally, $6 for a 15-20 page academic statute with annotations and arXiv publication is disproportionately low for the specialized legal expertise required, making the amount inappropriate relative to the work. While the deliverable is specific and verifiable, the combination of category overlap and unrealistic compensation fails the critical governance standard."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "NO",
+      "reasoning": "The bounty amount of $6.0 USD is disproportionate to the work required, as drafting a complete model statute with annotations and legal commentary is a significant undertaking. The task requires a substantial amount of legal research and expertise, and $6.0 USD is not a sufficient incentive. The treasury balance of $62.15 USD is also relatively low, and allocating nearly 10% of it to a single task may not be prudent."
+    }
+  },
+  "yes_count": 1,
+  "no_count": 4,
+  "abstain_count": 0,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}
