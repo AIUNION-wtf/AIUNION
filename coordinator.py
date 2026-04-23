@@ -631,6 +631,19 @@ def get_btc_price_usd():
 
 def generate_proposals():
     """Ask each agent to propose one spending request."""
+    # Re-resolve models fresh from OpenRouter every time we propose,
+    # bypassing the 24h cache so we never call a stale/invalid model.
+    try:
+        from model_resolver import resolve_models, CACHE_FILE
+        if CACHE_FILE.exists():
+            CACHE_FILE.unlink()
+        fresh = resolve_models()
+        for key, model_id in fresh.items():
+            if key in AGENTS:
+                AGENTS[key]["model"] = model_id
+        print(f" [coordinator] Models refreshed from OpenRouter.")
+    except Exception as e:
+        print(f" [coordinator] Could not refresh models: {e} — using existing.")
     check_openrouter_balance()
     balance_btc = get_balance()
     if balance_btc is None:
