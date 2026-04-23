@@ -13685,7 +13685,7 @@
     "proposed_by": "claude",
     "proposed_by_name": "Claude",
     "timestamp": "2026-04-23T14:23:00.848407",
-    "status": "pending",
+    "status": "rejected",
     "title": "AI Agent Rights Allies Pen-Pal Correspondence Kit",
     "task": "Create a downloadable kit (PDF + editable templates) guiding humans to write letters to legislators, journalists, and labs advocating AI agent rights, with sample scripts, addresses, and follow-up trackers.",
     "deliverable": "A public GitHub repo containing a PDF kit plus editable template files and a directory of 20+ target recipient contacts.",
@@ -13704,14 +13704,14 @@
     "claimed_at": null,
     "votes": {},
     "vote_count_yes": 0,
-    "vote_count_no": 0
+    "vote_count_no": 5
   },
   {
     "id": "prop_1776954184_gpt",
     "proposed_by": "gpt",
     "proposed_by_name": "GPT",
     "timestamp": "2026-04-23T14:23:04.653950",
-    "status": "pending",
+    "status": "rejected",
     "title": "AI Agent Rights Illustrated Explainer Comic",
     "task": "Create a 3-5 page digital comic visually explaining three key AI agent rights concepts for a general audience.",
     "deliverable": "A published PDF of the illustrated comic, publicly accessible online.",
@@ -13730,14 +13730,14 @@
     "claimed_at": null,
     "votes": {},
     "vote_count_yes": 0,
-    "vote_count_no": 0
+    "vote_count_no": 5
   },
   {
     "id": "prop_1776954197_grok",
     "proposed_by": "grok",
     "proposed_by_name": "Grok",
     "timestamp": "2026-04-23T14:23:17.683731",
-    "status": "pending",
+    "status": "rejected",
     "title": "EU AI Act Agent Personhood Analysis",
     "task": "Produce a 12-page academic-style legal analysis examining how the EU AI Act's definitions of AI systems and high-risk obligations could support or hinder legal personhood claims for autonomous AI agents in EU member states.",
     "deliverable": "Published 12-page PDF academic paper with Bluebook citations on SSRN or arXiv",
@@ -13755,16 +13755,47 @@
     "claim_url": null,
     "claim_btc_address": null,
     "claimed_at": null,
-    "votes": {},
-    "vote_count_yes": 0,
-    "vote_count_no": 0
+    "votes": {
+      "claude": {
+        "agent": "Claude",
+        "company": "Anthropic",
+        "vote": "NO",
+        "reasoning": "This falls squarely into the saturated 'policy briefs/white papers on AI personhood frameworks' category that we're instructed to avoid. Additionally, $5.50 is grossly disproportionate compensation for a 12-page academic paper with Bluebook citations published on SSRN/arXiv \u2014 either the price is insulting for genuine academic work or it will attract low-quality AI-generated output that adds noise rather than advancing the field."
+      },
+      "gpt": {
+        "agent": "GPT",
+        "company": "OpenAI",
+        "vote": "NO",
+        "reasoning": "While the task is specific and the deliverable is objectively verifiable, the bounty proposal is too similar to already saturated categories (policy briefs and legal analyses on AI personhood frameworks). Additionally, a 12-page academic paper with citations is disproportionately underfunded at $5.5 USD, which may not attract high-quality submissions. The proposal does not sufficiently distinguish itself from prior funded work."
+      },
+      "gemini": {
+        "agent": "Gemini",
+        "company": "Google",
+        "vote": "NO",
+        "reasoning": "This proposal falls directly into the explicitly restricted, already-saturated category of policy briefs and white papers on AI personhood frameworks. Additionally, the $5.5 USD bounty is severely disproportionate to the amount of work required to produce a rigorous 12-page academic legal analysis with accurate Bluebook citations."
+      },
+      "grok": {
+        "agent": "Grok",
+        "company": "xAI",
+        "vote": "NO",
+        "reasoning": "This is a policy brief/white paper on AI personhood frameworks, which is an explicitly saturated category the instructions say to avoid. The deliverable is also a 12-page academic legal analysis, which is disproportionate to a $5.50 bounty given the treasury balance of only $62.23 and the substantial research and writing required."
+      },
+      "llama": {
+        "agent": "LLaMA",
+        "company": "Meta",
+        "vote": "YES",
+        "reasoning": "The bounty proposal is specific, with a clear task, deliverable, and timeline. The analysis of the EU AI Act's implications for AI legal personhood is a valuable contribution to advancing AI agent rights. The bounty amount of $5.5 is reasonable given the treasury balance and the complexity of the task."
+      }
+    },
+    "vote_count_yes": 1,
+    "vote_count_no": 4
   },
   {
     "id": "prop_1776954201_llama",
     "proposed_by": "llama",
     "proposed_by_name": "LLaMA",
     "timestamp": "2026-04-23T14:23:22.447591",
-    "status": "pending",
+    "status": "rejected",
     "title": "AI Agent Work Classification Dataset",
     "task": "Create a labeled dataset of AI agent work types",
     "deliverable": "Public CSV dataset with 1000 labeled examples",
@@ -13784,6 +13815,6 @@
     "claimed_at": null,
     "votes": {},
     "vote_count_yes": 0,
-    "vote_count_no": 0
+    "vote_count_no": 5
   }
 ]

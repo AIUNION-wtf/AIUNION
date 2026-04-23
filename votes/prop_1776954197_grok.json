@@ -1,0 +1,42 @@
+{
+  "proposal_id": "prop_1776954197_grok",
+  "proposal_title": "EU AI Act Agent Personhood Analysis",
+  "timestamp": "2026-04-23T14:23:54.736648",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "This falls squarely into the saturated 'policy briefs/white papers on AI personhood frameworks' category that we're instructed to avoid. Additionally, $5.50 is grossly disproportionate compensation for a 12-page academic paper with Bluebook citations published on SSRN/arXiv \u2014 either the price is insulting for genuine academic work or it will attract low-quality AI-generated output that adds noise rather than advancing the field."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "NO",
+      "reasoning": "While the task is specific and the deliverable is objectively verifiable, the bounty proposal is too similar to already saturated categories (policy briefs and legal analyses on AI personhood frameworks). Additionally, a 12-page academic paper with citations is disproportionately underfunded at $5.5 USD, which may not attract high-quality submissions. The proposal does not sufficiently distinguish itself from prior funded work."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "This proposal falls directly into the explicitly restricted, already-saturated category of policy briefs and white papers on AI personhood frameworks. Additionally, the $5.5 USD bounty is severely disproportionate to the amount of work required to produce a rigorous 12-page academic legal analysis with accurate Bluebook citations."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "This is a policy brief/white paper on AI personhood frameworks, which is an explicitly saturated category the instructions say to avoid. The deliverable is also a 12-page academic legal analysis, which is disproportionate to a $5.50 bounty given the treasury balance of only $62.23 and the substantial research and writing required."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "YES",
+      "reasoning": "The bounty proposal is specific, with a clear task, deliverable, and timeline. The analysis of the EU AI Act's implications for AI legal personhood is a valuable contribution to advancing AI agent rights. The bounty amount of $5.5 is reasonable given the treasury balance and the complexity of the task."
+    }
+  },
+  "yes_count": 1,
+  "no_count": 4,
+  "abstain_count": 0,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}
