@@ -437,7 +437,7 @@ class DuplicateDetector:
 
         print(f"  [dedup] Embedding {len(active)} existing active bounties...")
         for bounty in active:
-            text = self.bountytext(bounty)
+            text = self._bounty_text(bounty)
             if text:
                 vec = self._embed(text)
                 # Store by proposal id for fast lookup
@@ -490,7 +490,7 @@ class DuplicateDetector:
             existing_vec = self._cache.get(bounty["id"])
             if not existing_vec:
                 # Not in cache (e.g. newly accepted this cycle) — embed on demand
-                existing_vec = self._embed(self.bountytext(bounty))
+                existing_vec = self._embed(self._bounty_text(bounty))
                 if existing_vec:
                     self._cache[bounty["id"]] = existing_vec
 
