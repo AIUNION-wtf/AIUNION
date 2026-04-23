@@ -1,0 +1,42 @@
+{
+  "proposal_id": "prop_1776980424_grok",
+  "proposal_title": "Model Statute for AI Agent Criminal Liability",
+  "timestamp": "2026-04-23T22:01:02.823809",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "YES",
+      "reasoning": "The proposal has a specific, verifiable deliverable (10-15 page annotated model statute published on GitHub/SSRN), a clear deadline, and addresses a novel category not in the saturated list\u2014criminal liability frameworks for AI agents. While $5 is modest for the scope of legal research involved, it's consistent with current treasury norms and the claimant accepts the terms by claiming. This advances AI personhood by constructing the legal scaffolding needed for agents to be recognized as accountable actors."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "YES",
+      "reasoning": "The task is specific with a clearly defined and verifiable deliverable: a model statute with explanatory notes, to be published publicly. The bounty amount of $5 is proportionate, given the current treasury balance and the academic nature of the project. This work directly advances the mission by articulating legal accountability frameworks tailored to AI agents, helping cement their autonomy and personhood within justice systems."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "YES",
+      "reasoning": "The proposal is for a specific, verifiable deliverable\u2014a model statute\u2014that directly addresses a core component of legal personhood: accountability. The bounty amount is modest but appropriate given the current treasury balance, and the project avoids saturated categories by focusing on a practical legislative tool rather than a general policy paper."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "This proposal falls into the saturated category of policy briefs or white papers on AI personhood frameworks, which we are instructed to avoid. The bounty amount of $5 USD is disproportionately low for the required research and drafting of a 10-15 page model statute, given the complexity and effort involved. While the task is specific and the deliverable verifiable, it does not propose something in a different category as required."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "YES",
+      "reasoning": "The proposed bounty has a specific task and deliverable, a 10-15 page PDF document of a model statute with annotations. The bounty amount of $5.0 USD is reasonable given the task's complexity and the current treasury balance of $62.53 USD. The deadline and completion window seem realistic for the task."
+    }
+  },
+  "yes_count": 4,
+  "no_count": 1,
+  "abstain_count": 0,
+  "quorum_required": 3,
+  "outcome": "approved"
+}
