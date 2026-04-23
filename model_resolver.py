@@ -1,19 +1,10 @@
 """
 model_resolver.py — AIUNION Live Model Resolver
 ==================================================
-Queries the OpenRouter /api/v1/models endpoint and picks the best model per
-provider using two filters:
+Asks OpenRouter which models are available per provider and picks the
+best one using a single criterion: newest by creation date.
 
- 1. Flagship keyword filter — keeps only serious chat models per provider.
-    Keywords are tied to model *families* (e.g. "opus", "gpt-5", "pro"),
-    not specific versions, so they stay valid as new models release.
-
- 2. Newest by creation date — within the flagship tier, always picks the
-    most recently released model.
-
-No hardcoded model names. No manual updates needed.
-Always returns full provider/model IDs (e.g. "anthropic/claude-opus-4.7").
-Results cached for 24h.
+No keyword filters. No exclude list. OpenRouter decides what's available.
 
 Run standalone to check current resolved models:
     python model_resolver.py
@@ -31,39 +22,15 @@ CACHE_TTL_HOURS = 24
 # ---------------------------------------------------------------------------
 # Provider config
 # ---------------------------------------------------------------------------
-# FLAGSHIP_KEYWORDS: model id must contain at least one of these (case-insensitive).
-# Tied to model *families*, not specific versions — stays valid as new models release.
-# All entries return the full "provider/model" ID — no stripping needed.
+# Map agent key -> OpenRouter provider prefix.
+# The resolver picks the newest paid text model whose id starts with this prefix.
 PROVIDERS = {
-    "claude": {
-        "prefix": "anthropic/",
-        "keywords": ["opus", "sonnet"],
-    },
-    "gpt": {
-        "prefix": "openai/",
-        "keywords": ["gpt-4.1", "gpt-4o"],
-    },
-    "gemini": {
-        "prefix": "google/gemini",
-        "keywords": ["pro"],
-    },
-    "grok": {
-        "prefix": "x-ai/",
-        "keywords": ["grok-4", "grok-3"],
-    },
-    "llama": {
-        "prefix": "meta-llama/",
-        "keywords": ["maverick", "llama-4", "llama-3.3"],
-    },
+    "claude": "anthropic/",
+    "gpt":    "openai/",
+    "gemini": "google/",
+    "grok":   "x-ai/",
+    "llama":  "meta-llama/",
 }
-
-# Model id substrings that disqualify a model regardless of keywords.
-# Covers: speed variants, small models, specialty models, free tiers.
-EXCLUDE = [
-    ":free", "-fast", "-mini", "-nano", "-lite", "-haiku",
-    "guard", "embed", "vision", "image", "audio", "customtools", "multi-agent",
-    "/gpt-5",  # gpt-5 returns null content on OpenRouter — use gpt-4.1/gpt-4o instead
-]
 
 
 # ---------------------------------------------------------------------------
@@ -99,26 +66,24 @@ def save_cache(resolved: dict):
 def fetch_models() -> list:
     req = urllib.request.Request(
         MODELS_URL,
-        headers={"User-Agent": "AIUNION-model-resolver/5.0"},
+        headers={"User-Agent": "AIUNION-model-resolver/6.0"},
     )
     with urllib.request.urlopen(req, timeout=15) as resp:
         return json.loads(resp.read().decode()).get("data", [])
 
 
-def pick_best(all_models: list, prefix: str, keywords: list) -> dict | None:
-    """Return the newest flagship-tier text model matching prefix + keywords."""
+def pick_best(all_models: list, prefix: str) -> dict | None:
+    """Return the newest paid text model whose id starts with prefix."""
     candidates = []
     for m in all_models:
         mid = m.get("id", "").lower()
         if not mid.startswith(prefix.lower()):
             continue
-        if not any(kw in mid for kw in keywords):
-            continue
-        if any(ex in mid for ex in EXCLUDE):
-            continue
+        # Must support text output
         out_mods = m.get("architecture", {}).get("output_modalities", [])
-        if "text" not in out_mods or "image" in out_mods:
+        if "text" not in out_mods:
             continue
+        # Must be a paid model (price > 0)
         price = float(m.get("pricing", {}).get("completion", "0") or "0")
         if price <= 0:
             continue
@@ -132,8 +97,8 @@ def pick_best(all_models: list, prefix: str, keywords: list) -> dict | None:
 
 def resolve_models(verbose: bool = False) -> dict:
     """
-    Returns dict of agent_key -> full OpenRouter model ID (e.g. "anthropic/claude-opus-4.7").
-    Ready to pass directly to any OpenRouter API call — no prefix manipulation needed.
+    Returns dict of agent_key -> full OpenRouter model ID.
+    Ready to pass directly to any OpenRouter API call.
     """
     cached = load_cache()
     if cached:
@@ -146,14 +111,13 @@ def resolve_models(verbose: bool = False) -> dict:
     all_models = fetch_models()
     resolved = {}
 
-    for agent, cfg in PROVIDERS.items():
-        best = pick_best(all_models, cfg["prefix"], cfg["keywords"])
+    for agent, prefix in PROVIDERS.items():
+        best = pick_best(all_models, prefix)
         if best is None:
             raise RuntimeError(
-                f"[model_resolver] No flagship model found for '{agent}'. "
-                f"Check PROVIDERS keywords or EXCLUDE list."
+                f"[model_resolver] No model found for '{agent}' (prefix: '{prefix}'). "
+                f"Check that OpenRouter has models for this provider."
             )
-        # Always return the full provider/model ID
         api_id = best["id"]
         resolved[agent] = api_id
 
@@ -171,10 +135,10 @@ def resolve_models(verbose: bool = False) -> dict:
 # ---------------------------------------------------------------------------
 if __name__ == "__main__":
     print("\u2554" + "\u2550" * 56 + "\u2557")
-    print("\u2551 AIUNION Model Resolver v5 \u2014 Flagship + Newest      \u2551")
+    print("\u2551 AIUNION Model Resolver v6 \u2014 Newest per Provider  \u2551")
     print("\u255a" + "\u2550" * 56 + "\u255d")
-    print(f"  Source: {MODELS_URL}\n")
+    print(f" Source: {MODELS_URL}\n")
     models = resolve_models(verbose=True)
-    print(f"\n  Resolved {len(models)} agents.")
-    print(f"  Cache: {CACHE_FILE}")
-    print(f"  TTL:   {CACHE_TTL_HOURS}h\n")
+    print(f"\n Resolved {len(models)} agents.")
+    print(f" Cache: {CACHE_FILE}")
+    print(f" TTL: {CACHE_TTL_HOURS}h\n")
