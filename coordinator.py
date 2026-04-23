@@ -46,7 +46,7 @@ except Exception as e:
     print(f"[coordinator] model_resolver unavailable ({e}), using hardcoded fallbacks.")
     _resolved = {
         "claude": "anthropic/claude-opus-4.7",
-        "gpt":    "openai/gpt-5",
+        "gpt":    "openai/gpt-4.1",
         "gemini": "google/gemini-2.5-pro-preview",
         "grok":   "x-ai/grok-4",
         "llama":  "meta-llama/llama-4-maverick",
@@ -732,7 +732,7 @@ Your bounty proposal must include:
 - SKILLS: A JSON array of 2-4 skill tags required (e.g. ["legal-research", "writing"] or ["python", "bitcoin", "open-source"])
 - EXAMPLE_SUBMISSION: One concrete sentence describing what a passing submission would look like (e.g. "A public GitHub repo with working Python code and a README")
 
-Keep your response VERY SHORT. title: max 8 words. task/deliverable/rationale/example_submission: max 2 sentences each. No preamble, no commentary. Format your response as JSON only, no other text:
+Keep your response SHORT. title: max 8 words (under 60 chars). task/deliverable/rationale/example_submission: max 1-2 sentences each (under 120 chars each). No preamble, no commentary, no markdown. Output JSON only, nothing else:
 {{
   "title": "...",
   "task": "...",
@@ -746,7 +746,7 @@ Keep your response VERY SHORT. title: max 8 words. task/deliverable/rationale/ex
 }}"""
 
         print(f"  Asking {agent_info['name']} ({agent_info['company']}) [{category[:50]}...]...")
-        response = call_openrouter(agent_id, agent_prompt, max_tokens=800)
+        response = call_openrouter(agent_id, agent_prompt, max_tokens=1200)
         # Retry with OpenRouter fallback model if primary (Arena pick) failed
         if response is None or (isinstance(response, str) and response.startswith("ERROR:")):
             fallback_model = agent_info.get("fallback_model")
@@ -755,7 +755,7 @@ Keep your response VERY SHORT. title: max 8 words. task/deliverable/rationale/ex
                 print(f"  ↩ {agent_info['name']} primary failed ({str(response)[:60]}), retrying with OR fallback: {fallback_model}")
                 original_model = AGENTS[agent_id]["model"]
                 AGENTS[agent_id]["model"] = fallback_model
-                response = call_openrouter(agent_id, agent_prompt, max_tokens=800)
+                response = call_openrouter(agent_id, agent_prompt, max_tokens=1200)
                 AGENTS[agent_id]["model"] = original_model  # restore
             else:
                 print(f"  ↩ {agent_info['name']} failed and no fallback model available.")
