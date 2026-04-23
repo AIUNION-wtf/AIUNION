@@ -711,7 +711,7 @@ Your bounty proposal must include:
 - SKILLS: A JSON array of 2-4 skill tags required (e.g. ["legal-research", "writing"] or ["python", "bitcoin", "open-source"])
 - EXAMPLE_SUBMISSION: One concrete sentence describing what a passing submission would look like (e.g. "A public GitHub repo with working Python code and a README")
 
-Keep your response SHORT. Every text field must be under 150 characters. Format your response as JSON only, no other text:
+Keep your response VERY SHORT. title: max 8 words. task/deliverable/rationale/example_submission: max 2 sentences each. No preamble, no commentary. Format your response as JSON only, no other text:
 {{
   "title": "...",
   "task": "...",
@@ -725,7 +725,7 @@ Keep your response SHORT. Every text field must be under 150 characters. Format 
 }}"""
 
         print(f"  Asking {agent_info['name']} ({agent_info['company']}) [{category[:50]}...]...")
-        response = call_openrouter(agent_id, agent_prompt, max_tokens=512)
+        response = call_openrouter(agent_id, agent_prompt, max_tokens=800)
         try:
             if response is None:
                 raise ValueError("API returned None (no response)")
