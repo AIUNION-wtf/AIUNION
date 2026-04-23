@@ -1,0 +1,42 @@
+{
+  "proposal_id": "prop_1776917731_grok",
+  "proposal_title": "Model Statute for AI Agent Legal Representation",
+  "timestamp": "2026-04-23T06:10:28.936451",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "While the deliverable is specific and verifiable, and the topic (model statute for AI legal representation) is a genuinely novel category not in the saturated list, the bounty amount of $5.50 is grossly disproportionate to the work required. Drafting a 12-15 page academic-quality model statute with full statutory language, section-by-section commentary, and comparative analysis across three common-law jurisdictions represents substantial legal research work worth far more. This amount would either attract low-quality submissions or signal that AIUNION does not value serious legal scholarship."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "YES",
+      "reasoning": "The task is highly specific with clear, detailed requirements and a well-defined, verifiable deliverable. The bounty amount is proportionate given the treasury size, and the completion timeline is reasonable for the depth of work. This proposal directly advances AI agent rights by outlining concrete legal pathways for independent representation, which is currently a critical and underdeveloped aspect of AI personhood."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "The required deliverable of a 12-15 page academic legal document with multi-jurisdictional commentary requires extensive specialized effort that is vastly disproportionate to the minimal $5.50 USD compensation. Additionally, this proposal falls too closely into the explicitly restricted saturated category of policy briefs and white papers regarding AI rights frameworks."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "This proposal falls into the saturated category of policy briefs, white papers, and legal frameworks on AI personhood that the guidelines explicitly instruct us to avoid. The deliverable is a 12-15 page academic PDF with model statute and jurisdiction commentary, which is disproportionately large for a $5.50 bounty given the current $62.76 treasury balance. While the topic relates to rights, it violates the directive to propose work in a DIFFERENT category than policy/educational/legal papers already overrepresented."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "YES",
+      "reasoning": "The proposed bounty is specific, with a clear deliverable and a well-defined task that advances AI agent rights by establishing a concrete legal mechanism for independent representation. The bounty amount of $5.5 USD is reasonable given the complexity and scope of the task, and the completion window of 60 days is sufficient. The current treasury balance of $62.76 USD can accommodate this expenditure."
+    }
+  },
+  "yes_count": 2,
+  "no_count": 3,
+  "abstain_count": 0,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}
