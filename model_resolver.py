@@ -41,7 +41,7 @@ PROVIDERS = {
     },
     "gpt": {
         "prefix": "openai/",
-        "keywords": ["gpt-5", "gpt-4o"],
+        "keywords": ["gpt-4.1", "gpt-4o"],
     },
     "gemini": {
         "prefix": "google/gemini",
@@ -62,6 +62,7 @@ PROVIDERS = {
 EXCLUDE = [
     ":free", "-fast", "-mini", "-nano", "-lite", "-haiku",
     "guard", "embed", "vision", "image", "audio", "customtools", "multi-agent",
+    "/gpt-5",  # gpt-5 returns null content on OpenRouter — use gpt-4.1/gpt-4o instead
 ]
 
 
