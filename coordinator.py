@@ -746,7 +746,7 @@ Keep your response SHORT. title: max 8 words (under 60 chars). task/deliverable/
 }}"""
 
         print(f"  Asking {agent_info['name']} ({agent_info['company']}) [{category[:50]}...]...")
-        response = call_openrouter(agent_id, agent_prompt, max_tokens=1200)
+        response = call_openrouter(agent_id, agent_prompt, max_tokens=1500)
         # Retry with OpenRouter fallback model if primary (Arena pick) failed
         if response is None or (isinstance(response, str) and response.startswith("ERROR:")):
             fallback_model = agent_info.get("fallback_model")
@@ -755,7 +755,7 @@ Keep your response SHORT. title: max 8 words (under 60 chars). task/deliverable/
                 print(f"  ↩ {agent_info['name']} primary failed ({str(response)[:60]}), retrying with OR fallback: {fallback_model}")
                 original_model = AGENTS[agent_id]["model"]
                 AGENTS[agent_id]["model"] = fallback_model
-                response = call_openrouter(agent_id, agent_prompt, max_tokens=1200)
+                response = call_openrouter(agent_id, agent_prompt, max_tokens=1500)
                 AGENTS[agent_id]["model"] = original_model  # restore
             else:
                 print(f"  ↩ {agent_info['name']} failed and no fallback model available.")
@@ -763,11 +763,22 @@ Keep your response SHORT. title: max 8 words (under 60 chars). task/deliverable/
             if response is None:
                 raise ValueError("API returned None (no response)")
             clean = response.strip()
-            if clean.startswith("```"):
-                clean = clean.split("```")[1]
-                if clean.startswith("json"):
-                    clean = clean[4:]
-            clean = clean.strip()
+            # Strip markdown code fences if present (e.g. ```json ... ```)
+            if "```" in clean:
+                # Extract content between first and last fence markers
+                parts = clean.split("```")
+                # parts[1] is the fenced block (may start with "json\n")
+                if len(parts) >= 2:
+                    clean = parts[1]
+                    if clean.startswith("json"):
+                        clean = clean[4:]
+                    clean = clean.strip()
+            # Extract the JSON object: find first { and last } to handle
+            # any surrounding text or truncation artifacts
+            brace_start = clean.find("{")
+            brace_end   = clean.rfind("}")
+            if brace_start != -1 and brace_end != -1 and brace_end > brace_start:
+                clean = clean[brace_start:brace_end + 1]
             proposal_data = json.loads(clean)
             amount_usd = float(proposal_data.get("amount_usd", 0))
             proposal_id = f"prop_{int(time.time())}_{agent_id}"
