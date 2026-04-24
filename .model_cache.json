@@ -1,8 +1,8 @@
 {
-  "cached_at": "2026-04-24T02:40:23.367730+00:00",
+  "cached_at": "2026-04-24T03:00:24.490011+00:00",
   "resolved": {
     "claude": "anthropic/claude-opus-4.7",
-    "gpt": "openai/gpt-4o-audio-preview",
+    "gpt": "openai/gpt-4.1",
     "gemini": "google/gemini-3.1-pro-preview",
     "grok": "x-ai/grok-4.20",
     "llama": "meta-llama/llama-4-maverick"
