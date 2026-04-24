@@ -116,8 +116,7 @@ def scrape_arena_leaderboard() -> dict[str, str]:
         html = resp.read().decode("utf-8", errors="replace")
 
     # Arena SSR page — model names and orgs are in <td> cells inside a <table>.
-    # Row pattern: <td>RANK</td> ... <td>MODEL_NAME
-ORG [dot] ...</td>
+    # Row pattern: <td>RANK</td> ... <td>MODEL_NAME ORG [dot] ...</td>
     # We parse all <td> text blocks and zip rank+name+org.
     td_texts = re.findall(r'<td[^>]*>(.*?)</td>', html, re.DOTALL)
     # Strip HTML tags within cells
@@ -146,7 +145,7 @@ ORG [dot] ...</td>
             continue
         arena_name = lines[0]
         org_line   = lines[1]  # e.g. "Anthropic [dot] Proprietary"
-        org        = org_line.split("\u00b7")[0].strip()
+        org        = org_line.split()[0].strip() if org_line.split() else ""
 
         if org and arena_name:
             if org not in best_per_org or rank < best_per_org[org][0]:
