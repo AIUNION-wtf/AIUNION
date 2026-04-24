@@ -281,9 +281,10 @@ def call_openrouter(agent_key, prompt, max_tokens=2048):
             model=AGENTS[agent_key]["model"],
             messages=[{"role": "user", "content": prompt}],
             max_tokens=max_tokens,
-            # Disable reasoning/thinking tokens for reliable JSON output.
-            # Has no effect on models that don't support reasoning.
-            extra_body={"reasoning": {"effort": "none"}},
+            # Minimise reasoning/thinking tokens for reliable JSON output.
+            # "minimal" works on models where reasoning is mandatory (e.g. Gemini 3
+            # previews) and is ignored by models that don't support reasoning.
+            extra_body={"reasoning": {"effort": "minimal"}},
         )
         content = result.choices[0].message.content
         if content is None:
@@ -642,22 +643,16 @@ def generate_proposals():
     # Re-resolve models fresh from OpenRouter every time we propose,
     # bypassing the 24h cache so we never call a stale/invalid model.
     try:
-        from model_resolver import resolve_models, pick_best_openrouter, fetch_openrouter_models, CACHE_FILE, PROVIDERS as RESOLVER_PROVIDERS
+        from model_resolver import resolve_models, CACHE_FILE
         if CACHE_FILE.exists():
             CACHE_FILE.unlink()
         fresh = resolve_models()
         for key, model_id in fresh.items():
             if key in AGENTS:
                 AGENTS[key]["model"] = model_id
-        # Pre-fetch OR catalogue for fallback use during propose
-        try:
-            _or_models = fetch_openrouter_models()
-            for key, cfg in RESOLVER_PROVIDERS.items():
-                best = pick_best_openrouter(_or_models, cfg["prefix"], cfg["keywords"])
-                AGENTS[key]["fallback_model"] = best["id"] if best else None
-        except Exception as fe:
-            print(f" [coordinator] Could not pre-fetch OR fallback models: {fe}")
-        print(f" [coordinator] Models refreshed from Arena + OpenRouter.")
+        print(f" [coordinator] Models refreshed from OpenRouter schema.")
+        for _k, _a in AGENTS.items():
+            print(f"    {_a['name']:8s} -> {_a['model']}")
     except Exception as e:
         print(f" [coordinator] Could not refresh models: {e} — using existing.")
     check_openrouter_balance()
