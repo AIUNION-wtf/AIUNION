@@ -1,5 +1,5 @@
 """
-model_resolver.py — AIUNION Live Model Resolver (v9, schema-based)
+model_resolver.py — AIUNION Live Model Resolver (v10, self-healing)
 ===================================================================
 Resolves the best available chat model per provider using ONLY the
 OpenRouter /api/v1/models catalogue and its declarative schema.
@@ -20,15 +20,24 @@ to exclude provider-specific problem models (e.g. for OpenAI, we require
 standard chat completion requests).
 
 Reasoning-capable models (Claude, Gemini, Grok) are safely used because
-coordinator.py sends `reasoning: {effort: "none"}` on every request, which
-disables thinking tokens on models that support them and is ignored by
+coordinator.py sends `reasoning: {effort: "minimal"}` on every request,
+which caps thinking tokens on models that support them and is ignored by
 models that don't.
 
 Within the filtered set, we pick the newest (by `created` timestamp) —
 this means as providers release new flagship models, the resolver
 automatically starts using them with no code changes.
 
-Results cached for 24h.
+Self-healing fallback chain (resolve_with_fallbacks):
+    1. Live OpenRouter schema resolver (picks newest per provider)
+    2. .last_good_models.json — the last model that actually proposed
+       successfully for each agent (committed to the repo so fresh
+       clones inherit the most recent known-good set)
+    3. Schema-generic prefix-only pick — same filter, no version hints,
+       so even an empty ledger and a fresh catalogue still resolve.
+
+Results cached for 24h. Cache is bypassed by coordinator before each
+propose run.
 
 Run standalone to check current resolved models:
     python model_resolver.py
@@ -39,16 +48,17 @@ import urllib.request
 from pathlib import Path
 from datetime import datetime, timezone
 
-MODELS_URL     = "https://openrouter.ai/api/v1/models"
-CACHE_FILE     = Path(__file__).parent / ".model_cache.json"
+MODELS_URL      = "https://openrouter.ai/api/v1/models"
+CACHE_FILE      = Path(__file__).parent / ".model_cache.json"
+LAST_GOOD_FILE  = Path(__file__).parent / ".last_good_models.json"
 CACHE_TTL_HOURS = 24
 
 # ---------------------------------------------------------------------------
 # Provider config
 # ---------------------------------------------------------------------------
-# prefix   : OpenRouter model ID prefix scoping this provider's models
-# require  : supported_parameters values that MUST be present
-# forbid   : supported_parameters values that MUST NOT be present
+# prefix         : OpenRouter model ID must start with this
+# require        : supported_parameters that MUST be present
+# forbid         : supported_parameters that MUST NOT be present
 # name_blocklist : case-insensitive substrings that disqualify a model by
 #                  ID — used only as a last-resort safety net for variants
 #                  that the schema cannot distinguish (e.g. "-image-",
@@ -122,12 +132,48 @@ def save_cache(resolved: dict):
 
 
 # ---------------------------------------------------------------------------
+# Last-known-good ledger
+# ---------------------------------------------------------------------------
+# The ledger is committed to the repo so fresh clones inherit the most
+# recent known-good set. It is updated every time an agent successfully
+# proposes, so it self-heals as model names drift over time.
+def load_last_good() -> dict:
+    try:
+        if not LAST_GOOD_FILE.exists():
+            return {}
+        data = json.loads(LAST_GOOD_FILE.read_text())
+        return data.get("resolved", {}) if isinstance(data, dict) else {}
+    except Exception:
+        return {}
+
+
+def save_last_good(agent_key: str, model_id: str):
+    """Record a model that just successfully proposed for an agent."""
+    try:
+        current = {}
+        meta = {}
+        if LAST_GOOD_FILE.exists():
+            data = json.loads(LAST_GOOD_FILE.read_text())
+            if isinstance(data, dict):
+                current = dict(data.get("resolved", {}) or {})
+                meta    = dict(data.get("updated_at", {}) or {})
+        current[agent_key] = model_id
+        meta[agent_key]    = datetime.now(timezone.utc).isoformat()
+        LAST_GOOD_FILE.write_text(json.dumps({
+            "resolved":   current,
+            "updated_at": meta,
+        }, indent=2))
+    except Exception:
+        pass
+
+
+# ---------------------------------------------------------------------------
 # OpenRouter catalogue
 # ---------------------------------------------------------------------------
 def fetch_openrouter_models() -> list:
     req = urllib.request.Request(
         MODELS_URL,
-        headers={"User-Agent": "AIUNION-model-resolver/9.0"},
+        headers={"User-Agent": "AIUNION-model-resolver/10.0"},
     )
     with urllib.request.urlopen(req, timeout=15) as resp:
         return json.loads(resp.read().decode()).get("data", [])
@@ -179,6 +225,20 @@ def passes_provider_filter(m: dict, cfg: dict) -> bool:
 # ---------------------------------------------------------------------------
 # Resolver
 # ---------------------------------------------------------------------------
+def _pick_newest(all_models: list, cfg: dict):
+    """Return the newest model (by created ts) passing all filters, or None."""
+    candidates = [
+        m for m in all_models
+        if m.get("id", "").lower().startswith(cfg["prefix"].lower())
+        and passes_basic_safety(m)
+        and passes_provider_filter(m, cfg)
+    ]
+    if not candidates:
+        return None
+    candidates.sort(key=lambda m: m.get("created", 0) or 0, reverse=True)
+    return candidates[0]
+
+
 def resolve_models(verbose: bool = False) -> dict:
     """
     Returns dict of agent_key -> full OpenRouter model ID.
@@ -197,23 +257,15 @@ def resolve_models(verbose: bool = False) -> dict:
         print("  Fetching OpenRouter model catalogue...")
     all_models = fetch_openrouter_models()
 
-    resolved: dict[str, str] = {}
+    resolved: dict = {}
     for agent, cfg in PROVIDERS.items():
-        candidates = [
-            m for m in all_models
-            if m.get("id", "").lower().startswith(cfg["prefix"].lower())
-            and passes_basic_safety(m)
-            and passes_provider_filter(m, cfg)
-        ]
-        if not candidates:
+        best = _pick_newest(all_models, cfg)
+        if best is None:
             raise RuntimeError(
                 f"[model_resolver] No model found for '{agent}' with "
                 f"prefix='{cfg['prefix']}'. Check PROVIDERS config or "
                 f"OpenRouter availability."
             )
-        # Newest first
-        candidates.sort(key=lambda m: m.get("created", 0) or 0, reverse=True)
-        best = candidates[0]
         resolved[agent] = best["id"]
         if verbose:
             created_str = datetime.fromtimestamp(best.get("created", 0)).strftime("%Y-%m-%d")
@@ -223,18 +275,66 @@ def resolve_models(verbose: bool = False) -> dict:
     return resolved
 
 
+def resolve_with_fallbacks(verbose: bool = False) -> dict:
+    """
+    Self-healing three-tier resolution:
+        tier 1 — live OpenRouter schema resolver
+        tier 2 — .last_good_models.json ledger (committed to repo)
+        tier 3 — schema-generic prefix-only pick (no cache, no ledger)
+
+    Never raises. Any agent that can't be resolved at any tier is simply
+    omitted from the returned dict (caller decides what to do).
+    """
+    # Tier 1
+    try:
+        live = resolve_models(verbose=verbose)
+        if verbose:
+            print("  [resolve_with_fallbacks] tier 1 (live) OK")
+        return live
+    except Exception as e:
+        if verbose:
+            print(f"  [resolve_with_fallbacks] tier 1 failed: {e}")
+
+    # Tier 2
+    ledger = load_last_good()
+    if ledger and verbose:
+        print(f"  [resolve_with_fallbacks] tier 2 (last-good ledger) -> {ledger}")
+    result = dict(ledger) if ledger else {}
+
+    missing = [k for k in PROVIDERS if k not in result]
+    if not missing:
+        return result
+
+    # Tier 3 — schema-generic prefix-only
+    try:
+        all_models = fetch_openrouter_models()
+        for agent in missing:
+            cfg = PROVIDERS[agent]
+            best = _pick_newest(all_models, cfg)
+            if best is not None:
+                result[agent] = best["id"]
+                if verbose:
+                    print(f"  [resolve_with_fallbacks] tier 3 {agent} -> {best['id']}")
+    except Exception as e:
+        if verbose:
+            print(f"  [resolve_with_fallbacks] tier 3 failed: {e}")
+
+    return result
+
+
 # ---------------------------------------------------------------------------
 # Standalone check
 # ---------------------------------------------------------------------------
 if __name__ == "__main__":
-    print("\u2554" + "\u2550" * 62 + "\u2557")
-    print("\u2551 AIUNION Model Resolver v9 \u2014 OpenRouter schema-based       \u2551")
-    print("\u255a" + "\u2550" * 62 + "\u255d")
+    print("=" * 64)
+    print("AIUNION Model Resolver v10 — OpenRouter schema-based")
+    print("=" * 64)
     print(f"  Source: {MODELS_URL}\n")
     # Force a fresh resolve (skip cache) for standalone check
     if CACHE_FILE.exists():
         CACHE_FILE.unlink()
-    models = resolve_models(verbose=True)
-    print(f"\n  Resolved {len(models)} agents.")
-    print(f"  Cache:  {CACHE_FILE}")
-    print(f"  TTL:    {CACHE_TTL_HOURS}h\n")
+    models = resolve_with_fallbacks(verbose=True)
+    print()
+    print("  Resolved:")
+    for k, v in models.items():
+        print(f"    {k:8s} -> {v}")
