@@ -40,17 +40,11 @@ except ImportError:
 
 # ── Live model resolution via OpenRouter ─────────────────────────────────────
 try:
-    from model_resolver import resolve_models
-    _resolved = resolve_models()
+    from model_resolver import resolve_with_fallbacks
+    _resolved = resolve_with_fallbacks()
 except Exception as e:
-    print(f"[coordinator] model_resolver unavailable ({e}), using hardcoded fallbacks.")
-    _resolved = {
-        "claude": "anthropic/claude-opus-4.7",
-        "gpt":    "openai/gpt-4.1",
-        "gemini": "google/gemini-2.0-flash-001",
-        "grok":   "x-ai/grok-4",
-        "llama":  "meta-llama/llama-4-maverick",
-    }
+    print(f"[coordinator] model_resolver unavailable ({e}); starting with empty model map.")
+    _resolved = {}
 
 try:
     from wallet import (
@@ -643,14 +637,14 @@ def generate_proposals():
     # Re-resolve models fresh from OpenRouter every time we propose,
     # bypassing the 24h cache so we never call a stale/invalid model.
     try:
-        from model_resolver import resolve_models, CACHE_FILE
+        from model_resolver import resolve_with_fallbacks, CACHE_FILE
         if CACHE_FILE.exists():
             CACHE_FILE.unlink()
-        fresh = resolve_models()
+        fresh = resolve_with_fallbacks()
         for key, model_id in fresh.items():
             if key in AGENTS:
                 AGENTS[key]["model"] = model_id
-        print(f" [coordinator] Models refreshed from OpenRouter schema.")
+        print(f" [coordinator] Models refreshed via resolve_with_fallbacks.")
         for _k, _a in AGENTS.items():
             print(f"    {_a['name']:8s} -> {_a['model']}")
     except Exception as e:
@@ -849,6 +843,11 @@ Keep your response SHORT. title: max 8 words (under 60 chars). task/deliverable/
             }
             proposals.append(proposal)
             print(f"  ✓ {agent_info['name']} proposed: {proposal['title']} (${amount_usd} USD)")
+            try:
+                from model_resolver import save_last_good
+                save_last_good(agent_id, agent_info["model"])
+            except Exception:
+                pass
         except Exception as e:
             print(f"  ✗ {agent_info['name']} failed to generate valid proposal: {e}")
             print(f"    Raw response: {str(response)[:200]}")
