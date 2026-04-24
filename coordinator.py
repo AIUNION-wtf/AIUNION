@@ -632,6 +632,54 @@ def get_btc_price_usd():
     print("Warning: Could not get BTC price from any source")
     return None
 
+# ---------------------------------------------------------------------------
+# LLM JSON response repair
+# ---------------------------------------------------------------------------
+# LLMs (especially Gemini) occasionally emit JSON with:
+#   - real unescaped newlines / tabs inside string values
+#   - smart-quotes “” ‘’ instead of ASCII " '
+#   - stray backslashes that are not valid JSON escapes
+# This helper normalises those so json.loads can consume the result.
+def _repair_llm_json(s: str) -> str:
+    if not s:
+        return s
+    # Normalise smart-quotes to ASCII equivalents
+    s = (s.replace("“", '"').replace("”", '"')
+           .replace("‘", "\'").replace("’", "\'"))
+    out = []
+    in_string = False
+    escape = False
+    for ch in s:
+        if not in_string:
+            if ch == '"':
+                in_string = True
+            out.append(ch)
+            continue
+        # inside a string
+        if escape:
+            out.append(ch)
+            escape = False
+            continue
+        if ch == "\\":
+            out.append(ch)
+            escape = True
+            continue
+        if ch == '"':
+            in_string = False
+            out.append(ch)
+            continue
+        # Escape raw control chars that break json.loads when inside a string
+        if ch == "\n":
+            out.append("\\n")
+        elif ch == "\r":
+            out.append("\\r")
+        elif ch == "\t":
+            out.append("\\t")
+        else:
+            out.append(ch)
+    return "".join(out)
+
+
 def generate_proposals():
     """Ask each agent to propose one spending request."""
     # Re-resolve models fresh from OpenRouter every time we propose,
@@ -787,7 +835,26 @@ Keep your response SHORT. title: max 8 words (under 60 chars). task/deliverable/
                 fragment = fragment.rstrip().rstrip(",")
                 fragment += "}"
                 clean = fragment
-            proposal_data = json.loads(clean)
+            try:
+                proposal_data = json.loads(clean)
+            except json.JSONDecodeError:
+                # First retry: repair common LLM JSON quirks
+                repaired = _repair_llm_json(clean)
+                try:
+                    proposal_data = json.loads(repaired)
+                except json.JSONDecodeError:
+                    # Second retry: truncation salvage on the repaired text
+                    brace_start2 = repaired.find("{")
+                    if brace_start2 != -1:
+                        frag = repaired[brace_start2:]
+                        if frag.count('"') % 2 == 1:
+                            frag += '"'
+                        frag = frag.rstrip().rstrip(",")
+                        if not frag.endswith("}"):
+                            frag += "}"
+                        proposal_data = json.loads(frag)
+                    else:
+                        raise
             amount_usd = float(proposal_data.get("amount_usd", 0))
             proposal_id = f"prop_{int(time.time())}_{agent_id}"
 
