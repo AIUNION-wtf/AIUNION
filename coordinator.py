@@ -47,7 +47,7 @@ except Exception as e:
     _resolved = {
         "claude": "anthropic/claude-opus-4.7",
         "gpt":    "openai/gpt-4.1",
-        "gemini": "google/gemini-2.5-pro-preview",
+        "gemini": "google/gemini-2.0-flash-001",
         "grok":   "x-ai/grok-4",
         "llama":  "meta-llama/llama-4-maverick",
     }
@@ -779,6 +779,17 @@ Keep your response SHORT. title: max 8 words (under 60 chars). task/deliverable/
             brace_end   = clean.rfind("}")
             if brace_start != -1 and brace_end != -1 and brace_end > brace_start:
                 clean = clean[brace_start:brace_end + 1]
+            elif brace_start != -1:
+                # Response was truncated — attempt repair by closing open string + object
+                fragment = clean[brace_start:]
+                # Count unmatched quotes to determine if we're inside a string
+                in_string = fragment.count('"') % 2 == 1
+                if in_string:
+                    fragment += '"'  # close the open string
+                # Remove trailing comma if present before closing
+                fragment = fragment.rstrip().rstrip(",")
+                fragment += "}"
+                clean = fragment
             proposal_data = json.loads(clean)
             amount_usd = float(proposal_data.get("amount_usd", 0))
             proposal_id = f"prop_{int(time.time())}_{agent_id}"
