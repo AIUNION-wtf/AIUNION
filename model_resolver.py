@@ -1,15 +1,32 @@
 """
-model_resolver.py — AIUNION Live Model Resolver
-==================================================
-Resolves the best available chat model per provider using two sources:
+model_resolver.py — AIUNION Live Model Resolver (v9, schema-based)
+===================================================================
+Resolves the best available chat model per provider using ONLY the
+OpenRouter /api/v1/models catalogue and its declarative schema.
 
- 1. PRIMARY — Chatbot Arena (arena.ai): scraped from the live leaderboard,
-    backed by ~6M real human preference votes. The top-ranked model per
-    provider that also exists on OpenRouter is used.
+Core idea: instead of matching model names (which change over time),
+filter by declarative capability signals from the OpenRouter schema:
 
- 2. FALLBACK — OpenRouter /api/v1/models: if Arena scraping fails or a
-    provider's top Arena model isn't available on OpenRouter, falls back to
-    keyword + newest filtering against the OpenRouter catalogue.
+  * architecture.output_modalities == ["text"]   — text-only output
+    (blocks image/audio multi-output models that reject plain chat)
+  * architecture.input_modalities contains "text"
+  * pricing.completion > 0                       — paid tier (blocks free)
+  * expiration_date is None                      — not being sunset
+  * "max_tokens" in supported_parameters         — accepts token limit
+
+Per provider, we can optionally require/forbid specific supported_parameters
+to exclude provider-specific problem models (e.g. for OpenAI, we require
+"temperature" to exclude reasoning-only models like o3/gpt-5 that reject
+standard chat completion requests).
+
+Reasoning-capable models (Claude, Gemini, Grok) are safely used because
+coordinator.py sends `reasoning: {effort: "none"}` on every request, which
+disables thinking tokens on models that support them and is ignored by
+models that don't.
+
+Within the filtered set, we pick the newest (by `created` timestamp) —
+this means as providers release new flagship models, the resolver
+automatically starts using them with no code changes.
 
 Results cached for 24h.
 
@@ -18,62 +35,63 @@ Run standalone to check current resolved models:
 """
 
 import json
-import re
 import urllib.request
 from pathlib import Path
 from datetime import datetime, timezone
 
-MODELS_URL  = "https://openrouter.ai/api/v1/models"
-ARENA_URL   = "https://arena.ai/leaderboard/text"
-CACHE_FILE  = Path(__file__).parent / ".model_cache.json"
+MODELS_URL     = "https://openrouter.ai/api/v1/models"
+CACHE_FILE     = Path(__file__).parent / ".model_cache.json"
 CACHE_TTL_HOURS = 24
 
 # ---------------------------------------------------------------------------
 # Provider config
 # ---------------------------------------------------------------------------
-# prefix:    OpenRouter provider prefix to scope model lookup.
-# keywords:  Fallback keyword filter — model id must contain at least one.
-# arena_org: String that appears in the Arena leaderboard "org" cell for
-#            this provider, used to identify their models in the scraped data.
+# prefix   : OpenRouter model ID prefix scoping this provider's models
+# require  : supported_parameters values that MUST be present
+# forbid   : supported_parameters values that MUST NOT be present
+# name_blocklist : case-insensitive substrings that disqualify a model by
+#                  ID — used only as a last-resort safety net for variants
+#                  that the schema cannot distinguish (e.g. "-image-",
+#                  "-audio", "-guard", "-safeguard"). Kept minimal.
 PROVIDERS = {
     "claude": {
-        "prefix":    "anthropic/",
-        "keywords":  ["opus"],
-        "arena_org": "Anthropic",
+        "prefix":         "anthropic/",
+        "require":        [],
+        "forbid":         [],
+        "name_blocklist": ["haiku", "-fast", "-latest"],
     },
     "gpt": {
-        "prefix":    "openai/",
-        "keywords":  ["gpt-4.1", "gpt-4o"],
-        "arena_org": "OpenAI",
+        "prefix":         "openai/",
+        # OpenAI reasoning models (o1/o3/o4/gpt-5) lack "temperature" and
+        # reject our standard chat requests. Requiring temperature filters
+        # them out without naming any specific model.
+        "require":        ["temperature"],
+        "forbid":         ["reasoning"],
+        "name_blocklist": ["oss", "audio", "guard", "safeguard",
+                           "deep-research", "-image", "-mini", "-nano"],
     },
     "gemini": {
-        "prefix":    "google/gemini",
-        "keywords":  ["pro-preview", "gemini-pro", "gemini-2.5-pro"],
-        "arena_org": "Google",
+        "prefix":         "google/gemini",
+        "require":        ["temperature"],
+        "forbid":         [],  # can't forbid reasoning — all new Geminis have it
+        "name_blocklist": ["-image", "-flash-lite", "customtools",
+                           "-lite", "-audio", "embedding"],
     },
     "grok": {
-        "prefix":    "x-ai/",
-        "keywords":  ["grok-4."],
-        "arena_org": "xAI",
+        "prefix":         "x-ai/",
+        "require":        ["temperature"],
+        "forbid":         [],
+        "name_blocklist": ["multi-agent", "customtools", "-image",
+                           "-mini", "-nano", "-fast"],
     },
     "llama": {
-        "prefix":    "meta-llama/",
-        "keywords":  ["maverick", "llama-4"],
-        "arena_org": "Meta",
+        "prefix":         "meta-llama/",
+        "require":        [],
+        "forbid":         [],
+        "name_blocklist": ["guard", "embed", "-scout", "-mini", "-nano",
+                           "prompt-guard"],
     },
 }
-
-# Substrings that disqualify a model from OpenRouter fallback.
-EXCLUDE = [
-    "guard", "embed", "multi-agent", "customtools",
-    "-image-", "image-2", "gemma",
-    "-nano", "-mini", "-lite", "-fast", "-flash", "scout",
-    ":free",
-    # OpenAI reasoning models — require special output_modalities config
-    "/o1", "/o3", "/o4",
-    # Gemini thinking mode — uses hidden tokens that eat into max_tokens
-    "-thinking",
-]
 
 
 # ---------------------------------------------------------------------------
@@ -104,144 +122,58 @@ def save_cache(resolved: dict):
 
 
 # ---------------------------------------------------------------------------
-# Source 1 — Chatbot Arena scraper
-# ---------------------------------------------------------------------------
-def scrape_arena_leaderboard() -> dict[str, str]:
-    """
-    Scrape arena.ai/leaderboard/text and return a dict of
-    arena_org -> arena_model_name for the top-ranked model per org.
-    Model names use Arena's short format (e.g. "claude-opus-4-7").
-    """
-    req = urllib.request.Request(
-        ARENA_URL,
-        headers={"User-Agent": "Mozilla/5.0 (compatible; AIUNION-resolver/1.0)"},
-    )
-    with urllib.request.urlopen(req, timeout=15) as resp:
-        html = resp.read().decode("utf-8", errors="replace")
-
-    # Arena SSR page — model names and orgs are in <td> cells inside a <table>.
-    # Row pattern: <td>RANK</td> ... <td>MODEL_NAME ORG [dot] ...</td>
-    # We parse all <td> text blocks and zip rank+name+org.
-    td_texts = re.findall(r'<td[^>]*>(.*?)</td>', html, re.DOTALL)
-    # Strip HTML tags within cells
-    def strip(s):
-        return re.sub(r'<[^>]+>', '', s).strip()
-
-    clean = [strip(t) for t in td_texts]
-
-    # Table columns (based on observed structure):
-    # 0:rank  1:rank_spread  2:model+org  3:elo  4:ci  5:votes  6:org_badge  ...
-    # We walk in strides of ~7 and pull rank + model_cell
-    best_per_org: dict[str, tuple[int, str]] = {}  # org -> (rank, arena_name)
-
-    i = 0
-    while i < len(clean) - 2:
-        rank_str = clean[i].strip()
-        if not rank_str.isdigit():
-            i += 1
-            continue
-        rank = int(rank_str)
-        # model cell is typically 2 positions ahead
-        model_cell = clean[i + 2] if i + 2 < len(clean) else ""
-        lines = [l.strip() for l in model_cell.split("\n") if l.strip()]
-        if len(lines) < 2:
-            i += 1
-            continue
-        arena_name = lines[0]
-        org_line   = lines[1]  # e.g. "Anthropic [dot] Proprietary"
-        org        = org_line.split()[0].strip() if org_line.split() else ""
-
-        if org and arena_name:
-            if org not in best_per_org or rank < best_per_org[org][0]:
-                best_per_org[org] = (rank, arena_name)
-        i += 1
-
-    return {org: name for org, (_, name) in best_per_org.items()}
-
-
-def arena_name_to_openrouter_id(
-    arena_name: str,
-    prefix: str,
-    all_openrouter_models: list,
-) -> str | None:
-    """
-    Convert an Arena short name (e.g. "claude-opus-4-7") to the matching
-    OpenRouter model ID (e.g. "anthropic/claude-opus-4.7").
-
-    Strategy: normalise both strings (replace - with . and vice-versa, lower)
-    and look for the best substring match among OpenRouter models with prefix.
-    """
-    # Normalise: Arena uses hyphens everywhere, OR uses dots in version numbers
-    def normalise(s: str) -> str:
-        return s.lower().replace(".", "-").replace("_", "-")
-
-    norm_arena = normalise(arena_name)
-    # Remove known Arena-only suffixes that don't appear in OR IDs
-    for suffix in ["-thinking", "-preview", "-beta", "-beta1", "-high"]:
-        norm_arena = norm_arena.replace(normalise(suffix), "")
-    norm_arena = norm_arena.strip("-")
-
-    candidates = [
-        m for m in all_openrouter_models
-        if m.get("id", "").lower().startswith(prefix.lower())
-        and not m.get("expiration_date")
-        and float(m.get("pricing", {}).get("completion", "0") or "0") > 0
-        and not any(ex in m.get("id", "").lower() for ex in EXCLUDE if not ex.startswith("#"))
-    ]
-
-    # Score each candidate by how much of norm_arena appears in normalise(id)
-    scored = []
-    for m in candidates:
-        norm_id = normalise(m["id"])
-        # Count matching tokens
-        tokens = [t for t in norm_arena.split("-") if t]
-        hits = sum(1 for t in tokens if t in norm_id)
-        if hits > 0:
-            scored.append((hits, m.get("created", 0) or 0, m))
-
-    if not scored:
-        return None
-
-    scored.sort(key=lambda x: (x[0], x[1]), reverse=True)
-    return scored[0][2]["id"]
-
-
-# ---------------------------------------------------------------------------
-# Source 2 — OpenRouter fallback
+# OpenRouter catalogue
 # ---------------------------------------------------------------------------
 def fetch_openrouter_models() -> list:
     req = urllib.request.Request(
         MODELS_URL,
-        headers={"User-Agent": "AIUNION-model-resolver/8.0"},
+        headers={"User-Agent": "AIUNION-model-resolver/9.0"},
     )
     with urllib.request.urlopen(req, timeout=15) as resp:
         return json.loads(resp.read().decode()).get("data", [])
 
 
-def pick_best_openrouter(all_models: list, prefix: str, keywords: list) -> dict | None:
-    """Return the newest flagship-tier chat model matching prefix + keywords."""
-    candidates = []
-    for m in all_models:
-        mid = m.get("id", "").lower()
-        if not mid.startswith(prefix.lower()):
-            continue
-        if not any(kw.lower() in mid for kw in keywords):
-            continue
-        if any(ex.lower() in mid for ex in EXCLUDE):
-            continue
-        if m.get("expiration_date"):
-            continue
-        out_mods = m.get("architecture", {}).get("output_modalities", [])
-        if "text" not in out_mods:
-            continue
-        price = float(m.get("pricing", {}).get("completion", "0") or "0")
-        if price <= 0:
-            continue
-        candidates.append(m)
-    if not candidates:
-        return None
-    candidates.sort(key=lambda m: m.get("created", 0) or 0, reverse=True)
-    return candidates[0]
+# ---------------------------------------------------------------------------
+# Filters
+# ---------------------------------------------------------------------------
+def passes_basic_safety(m: dict) -> bool:
+    """Universal schema filter for plain-chat capable models."""
+    arch = m.get("architecture", {}) or {}
+    out_mods = arch.get("output_modalities", []) or []
+    in_mods  = arch.get("input_modalities", []) or []
+    sp       = m.get("supported_parameters", []) or []
+    price    = m.get("pricing", {}) or {}
+
+    if out_mods != ["text"]:
+        return False
+    if "text" not in in_mods:
+        return False
+    try:
+        if float(price.get("completion", "0") or "0") <= 0:
+            return False
+    except (TypeError, ValueError):
+        return False
+    if m.get("expiration_date"):
+        return False
+    if "max_tokens" not in sp:
+        return False
+    return True
+
+
+def passes_provider_filter(m: dict, cfg: dict) -> bool:
+    """Per-provider require/forbid/name_blocklist rules."""
+    sp = m.get("supported_parameters", []) or []
+    for r in cfg["require"]:
+        if r not in sp:
+            return False
+    for f in cfg["forbid"]:
+        if f in sp:
+            return False
+    mid_lower = m.get("id", "").lower()
+    for bad in cfg["name_blocklist"]:
+        if bad.lower() in mid_lower:
+            return False
+    return True
 
 
 # ---------------------------------------------------------------------------
@@ -250,66 +182,42 @@ def pick_best_openrouter(all_models: list, prefix: str, keywords: list) -> dict 
 def resolve_models(verbose: bool = False) -> dict:
     """
     Returns dict of agent_key -> full OpenRouter model ID.
-    Tries Arena first per provider; falls back to OpenRouter keyword filter.
+    Picks the newest model per provider that passes both the basic
+    safety filter and that provider's require/forbid/blocklist rules.
     """
     cached = load_cache()
     if cached:
         if verbose:
-            print(" [using 24h cache]")
+            print("  [using 24h cache]")
             for agent, model in cached.items():
-                print(f"  {agent:8s} -> {model}")
+                print(f"    {agent:8s} -> {model}")
         return cached
 
-    # Fetch OpenRouter catalogue (needed for both Arena ID mapping and fallback)
     if verbose:
-        print(" Fetching OpenRouter model catalogue...")
-    all_or_models = fetch_openrouter_models()
-
-    # Attempt Arena scrape
-    arena_top: dict[str, str] = {}
-    try:
-        if verbose:
-            print(" Scraping Chatbot Arena leaderboard...")
-        arena_top = scrape_arena_leaderboard()
-        if verbose:
-            print(f"  Arena returned top models for {len(arena_top)} orgs.")
-    except Exception as e:
-        if verbose:
-            print(f"  Arena scrape failed ({e}) — using OpenRouter fallback for all providers.")
+        print("  Fetching OpenRouter model catalogue...")
+    all_models = fetch_openrouter_models()
 
     resolved: dict[str, str] = {}
-
     for agent, cfg in PROVIDERS.items():
-        model_id: str | None = None
-        source = "?"
-
-        # --- Try Arena ---
-        arena_org  = cfg["arena_org"]
-        arena_name = arena_top.get(arena_org)
-        if arena_name:
-            model_id = arena_name_to_openrouter_id(arena_name, cfg["prefix"], all_or_models)
-            if model_id:
-                source = f"Arena #{arena_name}"
-            elif verbose:
-                print(f"  [{agent}] Arena pick '{arena_name}' not found on OpenRouter — trying fallback.")
-
-        # --- Fallback: OpenRouter keyword filter ---
-        if not model_id:
-            best = pick_best_openrouter(all_or_models, cfg["prefix"], cfg["keywords"])
-            if best:
-                model_id = best["id"]
-                source = "OpenRouter fallback"
-
-        if not model_id:
+        candidates = [
+            m for m in all_models
+            if m.get("id", "").lower().startswith(cfg["prefix"].lower())
+            and passes_basic_safety(m)
+            and passes_provider_filter(m, cfg)
+        ]
+        if not candidates:
             raise RuntimeError(
-                f"[model_resolver] No model found for '{agent}'. "
-                f"Arena org='{arena_org}', prefix='{cfg['prefix']}'. "
-                f"Check PROVIDERS config."
+                f"[model_resolver] No model found for '{agent}' with "
+                f"prefix='{cfg['prefix']}'. Check PROVIDERS config or "
+                f"OpenRouter availability."
             )
-
-        resolved[agent] = model_id
+        # Newest first
+        candidates.sort(key=lambda m: m.get("created", 0) or 0, reverse=True)
+        best = candidates[0]
+        resolved[agent] = best["id"]
         if verbose:
-            print(f"  {agent:8s} -> {model_id:55s} [{source}]")
+            created_str = datetime.fromtimestamp(best.get("created", 0)).strftime("%Y-%m-%d")
+            print(f"    {agent:8s} -> {best['id']:55s}  (created {created_str})")
 
     save_cache(resolved)
     return resolved
@@ -320,11 +228,13 @@ def resolve_models(verbose: bool = False) -> dict:
 # ---------------------------------------------------------------------------
 if __name__ == "__main__":
     print("\u2554" + "\u2550" * 62 + "\u2557")
-    print("\u2551 AIUNION Model Resolver v8 \u2014 Arena primary / OR fallback \u2551")
+    print("\u2551 AIUNION Model Resolver v9 \u2014 OpenRouter schema-based       \u2551")
     print("\u255a" + "\u2550" * 62 + "\u255d")
-    print(f" Arena:  {ARENA_URL}")
-    print(f" OR API: {MODELS_URL}\n")
+    print(f"  Source: {MODELS_URL}\n")
+    # Force a fresh resolve (skip cache) for standalone check
+    if CACHE_FILE.exists():
+        CACHE_FILE.unlink()
     models = resolve_models(verbose=True)
-    print(f"\n Resolved {len(models)} agents.")
-    print(f" Cache: {CACHE_FILE}")
-    print(f" TTL:   {CACHE_TTL_HOURS}h\n")
+    print(f"\n  Resolved {len(models)} agents.")
+    print(f"  Cache:  {CACHE_FILE}")
+    print(f"  TTL:    {CACHE_TTL_HOURS}h\n")
