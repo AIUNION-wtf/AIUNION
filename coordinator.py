@@ -112,6 +112,11 @@ AGENTS = {
     },
 }
 
+# Log the resolved model for each agent so failures are self-diagnosing
+print("[coordinator] Resolved agent models:")
+for _k, _a in AGENTS.items():
+    print(f"    {_a['name']:8s} -> {_a['model']}")
+
 QUORUM = 3  # votes needed to pass
 
 # ── Directive ────────────────────────────────────────────────────────────────
@@ -275,7 +280,10 @@ def call_openrouter(agent_key, prompt, max_tokens=2048):
         result = client.chat.completions.create(
             model=AGENTS[agent_key]["model"],
             messages=[{"role": "user", "content": prompt}],
-            max_tokens=max_tokens
+            max_tokens=max_tokens,
+            # Disable reasoning/thinking tokens for reliable JSON output.
+            # Has no effect on models that don't support reasoning.
+            extra_body={"reasoning": {"effort": "none"}},
         )
         content = result.choices[0].message.content
         if content is None:
