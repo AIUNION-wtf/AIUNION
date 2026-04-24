@@ -69,6 +69,10 @@ EXCLUDE = [
     "-image-", "image-2", "gemma",
     "-nano", "-mini", "-lite", "-fast", "-flash", "scout",
     ":free",
+    # OpenAI reasoning models — require special output_modalities config
+    "/o1", "/o3", "/o4",
+    # Gemini thinking mode — uses hidden tokens that eat into max_tokens
+    "-thinking",
 ]
 
 
@@ -182,6 +186,7 @@ def arena_name_to_openrouter_id(
         if m.get("id", "").lower().startswith(prefix.lower())
         and not m.get("expiration_date")
         and float(m.get("pricing", {}).get("completion", "0") or "0") > 0
+        and not any(ex in m.get("id", "").lower() for ex in EXCLUDE if not ex.startswith("#"))
     ]
 
     # Score each candidate by how much of norm_arena appears in normalise(id)
