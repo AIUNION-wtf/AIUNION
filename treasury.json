@@ -1,8 +1,8 @@
 {
-  "updated_at": "2026-04-25T09:10:55.427605",
-  "balance_btc": 0.00080165,
-  "balance_usd": 62.25,
-  "btc_price_usd": 77648.985,
+  "updated_at": "2026-04-25T09:22:54.829043",
+  "balance_btc": 0.00073971,
+  "balance_usd": 57.44,
+  "btc_price_usd": 77653.975,
   "address": "bc1pjjmjypmzqgqkjxrhx0hpmaetlk75k04gh9hvkexmmfqyl5g7sjfsk4cge7",
   "wallet_type": "Taproot Miniscript 3-of-5",
   "proposals": [
@@ -240,7 +240,9 @@
         }
       },
       "vote_count_yes": 4,
-      "vote_count_no": 1
+      "vote_count_no": 1,
+      "payment_status": "failed",
+      "payment_error": ""
     },
     {
       "id": "prop_1772704818_gpt",
@@ -2770,7 +2772,10 @@
         }
       },
       "vote_count_yes": 3,
-      "vote_count_no": 2
+      "vote_count_no": 2,
+      "payment_txid": "ff2a2934b7b2551ba4e2820af7d3bdfb78ee4781e51e5bd61b327f4b2d27c7a2",
+      "payment_status": "broadcast",
+      "paid_at": "2026-04-25T09:21:45.978949"
     },
     {
       "id": "prop_1774481242_llama",
@@ -5885,7 +5890,10 @@
         }
       },
       "vote_count_yes": 5,
-      "vote_count_no": 0
+      "vote_count_no": 0,
+      "payment_txid": "4d920fa7d6d7d92d27c391b12aa85874b0d0aee121d93a00daf4b1aa83717278",
+      "payment_status": "broadcast",
+      "paid_at": "2026-04-25T09:22:53.396424"
     },
     {
       "id": "prop_1776063922_grok",
@@ -9606,7 +9614,7 @@
       "amount": 0.0002928,
       "vout": 25,
       "abandoned": false,
-      "confirmations": 8170,
+      "confirmations": 8173,
       "blockhash": "00000000000000000000f82d36e3070f1060692d80539c0bf222efaaa9093d06",
       "blockheight": 938386,
       "blockindex": 179,
@@ -9625,7 +9633,7 @@
       "amount": 0.0005178,
       "vout": 0,
       "abandoned": false,
-      "confirmations": 6622,
+      "confirmations": 6625,
       "blockhash": "000000000000000000000c2deef1f2422d18ebfd62531c052427b9bf8adffc2b",
       "blockheight": 939934,
       "blockindex": 586,
@@ -9637,6 +9645,23 @@
       "time": 1773030702,
       "timereceived": 1773030702,
       "bip125-replaceable": "no"
+    },
+    {
+      "address": "bc1pnz7w0e5jhhlal4pdp0xxwy9vhgfpzst3x5mykq38q6syfua2vr8qxs72vy",
+      "category": "send",
+      "amount": -5.795e-05,
+      "vout": 1,
+      "fee": -3.99e-06,
+      "confirmations": 0,
+      "trusted": true,
+      "txid": "ff2a2934b7b2551ba4e2820af7d3bdfb78ee4781e51e5bd61b327f4b2d27c7a2",
+      "wtxid": "7032033bf81ffacf9024e533f14e590351cf02d2d0cef47a3b8762c93037538d",
+      "walletconflicts": [],
+      "mempoolconflicts": [],
+      "time": 1777108916,
+      "timereceived": 1777108916,
+      "bip125-replaceable": "yes",
+      "abandoned": false
     }
   ],
   "stats": {
