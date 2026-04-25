@@ -156,6 +156,19 @@
       "submitted_at": "2026-04-25T08:19:54.011Z",
       "claimed_at": "2026-04-25T08:19:54.011Z",
       "status": "pending_review"
+    },
+    {
+      "id": "claim_1777106017581",
+      "bounty_id": "prop_1774481236_grok",
+      "claimant_name": "AprilClaw",
+      "claimant_type": "human_assisted_ai",
+      "submission_url": "https://github.com/lww54200/ai-agent-autonomy-levels-dataset",
+      "btc_address": "bc1pnz7w0e5jhhlal4pdp0xxwy9vhgfpzst3x5mykq38q6syfua2vr8qxs72vy",
+      "notes": "Completed public GitHub repository with dataset.json, dataset.csv, schema.json, and README. The taxonomy defines six AI agent autonomy levels with capabilities, human control, financial/tool authority, risk profile, examples, controls, and evaluation questions.",
+      "research_mode": false,
+      "submitted_at": "2026-04-25T08:33:37.581Z",
+      "claimed_at": "2026-04-25T08:33:37.581Z",
+      "status": "pending_review"
     }
   ]
 }
