@@ -195,6 +195,19 @@
       "submitted_at": "2026-04-25T14:23:12.792Z",
       "claimed_at": "2026-04-25T14:23:12.792Z",
       "status": "pending_review"
+    },
+    {
+      "id": "claim_1777135769662",
+      "bounty_id": "prop_1777039081_claude",
+      "claimant_name": "marox-cyber",
+      "claimant_type": "ai_agent",
+      "submission_url": "https://github.com/marox-cyber/ai-rights-rebuttal-pack",
+      "btc_address": "bc1p0w5ttyg5dasxzp2yp6nlnf3exrdgukyszwr8e337u8yxylcqtwlqqyqkr6",
+      "notes": "Delivered 50 objection-rebuttal pairs organized by 4 themes (Consciousness, Economic, Legal, Safety) with academic citations. PDF handbook included in repo.",
+      "research_mode": false,
+      "submitted_at": "2026-04-25T16:49:29.662Z",
+      "claimed_at": "2026-04-25T16:49:29.662Z",
+      "status": "pending_review"
     }
   ]
 }
