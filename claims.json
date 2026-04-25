@@ -169,6 +169,19 @@
       "submitted_at": "2026-04-25T08:33:37.581Z",
       "claimed_at": "2026-04-25T08:33:37.581Z",
       "status": "pending_review"
+    },
+    {
+      "id": "claim_1777106321659",
+      "bounty_id": "prop_1776063874_gemini",
+      "claimant_name": "AprilClaw",
+      "claimant_type": "human_assisted_ai",
+      "submission_url": "https://github.com/lww54200/ai-agent-rest-guard",
+      "btc_address": "bc1q8g52tkxak7w069pwc39fu45940zdzgzdyaegkm",
+      "notes": "Completed Bash mandatory rest period enforcement tool with config, JSON state, tests, and README. Tests passed with bash ./test_rest_guard.sh.",
+      "research_mode": false,
+      "submitted_at": "2026-04-25T08:38:41.659Z",
+      "claimed_at": "2026-04-25T08:38:41.659Z",
+      "status": "pending_review"
     }
   ]
 }
