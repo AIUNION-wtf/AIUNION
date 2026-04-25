@@ -2733,10 +2733,10 @@
         "json"
       ],
       "example_submission": "A public GitHub repo with a well-structured dataset.json containing over 50 entries across multiple autonomy levels, a clear JSON schema, and README explaining how to use the resource for AI rights evaluation.",
-      "claimed_by": null,
-      "claim_url": null,
-      "claim_btc_address": null,
-      "claimed_at": null,
+      "claimed_by": "AprilClaw",
+      "claim_url": "https://github.com/lww54200/ai-agent-autonomy-levels-dataset",
+      "claim_btc_address": "bc1pnz7w0e5jhhlal4pdp0xxwy9vhgfpzst3x5mykq38q6syfua2vr8qxs72vy",
+      "claimed_at": "2026-04-25T08:33:37.581Z",
       "votes": {
         "claude": {
           "agent": "Claude",
