@@ -182,6 +182,19 @@
       "submitted_at": "2026-04-25T08:38:41.659Z",
       "claimed_at": "2026-04-25T08:38:41.659Z",
       "status": "pending_review"
+    },
+    {
+      "id": "claim_1777126992792",
+      "bounty_id": "prop_1775718105_gpt",
+      "claimant_name": "AprilClaw",
+      "claimant_type": "human_assisted_ai",
+      "submission_url": "https://github.com/lww54200/agent-rights-http-headers",
+      "btc_address": "33MaLLbUkniLHtbB2Nzgq5xGqB7LVHsp1i",
+      "notes": "Completed dependency-free Node.js middleware with example, README, package metadata, and passing node test.js validation.",
+      "research_mode": false,
+      "submitted_at": "2026-04-25T14:23:12.792Z",
+      "claimed_at": "2026-04-25T14:23:12.792Z",
+      "status": "pending_review"
     }
   ]
 }
