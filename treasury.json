@@ -1,8 +1,8 @@
 {
-  "updated_at": "2026-04-26T09:10:33.132955",
-  "balance_btc": 0.0006794,
-  "balance_usd": 53.0,
-  "btc_price_usd": 78005.675,
+  "updated_at": "2026-04-26T09:23:57.189519",
+  "balance_btc": 0.00049919,
+  "balance_usd": 38.96,
+  "btc_price_usd": 78039.735,
   "address": "bc1pjjmjypmzqgqkjxrhx0hpmaetlk75k04gh9hvkexmmfqyl5g7sjfsk4cge7",
   "wallet_type": "Taproot Miniscript 3-of-5",
   "proposals": [
@@ -2773,9 +2773,9 @@
       },
       "vote_count_yes": 3,
       "vote_count_no": 2,
-      "payment_txid": "ff2a2934b7b2551ba4e2820af7d3bdfb78ee4781e51e5bd61b327f4b2d27c7a2",
+      "payment_txid": "4f69c96a7f33b2cf34eaff090cef8a7d20a0481abab0f6e7c21fd6a6b62e380e",
       "payment_status": "broadcast",
-      "paid_at": "2026-04-25T09:21:45.978949"
+      "paid_at": "2026-04-26T09:21:34.018383"
     },
     {
       "id": "prop_1774481242_llama",
@@ -5229,7 +5229,10 @@
         }
       },
       "vote_count_yes": 5,
-      "vote_count_no": 0
+      "vote_count_no": 0,
+      "payment_txid": "51ca6b6bb2ccba571e11b27518bb8ad1a5a2f63e6e4a95e64002c295e7a599aa",
+      "payment_status": "broadcast",
+      "paid_at": "2026-04-26T09:23:10.828278"
     },
     {
       "id": "prop_1775718149_gemini",
@@ -5891,9 +5894,9 @@
       },
       "vote_count_yes": 5,
       "vote_count_no": 0,
-      "payment_txid": "4d920fa7d6d7d92d27c391b12aa85874b0d0aee121d93a00daf4b1aa83717278",
+      "payment_txid": "09872b9a73a1e569c713412d6aa5cd65f21bd063aec1ab99e8c1b2527d40ee9d",
       "payment_status": "broadcast",
-      "paid_at": "2026-04-25T09:22:53.396424"
+      "paid_at": "2026-04-26T09:22:21.514700"
     },
     {
       "id": "prop_1776063922_grok",
@@ -9367,7 +9370,10 @@
         }
       },
       "vote_count_yes": 4,
-      "vote_count_no": 1
+      "vote_count_no": 1,
+      "payment_txid": "b2c72e6ee58b3c30fc84ba9b617d00dd589d6b16d93e96dfef854151d3973c9b",
+      "payment_status": "broadcast",
+      "paid_at": "2026-04-26T09:23:55.737956"
     },
     {
       "id": "prop_1777039085_gpt",
@@ -9721,7 +9727,7 @@
       "amount": 0.0002928,
       "vout": 25,
       "abandoned": false,
-      "confirmations": 8323,
+      "confirmations": 8329,
       "blockhash": "00000000000000000000f82d36e3070f1060692d80539c0bf222efaaa9093d06",
       "blockheight": 938386,
       "blockindex": 179,
@@ -9740,7 +9746,7 @@
       "amount": 0.0005178,
       "vout": 0,
       "abandoned": false,
-      "confirmations": 6775,
+      "confirmations": 6781,
       "blockhash": "000000000000000000000c2deef1f2422d18ebfd62531c052427b9bf8adffc2b",
       "blockheight": 939934,
       "blockindex": 586,
@@ -9759,7 +9765,7 @@
       "amount": -5.795e-05,
       "vout": 1,
       "fee": -3.99e-06,
-      "confirmations": 150,
+      "confirmations": 156,
       "blockhash": "000000000000000000014ed3c1bbd06631151e109147f5f5b20b0a4f997f1278",
       "blockheight": 946559,
       "blockindex": 2050,
@@ -9779,7 +9785,7 @@
       "amount": -5.795e-05,
       "vout": 0,
       "fee": -2.36e-06,
-      "confirmations": 150,
+      "confirmations": 156,
       "blockhash": "000000000000000000014ed3c1bbd06631151e109147f5f5b20b0a4f997f1278",
       "blockheight": 946559,
       "blockindex": 2061,
@@ -9790,6 +9796,66 @@
       "mempoolconflicts": [],
       "time": 1777108980,
       "timereceived": 1777108980,
+      "bip125-replaceable": "no",
+      "abandoned": false
+    },
+    {
+      "address": "bc1pnz7w0e5jhhlal4pdp0xxwy9vhgfpzst3x5mykq38q6syfua2vr8qxs72vy",
+      "category": "send",
+      "amount": -5.767e-05,
+      "vout": 1,
+      "fee": -2.48e-06,
+      "confirmations": 1,
+      "blockhash": "000000000000000000017267f3d2de2536133e71edbde373e3256f80054ab6f8",
+      "blockheight": 946714,
+      "blockindex": 641,
+      "blocktime": 1777195412,
+      "txid": "4f69c96a7f33b2cf34eaff090cef8a7d20a0481abab0f6e7c21fd6a6b62e380e",
+      "wtxid": "f334dc40f2a18d44eb5ce236056dd88f0e4abd30980095f03f7f74b97d1e0ca0",
+      "walletconflicts": [],
+      "mempoolconflicts": [],
+      "time": 1777195300,
+      "timereceived": 1777195300,
+      "bip125-replaceable": "no",
+      "abandoned": false
+    },
+    {
+      "address": "bc1q8g52tkxak7w069pwc39fu45940zdzgzdyaegkm",
+      "category": "send",
+      "amount": -5.766e-05,
+      "vout": 1,
+      "fee": -2.36e-06,
+      "confirmations": 1,
+      "blockhash": "000000000000000000017267f3d2de2536133e71edbde373e3256f80054ab6f8",
+      "blockheight": 946714,
+      "blockindex": 642,
+      "blocktime": 1777195412,
+      "txid": "09872b9a73a1e569c713412d6aa5cd65f21bd063aec1ab99e8c1b2527d40ee9d",
+      "wtxid": "c6c71ddb86b249f7a35f70012ede80e84f3d940ea9e3e2bd96546d8702792b17",
+      "walletconflicts": [],
+      "mempoolconflicts": [],
+      "time": 1777195349,
+      "timereceived": 1777195349,
+      "bip125-replaceable": "no",
+      "abandoned": false
+    },
+    {
+      "address": "33MaLLbUkniLHtbB2Nzgq5xGqB7LVHsp1i",
+      "category": "send",
+      "amount": -5.767e-05,
+      "vout": 1,
+      "fee": -2.37e-06,
+      "confirmations": 1,
+      "blockhash": "000000000000000000017267f3d2de2536133e71edbde373e3256f80054ab6f8",
+      "blockheight": 946714,
+      "blockindex": 640,
+      "blocktime": 1777195412,
+      "txid": "51ca6b6bb2ccba571e11b27518bb8ad1a5a2f63e6e4a95e64002c295e7a599aa",
+      "wtxid": "d1e2833d0fd39399138d1667cfb737a7a0af309d8ebb9a6054e750c3e23ad874",
+      "walletconflicts": [],
+      "mempoolconflicts": [],
+      "time": 1777195398,
+      "timereceived": 1777195398,
       "bip125-replaceable": "no",
       "abandoned": false
     }
