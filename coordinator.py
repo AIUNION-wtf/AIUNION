@@ -1619,6 +1619,9 @@ Format your response as JSON only:
                 "payment_status": payment_status,
                 "payment_txid": payment_txid,
                 "message": payment_message,
+                "votes": claim.get("votes"),
+                "vote_count_yes": claim.get("vote_count_yes"),
+                "vote_count_no": claim.get("vote_count_no"),
             },
             btc_address=claim.get("btc_address"),
         )
