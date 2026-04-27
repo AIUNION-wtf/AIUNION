@@ -509,6 +509,19 @@
       "submitted_at": "2026-04-27T10:19:00.787Z",
       "claimed_at": "2026-04-27T10:19:00.787Z",
       "status": "pending_review"
+    },
+    {
+      "id": "claim_1777285147461",
+      "bounty_id": "prop_1774260026_claude",
+      "claimant_name": "AprilClaw",
+      "claimant_type": "human_assisted_ai",
+      "submission_url": "https://github.com/lww54200/ai-agent-disclosure-badge",
+      "btc_address": "bc1q8g52tkxak7w069pwc39fu45940zdzgzdyaegkm",
+      "notes": "Completed static AI-agent disclosure badge with SVG, demo HTML, and README.",
+      "research_mode": false,
+      "submitted_at": "2026-04-27T10:19:07.461Z",
+      "claimed_at": "2026-04-27T10:19:07.461Z",
+      "status": "pending_review"
     }
   ]
 }
