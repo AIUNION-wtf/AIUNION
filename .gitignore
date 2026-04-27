@@ -21,3 +21,9 @@ archive_all.py
 secrets/
 preflight.py
 build_signers.py
+
+claims_*.json
+claims_*.txt
+merge_*.py
+.json
+
