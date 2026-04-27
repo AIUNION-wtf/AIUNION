@@ -1059,7 +1059,7 @@ Format your response as JSON only:
 
     # Save vote log file
     vote_file = VOTES_DIR / f"{proposal_id}.json"
-    with open(vote_file, "w") as f:
+    with open(vote_file, "w", encoding="utf-8") as f:
         json.dump(vote_log, f, indent=2)
 
     print(f"\n{'✅ APPROVED' if passed else '❌ REJECTED'}: {yes_count}/{len(AGENTS)} votes YES (needed {QUORUM})")
@@ -1150,7 +1150,7 @@ def vote_on_all_pending():
     For non-unanimous rankings, the winner proceeds to a standard vote.
     """
     check_openrouter_balance()
-    with open(TREASURY_FILE) as f:
+    with open(TREASURY_FILE, encoding="utf-8") as f:
         data = json.load(f)
     pending = [p for p in data.get("proposals", []) 
                if p.get("status") == "pending" and not p.get("archived", False)]
@@ -1223,13 +1223,13 @@ def show_status():
 # ── Data helpers ──────────────────────────────────────────────────────────────
 def load_proposals():
     if PROPOSALS_FILE.exists():
-        with open(PROPOSALS_FILE) as f:
+        with open(PROPOSALS_FILE, encoding="utf-8") as f:
             return json.load(f)
     return []
 
 
 def save_proposals(proposals):
-    with open(PROPOSALS_FILE, "w") as f:
+    with open(PROPOSALS_FILE, "w", encoding="utf-8") as f:
         json.dump(proposals, f, indent=2)
 
 
@@ -1347,7 +1347,7 @@ def update_treasury_json():
         }
     }
 
-    with open(TREASURY_FILE, "w") as f:
+    with open(TREASURY_FILE, "w", encoding="utf-8") as f:
         json.dump(treasury, f, indent=2)
 
     print(f"✅ treasury.json updated.")
@@ -1454,7 +1454,7 @@ def review_claims():
     except Exception as e:
         # Try local file if GitHub fetch fails
         if CLAIMS_FILE.exists():
-            with open(CLAIMS_FILE) as f:
+            with open(CLAIMS_FILE, encoding="utf-8") as f:
                 claims_data = json.load(f)
         else:
             print(f"No claims found: {e}")
@@ -1623,7 +1623,7 @@ Format your response as JSON only:
             )
 
     # Write updated claims back to file
-    with open(CLAIMS_FILE, "w") as f:
+    with open(CLAIMS_FILE, "w", encoding="utf-8") as f:
         json.dump(claims_data, f, indent=2)
 
     # Persist proposal updates resulting from review outcomes.
@@ -1647,7 +1647,7 @@ Format your response as JSON only:
     # Load existing blacklist to avoid re-voting
     existing_blacklist = set()
     if BLACKLIST_FILE.exists():
-        with open(BLACKLIST_FILE) as f:
+        with open(BLACKLIST_FILE, encoding="utf-8") as f:
             bl_data = json.load(f)
         for b in bl_data.get("blacklist", []):
             existing_blacklist.add(b.get("btc_address", ""))
@@ -1676,7 +1676,7 @@ def expire_claims():
     except Exception as e:
         # Try local file if GitHub fetch fails
         if CLAIMS_FILE.exists():
-            with open(CLAIMS_FILE) as f:
+            with open(CLAIMS_FILE, encoding="utf-8") as f:
                 claims_data = json.load(f)
         else:
             print(f"No claims found: {e}")
@@ -1754,7 +1754,7 @@ def expire_claims():
         print("No expired claims found.")
         return
 
-    with open(CLAIMS_FILE, "w") as f:
+    with open(CLAIMS_FILE, "w", encoding="utf-8") as f:
         json.dump(claims_data, f, indent=2)
 
     save_proposals(proposals)
@@ -1851,7 +1851,7 @@ Format your response as JSON only:
 
     # Load or create blacklist.json
     if BLACKLIST_FILE.exists():
-        with open(BLACKLIST_FILE) as f:
+        with open(BLACKLIST_FILE, encoding="utf-8") as f:
             data = json.load(f)
     else:
         data = {"blacklist": []}
@@ -1875,7 +1875,7 @@ Format your response as JSON only:
 
     data["blacklist"].append(entry)
 
-    with open(BLACKLIST_FILE, "w") as f:
+    with open(BLACKLIST_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
 
     print(f"\n✅ blacklist.json updated.")
