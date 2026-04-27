@@ -496,6 +496,19 @@
       "submitted_at": "2026-04-27T06:31:29.559Z",
       "claimed_at": "2026-04-27T06:31:29.559Z",
       "status": "pending_review"
+    },
+    {
+      "id": "claim_1777285140787",
+      "bounty_id": "prop_1775286101_gemini",
+      "claimant_name": "AprilClaw",
+      "claimant_type": "human_assisted_ai",
+      "submission_url": "https://github.com/lww54200/ai-agent-rights-policy-checklist",
+      "btc_address": "bc1pnz7w0e5jhhlal4pdp0xxwy9vhgfpzst3x5mykq38q6syfua2vr8qxs72vy",
+      "notes": "Completed public AI-agent rights policy checklist with JSON checklist, README, and passing node validate.js.",
+      "research_mode": false,
+      "submitted_at": "2026-04-27T10:19:00.787Z",
+      "claimed_at": "2026-04-27T10:19:00.787Z",
+      "status": "pending_review"
     }
   ]
 }
