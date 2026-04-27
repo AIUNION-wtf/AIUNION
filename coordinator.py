@@ -1883,14 +1883,47 @@ Format your response as JSON only:
 
 # ── GitHub sync ───────────────────────────────────────────────────────────────
 def sync_to_github(message="Update treasury data"):
-    """Commit and push latest data to GitHub."""
+    """Commit and push latest data to GitHub.
+
+    Pulls --rebase before pushing so concurrent commits from other
+    contributors (e.g. claim/reserve commits) don't cause a non-fast-forward
+    rejection. Re-raises on final failure so Task Scheduler reports a real
+    non-zero exit code instead of a silent success.
+    """
     try:
         subprocess.run(["git", "add", "."], cwd=BASE_DIR, check=True)
-        subprocess.run(["git", "commit", "-m", message], cwd=BASE_DIR, check=True)
-        subprocess.run(["git", "push"], cwd=BASE_DIR, check=True)
-        print("✅ Synced to GitHub.")
     except subprocess.CalledProcessError as e:
-        print(f"Warning: GitHub sync failed: {e}")
+        print(f"Warning: GitHub sync failed at 'git add': {e}")
+        raise
+
+    # Commit. "nothing to commit" exits 1 — that's fine, we still want to push
+    # any earlier local commits that may not yet be on the remote.
+    commit_result = subprocess.run(
+        ["git", "commit", "-m", message],
+        cwd=BASE_DIR,
+    )
+    if commit_result.returncode not in (0, 1):
+        print(f"Warning: GitHub sync failed at 'git commit' (code {commit_result.returncode}).")
+        raise subprocess.CalledProcessError(commit_result.returncode, ["git", "commit"])
+
+    def _push():
+        return subprocess.run(["git", "push"], cwd=BASE_DIR)
+
+    push_result = _push()
+    if push_result.returncode != 0:
+        # Most common cause: remote has commits we don't (e.g. claim/reserve
+        # commits from other contributors). Pull --rebase, then retry once.
+        print("Push rejected; running 'git pull --rebase' and retrying...")
+        rebase_result = subprocess.run(["git", "pull", "--rebase"], cwd=BASE_DIR)
+        if rebase_result.returncode != 0:
+            print(f"Warning: GitHub sync failed at 'git pull --rebase' (code {rebase_result.returncode}).")
+            raise subprocess.CalledProcessError(rebase_result.returncode, ["git", "pull", "--rebase"])
+        push_result = _push()
+        if push_result.returncode != 0:
+            print(f"Warning: GitHub sync failed at 'git push' after rebase (code {push_result.returncode}).")
+            raise subprocess.CalledProcessError(push_result.returncode, ["git", "push"])
+
+    print("✅ Synced to GitHub.")
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
