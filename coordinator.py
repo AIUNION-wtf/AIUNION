@@ -1367,9 +1367,18 @@ def process_approved_claim_payment(claim, bounty, votes):
 
     Returns a payment result dict that can be persisted into claim/proposal records.
     """
+    # Idempotency: refuse to pay if any record of an existing on-chain payment
+    # exists. Checks all known payment-record fields including the payments[]
+    # array introduced by the duplicate-payment audit-trail merge.
     existing_payment = claim.get("payment", {}) or {}
     if existing_payment.get("status") == "broadcast" and existing_payment.get("txid"):
         return existing_payment
+    if claim.get("payment_txid"):
+        return {"status": "broadcast", "txid": claim["payment_txid"], "skipped": "already_paid"}
+    if claim.get("payments"):
+        last = (claim["payments"] or [{}])[-1] or {}
+        if last.get("txid"):
+            return {"status": "broadcast", "txid": last["txid"], "skipped": "already_paid"}
 
     if TreasuryWallet is None or AgentPsbtSigner is None:
         raise PaymentError(
@@ -1890,6 +1899,24 @@ def sync_to_github(message="Update treasury data"):
     rejection. Re-raises on final failure so Task Scheduler reports a real
     non-zero exit code instead of a silent success.
     """
+    # Guard: refuse to sync if we are not on a real branch (e.g. mid-rebase or
+    # detached HEAD). Otherwise commits get stranded and we silently double-pay
+    # next run because origin/main never sees the payment record.
+    try:
+        branch = subprocess.check_output(
+            ["git", "symbolic-ref", "--short", "HEAD"],
+            cwd=BASE_DIR, stderr=subprocess.STDOUT,
+        ).decode().strip()
+    except subprocess.CalledProcessError:
+        raise RuntimeError(
+            "sync_to_github aborted: HEAD is detached (not on a branch). "
+            "Resolve any in-progress rebase/merge before running coordinator."
+        )
+    if branch != "main":
+        raise RuntimeError(
+            f"sync_to_github aborted: on branch {branch!r}, expected 'main'."
+        )
+
     try:
         subprocess.run(["git", "add", "."], cwd=BASE_DIR, check=True)
     except subprocess.CalledProcessError as e:
