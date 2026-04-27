@@ -14075,9 +14075,9 @@
     },
     "vote_count_yes": 4,
     "vote_count_no": 0,
-    "payment_txid": "801333baec39654d0c2bd20bef38c0d223d6c58f83cf7e3c74f6c798a2df8e7e",
+    "payment_txid": "f3f83273e2daa0c27c783ad592285e4a3e234d0bfb16e95f8dd0570954e1560c",
     "payment_status": "broadcast",
-    "paid_at": "2026-04-27T09:21:03.482253"
+    "paid_at": "2026-04-27T13:45:19.172612"
   },
   {
     "id": "prop_1776963896_grok",

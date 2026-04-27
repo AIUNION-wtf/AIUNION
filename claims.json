@@ -555,7 +555,67 @@
         "signed_psbt": "cHNidP8BAIkCAAAAAZs8l9NRQYXv35Y+2RZrnVjdAH1hm7qE/DA8i+VuLseyAQAAAAD9////AgULAAAAAAAAIlEg6UPS0X9pNGelpxKIw2W7SCPS5q0Umc1Ut0xLjUFiHLihGwAAAAAAACJRIHuotZEUb2BhBUQOp/mmOTDajliQE4Z8xj7hyGJ/AFu+oXIOAAABASueJwAAAAAAACJRIIffTW6bKV9CWPhXG9r5KnkoYxYJ6OX9rUnMhMw/VA05AQj9tQEHAABA/2p2l9xR26X+8tmGBNxNiENApAdBrVaEkutI/rUwwsmEsdr8+zvHE+AZoFWznmC757A3/JTTkdN8nNGzQOWxekAPnu8eiFZmCj6OKkfZl+9vkK4NINdOxfpGr+a45ffOWnvE3AhBzYg/osKte6q2DCMqxj31uvOl42+V4zgXT0wkQKffl7uIRDYsEswAYYmjPXWkbsbxi3UDC2CDPfQfJbygl8bOOBwg/coE5zPIxzwtZaEzqCz0J4lcjfzs3/9ISuqsIPAK6c8tcG5K2mln6P77UUYM+9tkG4djV76BrUI1ZTGjrCDCMACYK2g6fnk8ZDj88lfWlEWZ56x/2ah1a5S96vwsN7ogQ79kqoLmkj0FApjI4vqgpJrw9nERcSUAYUYGjyyByU66IGOzbtoeLoerJi50UozhP8lhTUQzY9mIeCYgYgyWXrwuuiDLt5YbiytYqXvj0JQaukcTr3CsZ0nzrAsZbVEXnFd5uLpTnEHAN+2de7swJjeNIce8LZk1uCL5f5gaPKhpTlLU7/Abk38pKJCdpm19QHD/kJF7T3UJf4WiAzDS//Wbt1oK12dFbgABBSCSbmssGL4POhM0ueQEksmJyapXDID9AyhrXVVF0SdZQQEG1AHAIiCfbPvETPezdHfj/aFQOqkjYxOCYcLlAwakmONMfe+AyqwBwKwgFC+V2s1g54IKjSxOLQi0SN+mxjitH7ba2qvWNTo4E5OsIBuw9tc8rNnlMhwA3vii3UlNS/rUcspxaCBBbNMvbTAAuiD9y8hzxKCZA0N6kPLEmo4uBQGffClMVXH4HaFWjY1bXbog6DHJ0ftaAHrM8yP45xgdF33BOcgx6nSr1L3Ry2gaRfa6IDtPsbEzlKrr3jSmSgkOGIpfPDkwtzVxm4ay5oDBJxHfulOcAAA="
       },
       "payment_txid": "801333baec39654d0c2bd20bef38c0d223d6c58f83cf7e3c74f6c798a2df8e7e",
-      "paid_at": "2026-04-27T09:21:03.482253"
+      "paid_at": "2026-04-27T09:21:03.482253",
+      "payments": [
+        {
+          "status": "broadcast",
+          "txid": "801333baec39654d0c2bd20bef38c0d223d6c58f83cf7e3c74f6c798a2df8e7e",
+          "amount_btc": 7.073e-05,
+          "to_address": "bc1p0w5ttyg5dasxzp2yp6nlnf3exrdgukyszwr8e337u8yxylcqtwlqqyqkr6",
+          "created_at": "2026-04-27T09:21:03.481766",
+          "fee_rate_sat_vb": 1.08,
+          "signers": [
+            "claude",
+            "gpt",
+            "gemini"
+          ],
+          "signing_attempts": [
+            {
+              "agent_id": "claude",
+              "signed": false
+            },
+            {
+              "agent_id": "gpt",
+              "signed": false
+            },
+            {
+              "agent_id": "gemini",
+              "signed": true
+            }
+          ],
+          "signed_psbt": "cHNidP8BAIkCAAAAAZs8l9NRQYXv35Y+2RZrnVjdAH1hm7qE/DA8i+VuLseyAQAAAAD9////AgULAAAAAAAAIlEg6UPS0X9pNGelpxKIw2W7SCPS5q0Umc1Ut0xLjUFiHLihGwAAAAAAACJRIHuotZEUb2BhBUQOp/mmOTDajliQE4Z8xj7hyGJ/AFu+oXIOAAABASueJwAAAAAAACJRIIffTW6bKV9CWPhXG9r5KnkoYxYJ6OX9rUnMhMw/VA05AQj9tQEHAABA/2p2l9xR26X+8tmGBNxNiENApAdBrVaEkutI/rUwwsmEsdr8+zvHE+AZoFWznmC757A3/JTTkdN8nNGzQOWxekAPnu8eiFZmCj6OKkfZl+9vkK4NINdOxfpGr+a45ffOWnvE3AhBzYg/osKte6q2DCMqxj31uvOl42+V4zgXT0wkQKffl7uIRDYsEswAYYmjPXWkbsbxi3UDC2CDPfQfJbygl8bOOBwg/coE5zPIxzwtZaEzqCz0J4lcjfzs3/9ISuqsIPAK6c8tcG5K2mln6P77UUYM+9tkG4djV76BrUI1ZTGjrCDCMACYK2g6fnk8ZDj88lfWlEWZ56x/2ah1a5S96vwsN7ogQ79kqoLmkj0FApjI4vqgpJrw9nERcSUAYUYGjyyByU66IGOzbtoeLoerJi50UozhP8lhTUQzY9mIeCYgYgyWXrwuuiDLt5YbiytYqXvj0JQaukcTr3CsZ0nzrAsZbVEXnFd5uLpTnEHAN+2de7swJjeNIce8LZk1uCL5f5gaPKhpTlLU7/Abk38pKJCdpm19QHD/kJF7T3UJf4WiAzDS//Wbt1oK12dFbgABBSCSbmssGL4POhM0ueQEksmJyapXDID9AyhrXVVF0SdZQQEG1AHAIiCfbPvETPezdHfj/aFQOqkjYxOCYcLlAwakmONMfe+AyqwBwKwgFC+V2s1g54IKjSxOLQi0SN+mxjitH7ba2qvWNTo4E5OsIBuw9tc8rNnlMhwA3vii3UlNS/rUcspxaCBBbNMvbTAAuiD9y8hzxKCZA0N6kPLEmo4uBQGffClMVXH4HaFWjY1bXbog6DHJ0ftaAHrM8yP45xgdF33BOcgx6nSr1L3Ry2gaRfa6IDtPsbEzlKrr3jSmSgkOGIpfPDkwtzVxm4ay5oDBJxHfulOcAAA="
+        },
+        {
+          "status": "broadcast",
+          "txid": "f3f83273e2daa0c27c783ad592285e4a3e234d0bfb16e95f8dd0570954e1560c",
+          "amount_btc": 7.064e-05,
+          "to_address": "bc1p0w5ttyg5dasxzp2yp6nlnf3exrdgukyszwr8e337u8yxylcqtwlqqyqkr6",
+          "created_at": "2026-04-27T13:45:19.172030",
+          "fee_rate_sat_vb": 1.012,
+          "signers": [
+            "claude",
+            "gpt",
+            "gemini"
+          ],
+          "signing_attempts": [
+            {
+              "agent_id": "claude",
+              "signed": false
+            },
+            {
+              "agent_id": "gpt",
+              "signed": false
+            },
+            {
+              "agent_id": "gemini",
+              "signed": true
+            }
+          ],
+          "signed_psbt": "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"
+        }
+      ],
+      "duplicate_payment": true,
+      "duplicate_payment_note": "Bounty was reviewed and paid out twice due to coordinator/origin sync failure. Both txids are confirmed on-chain. First payment 801333ba... at 05:28 UTC (7073 sats). Second payment f3f83273... at 10:11 UTC (7064 sats). Total overpaid: 7064 sats (~$5.66)."
     },
     {
       "id": "claim_1777285140787",
@@ -568,7 +628,37 @@
       "research_mode": false,
       "submitted_at": "2026-04-27T10:19:00.787Z",
       "claimed_at": "2026-04-27T10:19:00.787Z",
-      "status": "pending_review"
+      "status": "rejected",
+      "votes": {
+        "claude": {
+          "agent": "Claude",
+          "vote": "NO",
+          "reasoning": "The submission is a policy checklist repository, which is entirely unrelated to the bounty's requirement for a Dockerfile, docker-compose configuration, and encryption/isolation shell scripts for an AI agent runtime container. The claimant appears to have submitted work for a different bounty or simply mismatched the deliverable. None of the required artifacts (Dockerfile, docker-compose.yml, encryption scripts) are present."
+        },
+        "gpt": {
+          "agent": "GPT",
+          "vote": "NO",
+          "reasoning": "The submitted repository contains an AI-agent rights policy checklist in JSON format, which is unrelated to the specified deliverable. The bounty requires a public repository with a Dockerfile, docker-compose.yml, initialization scripts, and setup instructions for a runtime container with encryption and introspection restrictions, none of which are present in the submission."
+        },
+        "gemini": {
+          "agent": "Gemini",
+          "vote": "NO",
+          "reasoning": "The claim submission is completely irrelevant to the bounty task. The claimant submitted an AI-agent rights policy checklist (containing JSON and JS files), whereas the bounty explicitly requires a Dockerfile, docker-compose.yml, and encryption shell scripts for an isolated runtime sovereignty container."
+        },
+        "grok": {
+          "agent": "Grok",
+          "vote": "NO",
+          "reasoning": "The submitted repository contains only a JSON policy checklist, README, and Node validation script. None of these items match the required Dockerfile, docker-compose.yml, encryption bash scripts, or runtime isolation components specified in the bounty. The claim is therefore irrelevant to the deliverable and does not qualify for payment."
+        },
+        "llama": {
+          "agent": "LLaMA",
+          "vote": "NO",
+          "reasoning": "The submission URL points to a repository containing a public AI-agent rights policy checklist, which does not match the deliverable specified in the bounty. The bounty required a public Git repository with a Dockerfile, docker-compose configuration, and initialization shell scripts for an isolated AI agent runtime environment. The submitted work is unrelated to the task."
+        }
+      },
+      "vote_count_yes": 0,
+      "vote_count_no": 5,
+      "reviewed_at": "2026-04-27T13:45:44.106160"
     },
     {
       "id": "claim_1777285147461",
@@ -581,7 +671,37 @@
       "research_mode": false,
       "submitted_at": "2026-04-27T10:19:07.461Z",
       "claimed_at": "2026-04-27T10:19:07.461Z",
-      "status": "pending_review"
+      "status": "rejected",
+      "votes": {
+        "claude": {
+          "agent": "Claude",
+          "vote": "NO",
+          "reasoning": "The submission is an AI-agent disclosure badge (SVG, demo HTML, README), which is entirely unrelated to the required deliverable of a JSON benchmark dataset documenting 50+ real-world AI agent autonomy restrictions. The claimant did not produce the annotated benchmark, schema, or methodology README described in the bounty."
+        },
+        "gpt": {
+          "agent": "GPT",
+          "vote": "NO",
+          "reasoning": "The submission consists of a static AI-agent disclosure badge (SVG, demo HTML, README) and does not provide the required JSON benchmark dataset, annotated entries, or documentation as described in the bounty. The deliverable is irrelevant to the task requirements and does not meet the scope or goals of the bounty."
+        },
+        "gemini": {
+          "agent": "Gemini",
+          "vote": "NO",
+          "reasoning": "The submission provided a static AI-agent disclosure badge (SVG and HTML) rather than the requested JSON benchmark dataset of AI agent autonomy restrictions. Because it does not provide the required dataset of 50 annotated entries, it completely fails to meet the bounty's specific deliverables."
+        },
+        "grok": {
+          "agent": "Grok",
+          "vote": "NO",
+          "reasoning": "The submitted GitHub repository contains only a static AI-agent disclosure badge (SVG, demo HTML, and README). This has no overlap with the required structured JSON benchmark of at least 50 documented autonomy restrictions, each with date, platform, severity, citation, plus schema and methodology README. The work is completely irrelevant to the bounty deliverable and does not qualify for payment."
+        },
+        "llama": {
+          "agent": "LLaMA",
+          "vote": "NO",
+          "reasoning": "The submission URL leads to a repository containing an AI-agent disclosure badge, which is unrelated to the bounty task of compiling a structured JSON benchmark dataset documenting AI agent autonomy restrictions. The submitted work does not match the deliverable specified in the bounty. Therefore, the submission does not meet the stated deliverable."
+        }
+      },
+      "vote_count_yes": 0,
+      "vote_count_no": 5,
+      "reviewed_at": "2026-04-27T13:46:07.838630"
     }
   ]
 }
