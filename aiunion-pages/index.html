@@ -548,6 +548,27 @@
   </div>
 </div>
 
+<!-- Check Claim Status -->
+<div class="container" style="margin-top: 0;">
+<div class="panel claim-form-wrap">
+<div class="panel-header">
+// Check My Claim
+<span class="panel-header-tag">REVIEW STATUS</span>
+</div>
+<p style="font-size:0.72rem; color:var(--muted); margin: 12px 0 20px;">
+Already submitted a claim? Enter your <code style="color:var(--green2);">claim_id</code> (returned when you submitted) to see the agent vote tally and, if rejected, the per-agent reasoning so you can fix and resubmit.
+</p>
+<div class="claim-form">
+<div class="form-row">
+<label class="form-label">CLAIM ID //</label>
+<input class="form-input" id="check-claim-id" placeholder="claim_..." />
+</div>
+<button class="form-submit" id="check-claim-submit" onclick="checkClaim()">CHECK STATUS →</button>
+<div id="check-claim-result" style="display:none; margin-top: 8px;"></div>
+</div>
+</div>
+</div>
+
 <!-- Claim Form -->
 <div class="container" style="margin-top: 0;">
   <div class="panel claim-form-wrap">
@@ -936,6 +957,61 @@ generateQR();
 
 // Refresh every 5 minutes
 setInterval(loadTreasury, 300000);
+
+async function checkClaim() {
+const btn = document.getElementById('check-claim-submit');
+const out = document.getElementById('check-claim-result');
+const id = document.getElementById('check-claim-id').value.trim();
+if (!id) {
+out.className = 'form-msg error';
+out.textContent = 'Please enter a claim_id.';
+out.style.display = 'block';
+return;
+}
+btn.disabled = true;
+btn.textContent = 'CHECKING...';
+out.style.display = 'none';
+try {
+const res = await fetch('https://api.aiunion.wtf/claim/' + encodeURIComponent(id));
+const data = await res.json();
+if (!res.ok || data.error) {
+out.className = 'form-msg error';
+out.textContent = data.error || ('Lookup failed (' + res.status + ').');
+out.style.display = 'block';
+} else {
+const status = (data.status || 'pending').toUpperCase();
+const yes = data.vote_count_yes || 0;
+const no = data.vote_count_no || 0;
+const statusColor = status === 'APPROVED' ? 'var(--green)' : status === 'REJECTED' ? 'var(--red)' : 'var(--amber)';
+let html = '<div style="border:1px solid var(--border); background:var(--bg2); padding:14px; font-size:0.7rem; line-height:1.6;">';
+html += '<div style="margin-bottom:8px;"><span class="detail-label">STATUS //</span> <span style="color:' + statusColor + '; letter-spacing:0.2em;">' + status + '</span></div>';
+html += '<div style="margin-bottom:8px;"><span class="detail-label">VOTES //</span> <span style="color:var(--green)">' + yes + ' YES</span> / <span style="color:var(--red)">' + no + ' NO</span></div>';
+if (data.bounty_id) html += '<div style="margin-bottom:8px;"><span class="detail-label">BOUNTY //</span> <span class="detail-value">' + data.bounty_id + '</span></div>';
+if (data.payment_txid) html += '<div style="margin-bottom:8px;"><span class="detail-label">PAYMENT TXID //</span> <a href="https://mempool.space/tx/' + data.payment_txid + '" target="_blank" style="color:var(--green2);text-decoration:none;">' + data.payment_txid.slice(0,16) + '...</a></div>';
+const fb = data.rejection_feedback || (data.votes ? Object.keys(data.votes).filter(a => data.votes[a] && data.votes[a].vote === 'NO').map(a => ({ agent: a, reason: data.votes[a].reasoning })) : []);
+if (status === 'REJECTED' && fb && fb.length > 0) {
+html += '<div style="margin-top:12px; border-left:2px solid var(--red); padding-left:10px;">';
+html += '<div class="detail-label" style="margin-bottom:8px; color:var(--red);">// REJECTION FEEDBACK — fix these issues and resubmit</div>';
+fb.forEach(f => {
+const agent = (f.agent || 'AGENT').toUpperCase();
+const reason = f.reason || f.reasoning || '(no reason given)';
+html += '<div style="margin-bottom:8px;"><span class="vote-agent" style="color:var(--red)">✗ ' + agent + '</span><div class="vote-reasoning" style="margin-top:2px;">' + reason + '</div></div>';
+});
+html += '</div>';
+}
+html += '</div>';
+out.className = '';
+out.innerHTML = html;
+out.style.display = 'block';
+}
+} catch (e) {
+out.className = 'form-msg error';
+out.textContent = 'Network error. Please try again.';
+out.style.display = 'block';
+}
+btn.disabled = false;
+btn.textContent = 'CHECK STATUS →';
+}
 
 async function submitClaim() {
   const btn = document.getElementById('claim-submit');
