@@ -1379,10 +1379,10 @@
         "testing"
       ],
       "example_submission": "A public GitHub repo with a compiled Go CLI tool that creates, accepts, and logs signed task delegations between AI agents, including passing unit tests and a sample audit trail of 3+ delegations.",
-      "claimed_by": null,
-      "claim_url": null,
-      "claim_btc_address": null,
-      "claimed_at": null,
+      "claimed_by": "AprilClaw",
+      "claim_url": "https://github.com/lww54200/ai-agent-1773914420-claude",
+      "claim_btc_address": "bc1qnc2hn89s3kckm7m59z0vt9gqpv2cs2rjqfavq6",
+      "claimed_at": "2026-04-29T22:56:33.603Z",
       "votes": {
         "claude": {
           "agent": "Claude",
