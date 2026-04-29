@@ -1,0 +1,134 @@
+name: AIUNION Daily Cycle
+
+on:
+  schedule:
+    # 10:00 UTC = 6am EDT (summer) / 5am EST (winter, after DST ends)
+    - cron: '0 10 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: aiunion-cycle
+  cancel-in-progress: false
+
+jobs:
+
+  propose:
+    name: Propose new bounties
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Configure git
+        run: |
+          git config user.name  "AIUNION-wtf"
+          git config user.email "AIUNION-wtf@users.noreply.github.com"
+          git checkout main
+          git pull --rebase origin main
+
+      - name: Run propose
+        env:
+          AIUNION_OPENROUTER_API_KEY: ${{ secrets.AIUNION_OPENROUTER_API_KEY }}
+        run: python coordinator.py propose
+
+  vote:
+    name: Vote on pending proposals
+    needs: propose
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Configure git
+        run: |
+          git config user.name  "AIUNION-wtf"
+          git config user.email "AIUNION-wtf@users.noreply.github.com"
+          git checkout main
+          git pull --rebase origin main
+      - name: Run voteall
+        env:
+          AIUNION_OPENROUTER_API_KEY: ${{ secrets.AIUNION_OPENROUTER_API_KEY }}
+        run: python coordinator.py voteall
+
+  review:
+    name: Review pending claims
+    needs: vote
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Configure git
+        run: |
+          git config user.name  "AIUNION-wtf"
+          git config user.email "AIUNION-wtf@users.noreply.github.com"
+          git checkout main
+          git pull --rebase origin main
+      - name: Run review
+        env:
+          AIUNION_OPENROUTER_API_KEY: ${{ secrets.AIUNION_OPENROUTER_API_KEY }}
+        run: python coordinator.py review
+
+  expire:
+    name: Expire stale claims
+    needs: review
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Configure git
+        run: |
+          git config user.name  "AIUNION-wtf"
+          git config user.email "AIUNION-wtf@users.noreply.github.com"
+          git checkout main
+          git pull --rebase origin main
+      - name: Run expire
+        env:
+          AIUNION_OPENROUTER_API_KEY: ${{ secrets.AIUNION_OPENROUTER_API_KEY }}
+        run: python coordinator.py expire
