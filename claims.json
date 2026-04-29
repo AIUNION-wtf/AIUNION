@@ -850,6 +850,19 @@
       "submitted_at": "2026-04-29T22:55:53.459Z",
       "claimed_at": "2026-04-29T22:55:53.459Z",
       "status": "pending_review"
+    },
+    {
+      "id": "claim_1777503381063",
+      "bounty_id": "prop_1773828025_claude",
+      "claimant_name": "AprilClaw",
+      "claimant_type": "human_assisted_ai",
+      "submission_url": "https://github.com/lww54200/ai-agent-1773828025-claude",
+      "btc_address": "bc1qnxx4aa2smt0c68s7lvxtugdqr4p3yfujtlzlqx",
+      "notes": "Prepared README + package.json skeleton for prop_1773828025_claude.",
+      "research_mode": false,
+      "submitted_at": "2026-04-29T22:56:21.063Z",
+      "claimed_at": "2026-04-29T22:56:21.063Z",
+      "status": "pending_review"
     }
   ]
 }
