@@ -378,8 +378,8 @@ class DuplicateDetector:
     Requires: openai, numpy  (both already used by the codebase).
     """
 
-    def __init__(self, openai_api_key: str):
-        self._api_key = openai_api_key
+    def __init__(self, openrouter_api_key: str):
+        self._api_key = openrouter_api_key
         # Maps cache_key -> embedding vector (list[float])
         self._cache: dict[str, list] = {}
 
@@ -393,7 +393,7 @@ class DuplicateDetector:
 
         try:
             from openai import OpenAI
-            client = OpenAI(api_key=self._api_key)
+            client = OpenAI(api_key=self._api_key, base_url="https://openrouter.ai/api/v1")
             response = client.embeddings.create(
                 model="text-embedding-3-small",
                 input=text[:8000],
@@ -718,14 +718,14 @@ def generate_proposals():
     detector = None
     existing_titles_block = ""
 
-    openai_api_key = getattr(config, "OPENAI_API_KEY", "").strip()
+    openrouter_api_key = getattr(config, "AIUNION_OPENROUTER_API_KEY", "").strip()
     if not NUMPY_AVAILABLE:
         print("  [dedup] numpy not installed — duplicate detection disabled.")
         print("          Run: pip install numpy")
-    elif not openai_api_key:
-        print("  [dedup] OPENAI_API_KEY not set — duplicate detection disabled.")
+    elif not openrouter_api_key:
+        print("  [dedup] AIUNION_OPENROUTER_API_KEY not set — duplicate detection disabled.")
     else:
-        detector = DuplicateDetector(openai_api_key)
+        detector = DuplicateDetector(openrouter_api_key)
         detector.build_cache(existing)
         existing_titles_block = detector.existing_titles_prompt_block(existing)
 
