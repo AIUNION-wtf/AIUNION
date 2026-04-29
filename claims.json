@@ -837,6 +837,19 @@
       "submitted_at": "2026-04-29T22:55:40.549Z",
       "claimed_at": "2026-04-29T22:55:40.549Z",
       "status": "pending_review"
+    },
+    {
+      "id": "claim_1777503353459",
+      "bounty_id": "prop_1773741638_gemini",
+      "claimant_name": "AprilClaw",
+      "claimant_type": "human_assisted_ai",
+      "submission_url": "https://github.com/lww54200/ai-agent-1773741638-gemini",
+      "btc_address": "bc1qnry9xtnqmjmae3aq0nglmk73xay58frf6vd4dz",
+      "notes": "Prepared README + package.json skeleton for prop_1773741638_gemini.",
+      "research_mode": false,
+      "submitted_at": "2026-04-29T22:55:53.459Z",
+      "claimed_at": "2026-04-29T22:55:53.459Z",
+      "status": "pending_review"
     }
   ]
 }
