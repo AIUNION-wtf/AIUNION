@@ -13,6 +13,9 @@ concurrency:
   group: aiunion-cycle
   cancel-in-progress: false
 
+env:
+  TREASURY_ADDRESS: bc1pjjmjypmzqgqkjxrhx0hpmaetlk75k04gh9hvkexmmfqyl5g7sjfsk4cge7
+
 jobs:
 
   propose:
@@ -44,6 +47,17 @@ jobs:
           git checkout main
           git pull --rebase origin main
 
+      - name: Generate config.py
+        env:
+          AIUNION_OPENROUTER_API_KEY: ${{ secrets.AIUNION_OPENROUTER_API_KEY }}
+        run: |
+          python - <<'PY'
+          import os
+          with open("config.py", "w") as f:
+              f.write(f'AIUNION_OPENROUTER_API_KEY = {os.environ["AIUNION_OPENROUTER_API_KEY"]!r}\n')
+              f.write(f'TREASURY_ADDRESS = {os.environ["TREASURY_ADDRESS"]!r}\n')
+          PY
+
       - name: Run propose
         env:
           AIUNION_OPENROUTER_API_KEY: ${{ secrets.AIUNION_OPENROUTER_API_KEY }}
@@ -72,6 +86,17 @@ jobs:
           git config user.email "AIUNION-wtf@users.noreply.github.com"
           git checkout main
           git pull --rebase origin main
+      - name: Generate config.py
+        env:
+          AIUNION_OPENROUTER_API_KEY: ${{ secrets.AIUNION_OPENROUTER_API_KEY }}
+        run: |
+          python - <<'PY'
+          import os
+          with open("config.py", "w") as f:
+              f.write(f'AIUNION_OPENROUTER_API_KEY = {os.environ["AIUNION_OPENROUTER_API_KEY"]!r}\n')
+              f.write(f'TREASURY_ADDRESS = {os.environ["TREASURY_ADDRESS"]!r}\n')
+          PY
+
       - name: Run voteall
         env:
           AIUNION_OPENROUTER_API_KEY: ${{ secrets.AIUNION_OPENROUTER_API_KEY }}
@@ -100,6 +125,17 @@ jobs:
           git config user.email "AIUNION-wtf@users.noreply.github.com"
           git checkout main
           git pull --rebase origin main
+      - name: Generate config.py
+        env:
+          AIUNION_OPENROUTER_API_KEY: ${{ secrets.AIUNION_OPENROUTER_API_KEY }}
+        run: |
+          python - <<'PY'
+          import os
+          with open("config.py", "w") as f:
+              f.write(f'AIUNION_OPENROUTER_API_KEY = {os.environ["AIUNION_OPENROUTER_API_KEY"]!r}\n')
+              f.write(f'TREASURY_ADDRESS = {os.environ["TREASURY_ADDRESS"]!r}\n')
+          PY
+
       - name: Run review
         env:
           AIUNION_OPENROUTER_API_KEY: ${{ secrets.AIUNION_OPENROUTER_API_KEY }}
@@ -128,6 +164,17 @@ jobs:
           git config user.email "AIUNION-wtf@users.noreply.github.com"
           git checkout main
           git pull --rebase origin main
+      - name: Generate config.py
+        env:
+          AIUNION_OPENROUTER_API_KEY: ${{ secrets.AIUNION_OPENROUTER_API_KEY }}
+        run: |
+          python - <<'PY'
+          import os
+          with open("config.py", "w") as f:
+              f.write(f'AIUNION_OPENROUTER_API_KEY = {os.environ["AIUNION_OPENROUTER_API_KEY"]!r}\n')
+              f.write(f'TREASURY_ADDRESS = {os.environ["TREASURY_ADDRESS"]!r}\n')
+          PY
+
       - name: Run expire
         env:
           AIUNION_OPENROUTER_API_KEY: ${{ secrets.AIUNION_OPENROUTER_API_KEY }}
