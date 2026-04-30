@@ -746,10 +746,26 @@
       "vote_count_no": 1,
       "reviewed_at": "2026-04-29T13:54:14.160552",
       "payment": {
-        "status": "failed",
-        "error": "Missing TREASURY_DESCRIPTOR_PUBLIC (or TREASURY_DESCRIPTOR) in config.py",
-        "failed_at": "2026-04-29T13:54:14.199959"
-      }
+        "status": "broadcast",
+        "txid": "41ee86f226251d3cf6c43cb3a65365efea5c559b56f5c3be0eac4ce10221e446",
+        "amount_sats": 7159,
+        "broadcast_at": "2026-04-28T09:45:20",
+        "backfilled_at": "2026-04-30T22:21:56.562",
+        "backfill_note": "On-chain verification (mempool.space block 947009) confirmed payout that was incorrectly recorded as failed during the 2026-04-29 CI run. The descriptor was missing in the cloud config so the second attempt errored before idempotency check, overwriting the prior broadcast record with a misleading failed status.",
+        "reconciled_from_onchain": true
+      },
+      "payment_status": "broadcast",
+      "payment_txid": "41ee86f226251d3cf6c43cb3a65365efea5c559b56f5c3be0eac4ce10221e446",
+      "paid_at": "2026-04-28T09:45:20",
+      "payments": [
+        {
+          "txid": "41ee86f226251d3cf6c43cb3a65365efea5c559b56f5c3be0eac4ce10221e446",
+          "status": "broadcast",
+          "at": "2026-04-28T09:45:20",
+          "amount_sats": 7159,
+          "backfill": true
+        }
+      ]
     },
     {
       "id": "claim_1777449620152",
@@ -794,10 +810,18 @@
       "vote_count_no": 1,
       "reviewed_at": "2026-04-29T13:54:38.002169",
       "payment": {
-        "status": "failed",
-        "error": "Missing TREASURY_DESCRIPTOR_PUBLIC (or TREASURY_DESCRIPTOR) in config.py",
-        "failed_at": "2026-04-29T13:54:38.051371"
-      }
+        "status": "pending_signature",
+        "queued_at": "2026-04-30T22:21:56.562",
+        "amount_usd": 5,
+        "recipient_address": "bc1qkyhm95qt0fnkwljuvcu83g52nhc8sm0m87w0gc",
+        "signer_ids": [
+          "claude",
+          "gpt",
+          "gemini"
+        ],
+        "backfill_note": "Migrated from failed status; original CI run lacked descriptor in cloud env. Will be paid by laptop payout step (Shape B)."
+      },
+      "payment_status": "pending_signature"
     },
     {
       "id": "claim_1777503148995",
