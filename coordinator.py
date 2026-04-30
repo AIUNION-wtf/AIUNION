@@ -69,6 +69,7 @@ BASE_DIR = Path(__file__).parent
 VOTES_DIR = BASE_DIR / "votes"
 PROPOSALS_FILE = BASE_DIR / "proposals.json"
 TREASURY_FILE = BASE_DIR / "treasury.json"
+TREASURY_ADDRESSES_FILE = BASE_DIR / "treasury_addresses.json"
 CLAIMS_FILE = BASE_DIR / "claims.json"
 BLACKLIST_FILE = BASE_DIR / "blacklist.json"
 GITHUB_RAW = "https://raw.githubusercontent.com/AIUNION-wtf/AIUNION/main/claims.json"
@@ -182,44 +183,248 @@ def rpc(method, params=None):
         return result.stdout.strip()
 
 
-def get_balance():
-    """Get current treasury balance in BTC."""
+def _load_treasury_addresses():
+    """Load the registry of treasury-owned addresses from treasury_addresses.json.
+
+    Returns a list of {"address": str, "role": str, ...} dicts. Falls back to
+    [config.TREASURY_ADDRESS] if the file is missing or malformed.
+    """
     try:
-        return float(rpc("getbalance"))
+        if TREASURY_ADDRESSES_FILE.exists():
+            with open(TREASURY_ADDRESSES_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            entries = data.get("addresses", []) if isinstance(data, dict) else []
+            valid = [e for e in entries if isinstance(e, dict) and e.get("address")]
+            if valid:
+                return valid
     except Exception as e:
-        print(f"Warning: Could not get Bitcoin Core balance, trying mempool API: {e}")
+        print(f"Warning: could not read {TREASURY_ADDRESSES_FILE.name}: {e}")
+    fallback = getattr(config, "TREASURY_ADDRESS", "").strip()
+    if fallback:
+        return [{"address": fallback, "role": "fallback", "added_by": "config",
+                 "added_at": datetime.datetime.utcnow().isoformat() + "Z",
+                 "note": "Fallback from config.TREASURY_ADDRESS"}]
+    return []
+
+
+def _save_treasury_addresses(entries):
+    """Write the address registry back to treasury_addresses.json."""
+    try:
+        payload = {
+            "_comment": ("Public addresses owned by the AIUNION treasury wallet. "
+                         "The cycle auto-discovers new change addresses from the "
+                         "on-chain spend graph. Do NOT put any private keys or "
+                         "descriptors in this file."),
+            "addresses": entries,
+        }
+        with open(TREASURY_ADDRESSES_FILE, "w", encoding="utf-8") as f:
+            json.dump(payload, f, indent=2)
+            f.write("\n")
+    except Exception as e:
+        print(f"Warning: could not write {TREASURY_ADDRESSES_FILE.name}: {e}")
+
+
+def _known_claimant_addresses():
+    """Return a set of btc_address strings that are known claimants (not us)."""
+    out = set()
+    try:
+        for p in load_proposals():
+            addr = (p.get("claim_btc_address") or "").strip()
+            if addr:
+                out.add(addr)
+    except Exception:
+        pass
+    return out
+
+
+def _mempool_address_data(address, api_base):
+    """Fetch raw /address/<addr> JSON. Returns dict or None on failure."""
+    try:
+        import urllib.request
+        base = api_base.rstrip("/")
+        req = urllib.request.Request(f"{base}/address/{address}", method="GET")
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            return json.loads(resp.read().decode("utf-8"))
+    except Exception:
+        return None
+
+
+def _mempool_address_txs(address, api_base):
+    """Fetch raw /address/<addr>/txs JSON. Returns list or [] on failure."""
+    try:
+        import urllib.request
+        base = api_base.rstrip("/")
+        req = urllib.request.Request(f"{base}/address/{address}/txs", method="GET")
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+        return data if isinstance(data, list) else []
+    except Exception:
+        return []
+
+
+def discover_treasury_addresses(api_base=None, max_new=50):
+    """Walk the spend graph one hop and append newly-discovered wallet addresses.
+
+    For each known treasury address, fetch tx history. For any tx where ANY input
+    address is one of ours (i.e., a wallet spend), inspect outputs. An output is
+    considered ours when:
+      - its address is not already known
+      - its address is not a known claimant from proposals.json
+      - its current balance per mempool is > 0 (still unspent or partially spent)
+        AND it has only ever received from txs whose inputs include a known
+        treasury address (i.e., no outside life)
+
+    Newly-discovered addresses are appended to treasury_addresses.json.
+    Returns the updated list of entries.
+    """
+    if api_base is None:
+        api_base = getattr(config, "MEMPOOL_API_BASE", "https://mempool.space/api")
+
+    entries = _load_treasury_addresses()
+    known = {e["address"] for e in entries}
+    claimants = _known_claimant_addresses()
+
+    candidates = {}  # address -> first-seen tx time
+
+    for addr in list(known):
+        txs = _mempool_address_txs(addr, api_base)
+        for tx in txs:
+            vins = tx.get("vin", []) or []
+            input_addrs = {(v.get("prevout") or {}).get("scriptpubkey_address")
+                           for v in vins if v.get("prevout")}
+            input_addrs.discard(None)
+            # Only walk if THIS tx is a wallet spend (some input is ours)
+            if not (input_addrs & known):
+                continue
+            for vout in tx.get("vout", []) or []:
+                cand = vout.get("scriptpubkey_address")
+                if not cand or cand in known or cand in claimants:
+                    continue
+                if cand in candidates:
+                    continue
+                candidates[cand] = tx.get("status", {}).get("block_time")
+                if len(candidates) >= max_new:
+                    break
+            if len(candidates) >= max_new:
+                break
+
+    # Validate each candidate: every funding tx for it must have an input that
+    # is one of OUR known addresses (otherwise it has an outside life).
+    accepted = []
+    for cand, _seen in candidates.items():
+        cand_data = _mempool_address_data(cand, api_base)
+        if not cand_data:
+            continue
+        cand_txs = _mempool_address_txs(cand, api_base)
+        ok = True
+        for tx in cand_txs:
+            outs_to_cand = [v for v in tx.get("vout", []) if v.get("scriptpubkey_address") == cand]
+            if not outs_to_cand:
+                continue  # this tx is a spend FROM cand, not a funding of cand
+            input_addrs = {(v.get("prevout") or {}).get("scriptpubkey_address")
+                           for v in tx.get("vin", []) if v.get("prevout")}
+            input_addrs.discard(None)
+            if not (input_addrs & known):
+                ok = False
+                break
+        if ok:
+            accepted.append(cand)
+
+    if not accepted:
+        return entries
+
+    now_iso = datetime.datetime.utcnow().isoformat() + "Z"
+    for addr in accepted:
+        entries.append({
+            "address": addr,
+            "role": "discovered_change",
+            "added_by": "auto_spend_graph_v1",
+            "added_at": now_iso,
+            "note": "Auto-discovered as a change output of a treasury spend.",
+        })
+    _save_treasury_addresses(entries)
+    print(f"  discovered {len(accepted)} new treasury address(es)")
+    return entries
+
+
+def aggregate_treasury_balance(api_base=None):
+    """Sum confirmed+mempool net balance across all treasury addresses (BTC)."""
+    if api_base is None:
+        api_base = getattr(config, "MEMPOOL_API_BASE", "https://mempool.space/api")
+    if mempool_address_balance_btc is None:
+        return None
+    total = 0.0
+    for entry in _load_treasury_addresses():
         try:
-            if mempool_address_balance_btc is None:
-                return None
-            api_base = getattr(config, "MEMPOOL_API_BASE", "https://mempool.space/api")
-            address = getattr(config, "TREASURY_ADDRESS", "").strip()
-            if not address:
-                return None
-            return float(mempool_address_balance_btc(address, api_base=api_base))
-        except Exception as mempool_error:
-            print(f"Warning: Could not get mempool balance: {mempool_error}")
-            return None
+            total += float(mempool_address_balance_btc(entry["address"], api_base=api_base))
+        except Exception as e:
+            print(f"Warning: balance fetch failed for {entry['address'][:12]}...: {e}")
+    return total
+
+
+def aggregate_treasury_transactions(count=10, api_base=None):
+    """Merged recent-tx history across all treasury addresses, newest first."""
+    if api_base is None:
+        api_base = getattr(config, "MEMPOOL_API_BASE", "https://mempool.space/api")
+    if mempool_address_transactions is None:
+        return []
+    seen = set()
+    merged = []
+    for entry in _load_treasury_addresses():
+        try:
+            txs = mempool_address_transactions(entry["address"], count=count, api_base=api_base) or []
+            for tx in txs:
+                key = tx.get("txid") or tx.get("hash") or json.dumps(tx, sort_keys=True)[:64]
+                if key in seen:
+                    continue
+                seen.add(key)
+                merged.append(tx)
+        except Exception as e:
+            print(f"Warning: tx fetch failed for {entry['address'][:12]}...: {e}")
+    def _ts(t):
+        return t.get("block_time") or t.get("time") or t.get("timestamp") or 0
+    merged.sort(key=_ts, reverse=True)
+    return sanitize_transactions(merged[:count])
+
+
+def get_balance():
+    """Get current treasury balance in BTC.
+
+    Aggregates across all addresses in treasury_addresses.json via mempool API
+    (no Bitcoin Core dependency). Falls back to Bitcoin Core RPC only if the
+    mempool aggregate fails AND BITCOIN_CLI/WALLET_NAME are configured.
+    """
+    try:
+        agg = aggregate_treasury_balance()
+        if agg is not None:
+            return float(agg)
+    except Exception as e:
+        print(f"Warning: aggregate_treasury_balance failed: {e}")
+    bitcoin_cli = getattr(config, "BITCOIN_CLI", "").strip()
+    wallet_name = getattr(config, "WALLET_NAME", "").strip()
+    if bitcoin_cli and wallet_name:
+        try:
+            return float(rpc("getbalance"))
+        except Exception as e:
+            print(f"Warning: Bitcoin Core balance fallback failed: {e}")
+    return None
 
 
 def get_recent_transactions(count=10):
-    """Get recent transactions."""
+    """Recent treasury transactions, merged across all known addresses."""
     try:
-        txs = rpc("listtransactions", ["*", count])
-        return sanitize_transactions(txs)
+        return aggregate_treasury_transactions(count=count)
     except Exception as e:
-        print(f"Warning: Could not get Bitcoin Core transactions, trying mempool API: {e}")
+        print(f"Warning: aggregate_treasury_transactions failed: {e}")
+    bitcoin_cli = getattr(config, "BITCOIN_CLI", "").strip()
+    wallet_name = getattr(config, "WALLET_NAME", "").strip()
+    if bitcoin_cli and wallet_name:
         try:
-            if mempool_address_transactions is None:
-                return []
-            api_base = getattr(config, "MEMPOOL_API_BASE", "https://mempool.space/api")
-            address = getattr(config, "TREASURY_ADDRESS", "").strip()
-            if not address:
-                return []
-            txs = mempool_address_transactions(address, count=count, api_base=api_base)
+            txs = rpc("listtransactions", ["*", count])
             return sanitize_transactions(txs)
-        except Exception as mempool_error:
-            print(f"Warning: Could not get mempool transactions: {mempool_error}")
-            return []
+        except Exception as e:
+            print(f"Warning: Bitcoin Core tx fallback failed: {e}")
+    return []
 
 
 SENSITIVE_TX_KEYS = {"parent_descs", "desc", "hdkeypath", "hdseedid"}
@@ -1322,6 +1527,10 @@ def trigger_event_post(event_type: str, **kwargs):
 
 def update_treasury_json():
     """Update treasury.json with current balance and recent txs for dashboard."""
+    try:
+        discover_treasury_addresses()
+    except Exception as e:
+        print(f"Warning: address discovery failed (continuing): {e}")
     balance = get_balance()
     if balance is None:
         balance = 0
