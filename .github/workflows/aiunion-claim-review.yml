@@ -31,7 +31,10 @@ jobs:
     # Skip when the bot itself is the author of the triggering commit, otherwise
     # the review job's own commit would re-trigger this workflow forever.
     # workflow_dispatch always runs.
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.head_commit.author.name != 'AIUNION-wtf' }}
+    # Skip when this workflow's own output (bot review commits) triggered the push,
+    # otherwise the review job's own commit would re-trigger this workflow forever.
+    # workflow_dispatch always runs.
+    if: ${{ github.event_name == 'workflow_dispatch' || !startsWith(github.event.head_commit.message, 'Record claim review votes') }}
     steps:
       - uses: actions/checkout@v4
         with:
