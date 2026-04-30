@@ -1,5 +1,5 @@
 {
-  "_comment": "Public addresses owned by the AIUNION treasury wallet. The cycle auto-discovers new change addresses from the on-chain spend graph and appends them here. Do NOT put any private keys or descriptors in this file.",
+  "_comment": "Public addresses owned by the AIUNION treasury wallet. The cycle auto-discovers new change addresses from the on-chain spend graph. Do NOT put any private keys or descriptors in this file.",
   "addresses": [
     {
       "address": "bc1pjjmjypmzqgqkjxrhx0hpmaetlk75k04gh9hvkexmmfqyl5g7sjfsk4cge7",
@@ -14,6 +14,27 @@
       "added_by": "manual",
       "added_at": "2026-04-30T04:30:00Z",
       "note": "Active receive/change address; held the wallet's full balance at registry creation time."
+    },
+    {
+      "address": "bc1p3xzpzr6ld5kvfzrz4n84s83s6n4w4mhem06r0cx39ywhgjxla7js206sdk",
+      "role": "discovered_change",
+      "added_by": "auto_spend_graph_v1",
+      "added_at": "2026-04-30T17:12:06.859750Z",
+      "note": "Auto-discovered as a change output of a treasury spend."
+    },
+    {
+      "address": "bc1pry5sxuhvt5gpvrn5wwhq3e6qefuvz6s4zcufl6336asku2f398gsyztq0f",
+      "role": "discovered_change",
+      "added_by": "auto_spend_graph_v1",
+      "added_at": "2026-04-30T17:12:06.859750Z",
+      "note": "Auto-discovered as a change output of a treasury spend."
+    },
+    {
+      "address": "bc1puye6jq8653fn4eh44wvl856enlelfc3h8hfsta76euxhzms9waks0h82wg",
+      "role": "discovered_change",
+      "added_by": "auto_spend_graph_v1",
+      "added_at": "2026-04-30T17:12:06.859750Z",
+      "note": "Auto-discovered as a change output of a treasury spend."
     }
   ]
 }
