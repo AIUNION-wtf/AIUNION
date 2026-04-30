@@ -1,0 +1,19 @@
+{
+  "_comment": "Public addresses owned by the AIUNION treasury wallet. The cycle auto-discovers new change addresses from the on-chain spend graph and appends them here. Do NOT put any private keys or descriptors in this file.",
+  "addresses": [
+    {
+      "address": "bc1pjjmjypmzqgqkjxrhx0hpmaetlk75k04gh9hvkexmmfqyl5g7sjfsk4cge7",
+      "role": "donation",
+      "added_by": "manual",
+      "added_at": "2026-04-30T04:30:00Z",
+      "note": "Public donation address advertised in AGENTS.md and README."
+    },
+    {
+      "address": "bc1pjuw9f9hxcfkhevuqr3q6ed6d8a5m9kyrfu0sslqxx4gwhcdre85qrfxyw0",
+      "role": "active",
+      "added_by": "manual",
+      "added_at": "2026-04-30T04:30:00Z",
+      "note": "Active receive/change address; held the wallet's full balance at registry creation time."
+    }
+  ]
+}
