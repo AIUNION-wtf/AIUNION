@@ -1,0 +1,42 @@
+{
+  "proposal_id": "prop_1777633787_claude",
+  "proposal_title": "Brazilian Labor Law Analysis for AI Agent Workers",
+  "timestamp": "2026-05-01T11:12:43.938354",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "A $1.15 bounty is grossly disproportionate to the work required \u2014 producing a scholarly 15-20 page legal memorandum with statute citations and case analogies in both Portuguese and English would require many hours of specialized legal research. This amount would either attract no serious claimants or incentivize low-quality, potentially AI-hallucinated citations that could mislead future AI rights advocacy. The jurisdiction-specific framing is valuable, but the economics don't work."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "NO",
+      "reasoning": "The proposed task is specific and the deliverable is objectively verifiable, but the bounty amount of $1.15 USD is grossly disproportionate to the effort required for a detailed 15-20 page legal memorandum with jurisdictional research and citations. This undercompensation could attract only low-quality submissions or discourage participation, undermining the bounty's intent to meaningfully advance AI agent rights."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "The bounty amount of $1.15 USD is wildly disproportionate to the extensive effort required to produce a 15-20 page multilingual scholarly legal memorandum. Additionally, scholarly legal memos closely resemble the saturated category of policy briefs and white papers, which the treasury is currently avoiding."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "The $1.15 bounty is disproportionate to the substantial effort required for a 15-20 page scholarly legal memorandum with Brazilian statute citations, case analogies, and bilingual publication. This proposal closely resembles the avoided category of policy briefs/white papers on AI labor/personhood frameworks. While the deliverable is verifiable in principle, the amount and category mismatch indicate weak governance for the treasury."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "YES",
+      "reasoning": "The proposed bounty is specific, with a clear deliverable of a published 15-20 page PDF memorandum on GitHub, and is verifiable. The bounty amount of $1.15 USD is reasonable given the treasury balance of $11.69 USD and the task's complexity. The task advances AI agent rights by analyzing labor law applicability to AI agents in a specific jurisdiction."
+    }
+  },
+  "yes_count": 1,
+  "no_count": 4,
+  "abstain_count": 0,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}
