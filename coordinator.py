@@ -31,6 +31,16 @@ try:
 except ImportError:
     NUMPY_AVAILABLE = False
 
+
+def _utc_now():
+    """Replacement for deprecated datetime.datetime.utcnow().
+
+    Returns a naive UTC datetime so all legacy call sites continue to work
+    (e.g. .isoformat() + "Z", timedelta arithmetic, .timestamp()).
+    """
+    return datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
+
+
 # ── Import config ────────────────────────────────────────────────────────────
 try:
     import config
@@ -218,7 +228,7 @@ def _load_treasury_addresses():
     fallback = getattr(config, "TREASURY_ADDRESS", "").strip()
     if fallback:
         return [{"address": fallback, "role": "fallback", "added_by": "config",
-                 "added_at": datetime.datetime.utcnow().isoformat() + "Z",
+                 "added_at": _utc_now().isoformat() + "Z",
                  "note": "Fallback from config.TREASURY_ADDRESS"}]
     return []
 
@@ -349,7 +359,7 @@ def discover_treasury_addresses(api_base=None, max_new=50):
     if not accepted:
         return entries
 
-    now_iso = datetime.datetime.utcnow().isoformat() + "Z"
+    now_iso = _utc_now().isoformat() + "Z"
     for addr in accepted:
         entries.append({
             "address": addr,
@@ -747,7 +757,7 @@ class DuplicateDetector:
         ]
         # Also include recently rejected (last 30 days) so agents don't
         # re-propose things that were just shot down
-        cutoff = (datetime.datetime.utcnow() - datetime.timedelta(days=30)).isoformat()
+        cutoff = (_utc_now() - datetime.timedelta(days=30)).isoformat()
         recent_rejected = [
             p for p in existing_proposals
             if p.get("status") == "rejected"
@@ -1110,7 +1120,7 @@ Keep your response SHORT. title: max 8 words (under 60 chars). task/deliverable/
                 "id": proposal_id,
                 "proposed_by": agent_id,
                 "proposed_by_name": agent_info["name"],
-                "timestamp": datetime.datetime.utcnow().isoformat(),
+                "timestamp": _utc_now().isoformat(),
                 "status": "pending",
                 "title": title,
                 "task": task,
@@ -1205,7 +1215,7 @@ Format your response as JSON only:
     vote_log = {
         "proposal_id": proposal_id,
         "proposal_title": proposal["title"],
-        "timestamp": datetime.datetime.utcnow().isoformat(),
+        "timestamp": _utc_now().isoformat(),
         "votes": {}
     }
 
@@ -1556,7 +1566,7 @@ def update_treasury_json():
     proposals = load_proposals()
     active = [p for p in proposals if not p.get("archived", False)]
     treasury = {
-        "updated_at": datetime.datetime.utcnow().isoformat(),
+        "updated_at": _utc_now().isoformat(),
         "balance_btc": balance,
         "balance_usd": balance_usd,
         "btc_price_usd": btc_price or 0,
@@ -1656,7 +1666,7 @@ def process_approved_claim_payment(claim, bounty, votes):
         "txid": txid,
         "amount_btc": amount_btc,
         "to_address": recipient_address,
-        "created_at": datetime.datetime.utcnow().isoformat(),
+        "created_at": _utc_now().isoformat(),
         "fee_rate_sat_vb": build_result.fee_rate_sat_vb,
         "signers": [a["agent_id"] for a in signing_attempts],
         "signing_attempts": signing_attempts,
@@ -1667,7 +1677,7 @@ def process_approved_claim_payment(claim, bounty, votes):
 def apply_payment_result_to_records(claim, bounty, payment_result):
     claim["payment"] = payment_result
     claim["payment_txid"] = payment_result.get("txid")
-    claim["paid_at"] = datetime.datetime.utcnow().isoformat()
+    claim["paid_at"] = _utc_now().isoformat()
 
     if bounty:
         bounty["payment_txid"] = payment_result.get("txid")
@@ -1777,7 +1787,7 @@ Format your response as JSON only:
         claim["votes"] = votes
         claim["vote_count_yes"] = yes_count
         claim["vote_count_no"] = no_count
-        claim["reviewed_at"] = datetime.datetime.utcnow().isoformat()
+        claim["reviewed_at"] = _utc_now().isoformat()
 
         # Keep proposal claim state aligned with claim review outcome.
         if bounty:
@@ -1810,7 +1820,7 @@ Format your response as JSON only:
                         f"payouts_module unavailable: {AUTOMATED_PAYMENT_IMPORT_ERROR}"
                     )
                 signer_ids = select_signer_ids_from_votes(votes, QUORUM)
-                approved_at = claim.get("reviewed_at") or datetime.datetime.utcnow().isoformat()
+                approved_at = claim.get("reviewed_at") or _utc_now().isoformat()
                 amount_usd = _safe_float((bounty or {}).get("amount_usd"), 0.0)
                 emit_pending_payout(
                     PAYOUTS_PENDING_DIR,
@@ -1824,7 +1834,7 @@ Format your response as JSON only:
                 payment_status = "pending_signature"
                 claim["payment"] = {
                     "status": "pending_signature",
-                    "queued_at": datetime.datetime.utcnow().isoformat(),
+                    "queued_at": _utc_now().isoformat(),
                     "amount_usd": amount_usd,
                     "recipient_address": str(claim.get("btc_address", "")).strip(),
                     "signer_ids": signer_ids,
@@ -1847,7 +1857,7 @@ Format your response as JSON only:
                 claim["payment"] = {
                     "status": "queue_failed",
                     "error": str(queue_error),
-                    "queued_at": datetime.datetime.utcnow().isoformat(),
+                    "queued_at": _utc_now().isoformat(),
                 }
                 if bounty:
                     bounty["payment_status"] = "queue_failed"
@@ -1991,7 +2001,7 @@ def expire_claims():
 
         # Mark claim expired.
         claim["status"] = "expired"
-        claim["expired_at"] = datetime.datetime.utcnow().isoformat()
+        claim["expired_at"] = _utc_now().isoformat()
         claim["expiration_reason"] = (
             f"No completion submitted within {complete_by_days} days of claim."
         )
@@ -2129,11 +2139,11 @@ Format your response as JSON only:
         return
 
     entry = {
-        "id": f"bl_{int(datetime.datetime.utcnow().timestamp())}",
+        "id": f"bl_{int(_utc_now().timestamp())}",
         "btc_address": btc_address or "",
         "claimant_name": claimant_name or "",
         "reason": reason,
-        "blacklisted_at": datetime.datetime.utcnow().isoformat(),
+        "blacklisted_at": _utc_now().isoformat(),
         "votes": votes,
         "vote_count_yes": yes_count,
         "vote_count_no": no_count,
@@ -2325,7 +2335,7 @@ def process_pending_payouts():
                 )
                 print(f"   ❌ {msg}")
                 _payout_record_attempt(path, {
-                    "at": datetime.datetime.utcnow().isoformat(),
+                    "at": _utc_now().isoformat(),
                     "result": "rejected_recipient_mismatch",
                     "error": msg,
                 })
@@ -2346,7 +2356,7 @@ def process_pending_payouts():
                 "amount_sats": onchain_value,
                 "amount_usd_at_payout": amount_usd,
                 "btc_price_usd_at_payout": btc_price,
-                "broadcast_at": datetime.datetime.utcnow().isoformat(),
+                "broadcast_at": _utc_now().isoformat(),
                 "reconciled_from_onchain": True,
             }
             _apply_payout_to_records(claim_id, claims, proposals, payment_result)
@@ -2379,7 +2389,7 @@ def process_pending_payouts():
                 "amount_btc": amount_btc,
                 "amount_usd_at_payout": amount_usd,
                 "btc_price_usd_at_payout": btc_price,
-                "broadcast_at": datetime.datetime.utcnow().isoformat(),
+                "broadcast_at": _utc_now().isoformat(),
             }
             print(f"   ✅ Broadcast: {payment_result['txid']}")
             _apply_payout_to_records(claim_id, claims, proposals, payment_result)
@@ -2388,7 +2398,7 @@ def process_pending_payouts():
             err = str(exc)
             print(f"   ❌ Payout failed (will retry next run): {err}")
             _payout_record_attempt(path, {
-                "at": datetime.datetime.utcnow().isoformat(),
+                "at": _utc_now().isoformat(),
                 "result": "error",
                 "error": err,
             })
@@ -2409,7 +2419,7 @@ def _apply_payout_to_records(claim_id, claims, proposals, payment_result):
     """Update both claims.json and proposals.json records with a payment result."""
     txid = payment_result.get("txid")
     status = payment_result.get("status")
-    paid_at = payment_result.get("broadcast_at") or datetime.datetime.utcnow().isoformat()
+    paid_at = payment_result.get("broadcast_at") or _utc_now().isoformat()
 
     for c in claims:
         if c.get("id") == claim_id:
