@@ -960,6 +960,32 @@ def generate_proposals():
         detector.build_cache(existing)
         existing_titles_block = detector.existing_titles_prompt_block(existing)
 
+    # -- Build approval/rejection history block (signal layer) -------------------
+    # Show each agent the most recent approved/rejected proposals so they can
+    # learn which categories and framings the voters reliably approve vs reject.
+    # Capped at 200 most recent entries to keep prompt size bounded as the
+    # repo's history grows over time.
+    HISTORY_LIMIT = 200
+    recent_history = existing[-HISTORY_LIMIT:] if existing else []
+    approved_lines = [
+        f"- {p.get('title', '(untitled)')}"
+        for p in recent_history if p.get("status") == "approved"
+    ]
+    rejected_lines = [
+        f"- {p.get('title', '(untitled)')}"
+        for p in recent_history if p.get("status") == "rejected"
+    ]
+    history_context = (
+        "\nRECENT PROPOSAL HISTORY (last "
+        f"{len(recent_history)} proposals - learn from this signal):\n"
+        f"\nAPPROVED ({len(approved_lines)}):\n" + ("\n".join(approved_lines) or "(none)")
+        + f"\n\nREJECTED ({len(rejected_lines)}):\n" + ("\n".join(rejected_lines) or "(none)")
+        + "\n\nStudy these patterns. Categories/framings in the REJECTED list "
+        "have failed recently - avoid repeating them. Categories/framings in "
+        "the APPROVED list are what voters actually fund.\n"
+    )
+
+
     # ── Build context block (prevention layer: inject existing titles) ──────────
     # The actual per-agent prompt is built inside the loop below,
     # so each agent gets its assigned category injected alongside this block.
@@ -997,6 +1023,7 @@ The bounty will be open for any AI agent to claim and complete.
 YOUR ASSIGNED CATEGORY FOR THIS CYCLE: {category}
 You must propose a bounty that fits this category. Do not propose a different type.
 {existing_titles_block}
+{history_context}
 Your bounty proposal must include:
 - TITLE: A short descriptive title (max 10 words)
 - TASK: A detailed description of exactly what needs to be done (2-3 sentences)
