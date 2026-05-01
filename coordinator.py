@@ -2243,6 +2243,27 @@ def process_pending_payouts():
 
     print(f"Found {len(pending)} pending payout(s).")
 
+    # Defensive: detect git merge-conflict markers in proposals.json/claims.json
+    # before parsing. If the laptop's working tree has unresolved conflicts,
+    # load_proposals() crashes with an opaque JSONDecodeError. Abort early
+    # with a clear actionable error instead.
+    _conflict_markers = ("<<<<<<<", "=======", ">>>>>>>")
+    for _state_path in (PROPOSALS_FILE, CLAIMS_FILE):
+        if not _state_path.exists():
+            continue
+        try:
+            _raw = _state_path.read_text(encoding="utf-8")
+        except Exception:
+            continue
+        if any(m in _raw for m in _conflict_markers):
+            print(f"❌ Merge conflict markers detected in {_state_path.name}.")
+            print("   Resolve the conflict before running payout. Common fix:")
+            print("     git checkout --theirs " + _state_path.name)
+            print("     git add " + _state_path.name)
+            print("     git commit -m 'Resolve merge'")
+            print("   Aborting; pending payouts left untouched.")
+            return
+
     # Load claim/proposal records once for cross-validation and bookkeeping.
     proposals = load_proposals()
     claims = []
