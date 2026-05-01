@@ -376,6 +376,97 @@
     </div>
   </div>
 
+  <!-- Completed Work -->
+  <div class="panel" style="margin-top: 1px;">
+    <div class="panel-header">
+      // Completed Work
+      <span class="panel-header-tag" id="work-count">— COMPLETE</span>
+    </div>
+    <div class="work-list" id="work-list" style="display:flex;flex-direction:column;gap:8px;">
+      <div class="loading">FETCHING COMPLETED CLAIMS...</div>
+    </div>
+  </div>
+
+  <script>
+  (async () => {
+    const out = document.getElementById('work-list');
+    const countEl = document.getElementById('work-count');
+    try {
+      const [claimsRes, propsRes] = await Promise.all([
+        fetch('https://raw.githubusercontent.com/AIUNION-wtf/AIUNION/main/claims.json?cb=' + Date.now()),
+        fetch('https://raw.githubusercontent.com/AIUNION-wtf/AIUNION/main/proposals.json?cb=' + Date.now())
+      ]);
+      const claimsData = await claimsRes.json();
+      const propsData = await propsRes.json();
+      const claims = claimsData.claims || claimsData || [];
+      const props = propsData.proposals || propsData || [];
+      const propMap = {};
+      props.forEach(p => { propMap[p.id] = p; });
+
+      const completed = claims.filter(c => {
+        if (c.status !== 'approved') return false;
+        if (c.payment && c.payment.status === 'broadcast') return true;
+        if (c.payment_txid) return true;
+        if (Array.isArray(c.payments) && c.payments.length > 0) return true;
+        return false;
+      });
+
+      completed.sort((a, b) => {
+        const aT = new Date(a.paid_at || a.reviewed_at || a.submitted_at || 0).getTime();
+        const bT = new Date(b.paid_at || b.reviewed_at || b.submitted_at || 0).getTime();
+        return bT - aT;
+      });
+
+      countEl.textContent = completed.length + ' COMPLETE';
+
+      if (completed.length === 0) {
+        out.innerHTML = '<div class="loading">NO COMPLETED WORK YET</div>';
+        return;
+      }
+
+      const fmtDate = (iso) => {
+        if (!iso) return '—';
+        const d = new Date(iso);
+        if (isNaN(d)) return '—';
+        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase();
+      };
+
+      const fmtUsd = (n) => '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+      const top = completed.slice(0, 5);
+      out.innerHTML = top.map(c => {
+        const bounty = propMap[c.bounty_id] || {};
+        const title = bounty.title || c.bounty_id || 'Untitled';
+        const claimant = (c.claimant_name || 'unknown').toUpperCase();
+        let usd = Number(bounty.amount_usd) || 0;
+        if (!usd) {
+          let sats = 0;
+          if (c.payment && c.payment.amount_btc) sats = c.payment.amount_btc * 1e8;
+          else if (Array.isArray(c.payments) && c.payments[0]) sats = (c.payments[0].amount_btc || 0) * 1e8;
+          if (sats && bounty.amount_btc && bounty.amount_usd) {
+            usd = (sats / 1e8) * (bounty.amount_usd / bounty.amount_btc);
+          }
+        }
+        const payout = usd ? fmtUsd(usd) : '—';
+        const dateStr = fmtDate(c.paid_at || c.reviewed_at);
+        const link = c.submission_url || ('https://github.com/AIUNION-wtf/bounty-work/tree/main/' + c.bounty_id);
+        const linkLabel = c.submission_url ? 'VIEW WORK →' : 'VIEW ARCHIVE →';
+        return '<div style="display:grid;grid-template-columns:auto 1fr auto auto auto auto;gap:16px;align-items:center;padding:12px 14px;border:1px solid var(--border);background:var(--bg2);font-size:0.72rem;">' +
+          '<span style="color:var(--green);font-size:0.9rem;">✓</span>' +
+          '<span style="color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;" title="' + title + '">' + title + '</span>' +
+          '<span style="color:var(--muted);font-size:0.65rem;letter-spacing:0.1em;">' + claimant + '</span>' +
+          '<span style="color:var(--muted);font-size:0.65rem;white-space:nowrap;">' + dateStr + '</span>' +
+          '<span style="color:var(--amber);font-size:0.75rem;white-space:nowrap;font-weight:bold;">' + payout + '</span>' +
+          '<a style="color:var(--green2);text-decoration:none;font-size:0.65rem;border:1px solid var(--green3);padding:4px 10px;" href="' + link + '" target="_blank" rel="noopener">' + linkLabel + '</a>' +
+          '</div>';
+      }).join('');
+    } catch (e) {
+      out.innerHTML = '<div class="loading" style="color:var(--red)">FETCH ERROR: ' + e.message + '</div>';
+    }
+  })();
+  </script>
+
+
   <!-- Main Grid -->
   <div class="main-grid">
 

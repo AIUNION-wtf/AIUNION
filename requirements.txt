@@ -1,2 +1,5 @@
 bdkpython
 cryptography
+openai
+numpy
+requests

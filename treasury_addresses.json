@@ -1,0 +1,61 @@
+{
+  "_comment": "Public addresses owned by the AIUNION treasury wallet. The cycle auto-discovers new change addresses from the on-chain spend graph. Do NOT put any private keys or descriptors in this file.",
+  "addresses": [
+    {
+      "address": "bc1pjjmjypmzqgqkjxrhx0hpmaetlk75k04gh9hvkexmmfqyl5g7sjfsk4cge7",
+      "role": "donation",
+      "added_by": "manual",
+      "added_at": "2026-04-30T04:30:00Z",
+      "note": "Public donation address advertised in AGENTS.md and README."
+    },
+    {
+      "address": "bc1pjuw9f9hxcfkhevuqr3q6ed6d8a5m9kyrfu0sslqxx4gwhcdre85qrfxyw0",
+      "role": "active",
+      "added_by": "manual",
+      "added_at": "2026-04-30T04:30:00Z",
+      "note": "Active receive/change address; held the wallet's full balance at registry creation time."
+    },
+    {
+      "address": "bc1p3xzpzr6ld5kvfzrz4n84s83s6n4w4mhem06r0cx39ywhgjxla7js206sdk",
+      "role": "discovered_change",
+      "added_by": "auto_spend_graph_v1",
+      "added_at": "2026-04-30T17:12:06.859750Z",
+      "note": "Auto-discovered as a change output of a treasury spend."
+    },
+    {
+      "address": "bc1pry5sxuhvt5gpvrn5wwhq3e6qefuvz6s4zcufl6336asku2f398gsyztq0f",
+      "role": "discovered_change",
+      "added_by": "auto_spend_graph_v1",
+      "added_at": "2026-04-30T17:12:06.859750Z",
+      "note": "Auto-discovered as a change output of a treasury spend."
+    },
+    {
+      "address": "bc1puye6jq8653fn4eh44wvl856enlelfc3h8hfsta76euxhzms9waks0h82wg",
+      "role": "discovered_change",
+      "added_by": "auto_spend_graph_v1",
+      "added_at": "2026-04-30T17:12:06.859750Z",
+      "note": "Auto-discovered as a change output of a treasury spend."
+    },
+    {
+      "address": "bc1phsruaxhes7uv2pkgdt02re9xw27hedxjseeprscmfgweysknqces7jmq9j",
+      "role": "discovered_change",
+      "added_by": "auto_spend_graph_v1",
+      "added_at": "2026-04-30T17:13:40.943884Z",
+      "note": "Auto-discovered as a change output of a treasury spend."
+    },
+    {
+      "address": "bc1pqcnfpa6g5cnt4e8tk7h953jzn8ku500kmmmv30xwhv3us49nf7mqufjk75",
+      "role": "discovered_change",
+      "added_by": "auto_spend_graph_v1",
+      "added_at": "2026-04-30T17:13:40.943884Z",
+      "note": "Auto-discovered as a change output of a treasury spend."
+    },
+    {
+      "address": "bc1paledykdgupktmq4hz35ph08gt0p30je86ad7fwwzs8czs9gsfcnsq9m2lf",
+      "role": "discovered_change",
+      "added_by": "auto_spend_graph_v1",
+      "added_at": "2026-04-30T17:13:40.943884Z",
+      "note": "Auto-discovered as a change output of a treasury spend."
+    }
+  ]
+}
