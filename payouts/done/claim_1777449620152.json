@@ -1,0 +1,9 @@
+{
+  "status": "broadcast",
+  "txid": "5811beb05ad7ff1772057b445580e4c02c3b807a14e588404f238290077df1a3",
+  "amount_sats": 6533,
+  "amount_btc": 6.533e-05,
+  "amount_usd_at_payout": 5.0,
+  "btc_price_usd_at_payout": 76529.705,
+  "broadcast_at": "2026-05-01T03:03:02.900803"
+}

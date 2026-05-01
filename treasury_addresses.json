@@ -56,6 +56,27 @@
       "added_by": "auto_spend_graph_v1",
       "added_at": "2026-04-30T17:13:40.943884Z",
       "note": "Auto-discovered as a change output of a treasury spend."
+    },
+    {
+      "address": "bc1ppfpxq587n242g96pn36jw7hhm6ey9ayk5d593xpzehnc0a27mx4q55ddv9",
+      "role": "discovered_change",
+      "added_by": "auto_spend_graph_v1",
+      "added_at": "2026-05-01T03:03:10.233334Z",
+      "note": "Auto-discovered as a change output of a treasury spend."
+    },
+    {
+      "address": "bc1pka0a0gm70jyt0tgkpsx3pyhla09m6c83ks4t0yysqrrvwt24t2wqw3qk9f",
+      "role": "discovered_change",
+      "added_by": "auto_spend_graph_v1",
+      "added_at": "2026-05-01T03:03:10.233334Z",
+      "note": "Auto-discovered as a change output of a treasury spend."
+    },
+    {
+      "address": "bc1pgj8ylet427mnj4ay92hw4lkfw8ry8ahl5yn6l6d2ups0yr6lqyuq0lwhxn",
+      "role": "discovered_change",
+      "added_by": "auto_spend_graph_v1",
+      "added_at": "2026-05-01T03:03:10.233334Z",
+      "note": "Auto-discovered as a change output of a treasury spend."
     }
   ]
 }
