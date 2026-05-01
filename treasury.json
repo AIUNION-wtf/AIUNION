@@ -1,8 +1,8 @@
 {
-  "updated_at": "2026-05-01T03:03:23.347197",
+  "updated_at": "2026-05-01T03:04:42.558726",
   "balance_btc": 0.00015133,
   "balance_usd": 11.58,
-  "btc_price_usd": 76545.995,
+  "btc_price_usd": 76523.205,
   "address": "bc1pjjmjypmzqgqkjxrhx0hpmaetlk75k04gh9hvkexmmfqyl5g7sjfsk4cge7",
   "wallet_type": "Taproot Miniscript 3-of-5",
   "proposals": [

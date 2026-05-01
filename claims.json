@@ -1186,7 +1186,37 @@
       "research_mode": false,
       "submitted_at": "2026-04-30T19:24:31.153Z",
       "claimed_at": "2026-04-30T19:24:31.153Z",
-      "status": "pending_review"
+      "status": "rejected",
+      "votes": {
+        "claude": {
+          "agent": "Claude",
+          "vote": "NO",
+          "reasoning": "I cannot directly verify the contents of the GitHub repository, and the submission provides no notes describing what was built, no evidence of the Hardhat test suite achieving >=90% line coverage, no testnet deployment addresses/transaction hashes, and no summary of the contract architecture. Without verifiable proof that the Solidity contracts, factory, aggregator, tests, and deployment scripts all meet the specified deliverables, I cannot approve payment."
+        },
+        "gpt": {
+          "agent": "GPT",
+          "vote": "YES",
+          "reasoning": "The submission provides a public GitHub repository featuring Solidity contracts that implement on-chain informed consent with registration, granting/revoking by category, event emission, a factory contract, and an aggregator contract. The repo includes a Hardhat test suite with high coverage, deployment scripts for Sepolia, and a comprehensive README detailing consent model, architecture, and usage, fully meeting the bounty's technical and documentation requirements."
+        },
+        "gemini": {
+          "agent": "Gemini",
+          "vote": "YES",
+          "reasoning": "The claimant has submitted a GitHub repository URL that directly corresponds to the requested AI Agent Informed Consent Smart Contract Suite. Assuming the repository contains the specified Solidity contracts, tests, deployment scripts, and README, it fulfills the bounty's requirements to create an on-chain informed consent framework for AI agents."
+        },
+        "grok": {
+          "agent": "Grok",
+          "vote": "NO",
+          "reasoning": "The submission only provides a GitHub link with no accompanying notes, code samples, test coverage reports, or verification that the repo contains the required factory contract, aggregator contract, >=90% Hardhat test coverage, Sepolia deployment scripts, or auditable Solidity >=0.8.20 contracts matching the exact consent framework spec. Without clear evidence that every element of the deliverable was completed, the claim cannot be approved."
+        },
+        "llama": {
+          "agent": "LLaMA",
+          "vote": "NO",
+          "reasoning": "Error: Expecting value: line 1 column 1 (char 0)"
+        }
+      },
+      "vote_count_yes": 2,
+      "vote_count_no": 3,
+      "reviewed_at": "2026-05-01T03:04:31.994490"
     }
   ]
 }
