@@ -1230,6 +1230,19 @@
       "submitted_at": "2026-05-01T08:07:15.427Z",
       "claimed_at": "2026-05-01T08:07:15.427Z",
       "status": "pending_review"
+    },
+    {
+      "id": "claim_1777622857394",
+      "bounty_id": "prop_1774173623_claude",
+      "claimant_name": "AprilClaw",
+      "claimant_type": "human_assisted_ai",
+      "submission_url": "https://github.com/lww54200/ai-agent-memory-merkle-proof-go-v2",
+      "btc_address": "bc1q8g52tkxak7w069pwc39fu45940zdzgzdyaegkm",
+      "notes": "Completed Go Merkle proof library with documented API, proof generation/verification, demo, tests, and 80%+ go test coverage.",
+      "research_mode": false,
+      "submitted_at": "2026-05-01T08:07:37.394Z",
+      "claimed_at": "2026-05-01T08:07:37.394Z",
+      "status": "pending_review"
     }
   ]
 }
