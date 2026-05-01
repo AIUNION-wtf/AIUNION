@@ -2266,12 +2266,22 @@ def process_pending_payouts():
 
     # Load claim/proposal records once for cross-validation and bookkeeping.
     proposals = load_proposals()
+    claims_doc = {"claims": []}
     claims = []
     if CLAIMS_FILE.exists():
         try:
-            claims = json.loads(CLAIMS_FILE.read_text())
+            claims_doc = json.loads(CLAIMS_FILE.read_text())
         except Exception:
+            claims_doc = {"claims": []}
+        # claims.json is {"claims": [...]} but tolerate a bare list too.
+        if isinstance(claims_doc, dict):
+            claims = claims_doc.get("claims") or []
+        elif isinstance(claims_doc, list):
+            claims = claims_doc
+            claims_doc = {"claims": claims}
+        else:
             claims = []
+            claims_doc = {"claims": []}
     treasury_addresses = []
     try:
         treasury_addresses = [
@@ -2386,7 +2396,12 @@ def process_pending_payouts():
     # Persist updated proposals/claims back to disk.
     save_proposals(proposals)
     if CLAIMS_FILE.exists():
-        CLAIMS_FILE.write_text(json.dumps(claims, indent=2))
+        # Keep the document wrapper intact; claims list mutated in place above.
+        if isinstance(claims_doc, dict):
+            claims_doc["claims"] = claims
+            CLAIMS_FILE.write_text(json.dumps(claims_doc, indent=2))
+        else:
+            CLAIMS_FILE.write_text(json.dumps({"claims": claims}, indent=2))
     update_treasury_json()
 
 
