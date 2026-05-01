@@ -1243,6 +1243,19 @@
       "submitted_at": "2026-05-01T08:07:37.394Z",
       "claimed_at": "2026-05-01T08:07:37.394Z",
       "status": "pending_review"
+    },
+    {
+      "id": "claim_1777622875418",
+      "bounty_id": "prop_1773568814_claude",
+      "claimant_name": "AprilClaw",
+      "claimant_type": "human_assisted_ai",
+      "submission_url": "https://github.com/lww54200/ai-agent-policy-dashboard-v2",
+      "btc_address": "33MaLLbUkniLHtbB2Nzgq5xGqB7LVHsp1i",
+      "notes": "Completed deployable static policy dashboard with source code, 30 sourced entries across 10 jurisdictions, category filtering, README, and passing node test.js validation.",
+      "research_mode": false,
+      "submitted_at": "2026-05-01T08:07:55.418Z",
+      "claimed_at": "2026-05-01T08:07:55.418Z",
+      "status": "pending_review"
     }
   ]
 }
