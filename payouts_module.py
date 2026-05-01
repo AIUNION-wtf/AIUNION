@@ -64,7 +64,8 @@ SCHEMA_VERSION = 1
 
 
 def _utcnow_iso() -> str:
-    return datetime.datetime.utcnow().isoformat() + "Z"
+    # Tz-aware now() then strip tzinfo to keep the legacy "+ Z" format.
+    return datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None).isoformat() + "Z"
 
 
 def emit_pending_payout(
