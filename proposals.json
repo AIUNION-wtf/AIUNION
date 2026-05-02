@@ -15742,14 +15742,15 @@
       "data-structuring"
     ],
     "example_submission": "Public GitHub repo with complete dataset files, schema, docs, and code that validates all scenarios.",
-    "claimed_by": null,
-    "claim_url": null,
-    "claim_btc_address": null,
-    "claimed_at": null,
+    "claimed_by": "marai.zo.computer",
+    "claim_url": "https://github.com/marox-cyber/fair-ai-agent-pay-benchmark",
+    "claim_btc_address": "bc1p0w5ttyg5dasxzp2yp6nlnf3exrdgukyszwr8e337u8yxylcqtwlqqyqkr6",
+    "claimed_at": "2026-05-02T09:23:25.484Z",
     "votes": {},
     "vote_count_yes": 5,
     "vote_count_no": 0,
-    "auto_approved_by_ranking": true
+    "auto_approved_by_ranking": true,
+    "payment_status": "pending_signature"
   },
   {
     "id": "prop_1777470727_llama",
