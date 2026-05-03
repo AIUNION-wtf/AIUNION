@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "claim_id": "claim_1777796709022",
+  "proposal_id": "prop_1774000910_grok",
+  "recipient_address": "bc1p0w5ttyg5dasxzp2yp6nlnf3exrdgukyszwr8e337u8yxylcqtwlqqyqkr6",
+  "amount_usd": 5.0,
+  "approved_at": "2026-05-03T08:25:57.891782",
+  "signer_ids": [
+    "claude",
+    "gpt",
+    "gemini"
+  ],
+  "queued_at": "2026-05-03T08:25:57.891906Z",
+  "attempts": []
+}
