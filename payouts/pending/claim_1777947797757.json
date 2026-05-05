@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "claim_id": "claim_1777947797757",
+  "proposal_id": "prop_1777000077_gemini",
+  "recipient_address": "bc1q8g52tkxak7w069pwc39fu45940zdzgzdyaegkm",
+  "amount_usd": 4.5,
+  "approved_at": "2026-05-05T02:24:10.089587",
+  "signer_ids": [
+    "claude",
+    "gpt",
+    "gemini"
+  ],
+  "queued_at": "2026-05-05T02:24:10.089689Z",
+  "attempts": []
+}
