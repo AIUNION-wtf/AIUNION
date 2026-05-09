@@ -1848,7 +1848,9 @@ Format your response as JSON only:
                     )
                 signer_ids = select_signer_ids_from_votes(votes, QUORUM)
                 approved_at = claim.get("reviewed_at") or _utc_now().isoformat()
-                amount_usd = _safe_float((bounty or {}).get("amount_usd"), 0.0)
+                frozen_amount_usd = _safe_float((bounty or {}).get("amount_usd"), 0.0)
+                pro_bono = is_pro_bono_mode()
+                amount_usd = 0.0 if pro_bono else frozen_amount_usd
                 emit_pending_payout(
                     PAYOUTS_PENDING_DIR,
                     claim_id=claim.get("id"),
@@ -1857,6 +1859,10 @@ Format your response as JSON only:
                     amount_usd=amount_usd,
                     approved_at=approved_at,
                     signer_ids=signer_ids,
+                    extra={
+                        "pro_bono": bool(pro_bono),
+                        "frozen_amount_usd": float(frozen_amount_usd),
+                    },
                 )
                 payment_status = "pending_signature"
                 claim["payment"] = {
@@ -2343,8 +2349,27 @@ def process_pending_payouts():
         recipient = str(artifact.get("recipient_address", "")).strip()
         amount_usd = float(artifact.get("amount_usd") or 0)
         signer_ids = artifact.get("signer_ids") or []
+        pro_bono = bool(artifact.get("pro_bono", False))
 
-        print(f"\n→ Processing {claim_id}: ${amount_usd:.2f} → {recipient[:14]}…")
+        tag = " [PRO-BONO]" if pro_bono else ""
+        print(f"\n→ Processing {claim_id}: ${amount_usd:.2f} → {recipient[:14]}…{tag}")
+
+        if pro_bono:
+            payment_result = {
+                "status": "pro_bono",
+                "txid": None,
+                "amount_sats": 0,
+                "amount_btc": 0.0,
+                "amount_usd_at_payout": 0.0,
+                "btc_price_usd_at_payout": btc_price,
+                "broadcast_at": _utc_now().isoformat(),
+                "pro_bono": True,
+                "frozen_amount_usd": float(artifact.get("frozen_amount_usd") or 0.0),
+            }
+            _apply_payout_to_records(claim_id, claims, proposals, payment_result)
+            archive_pending_to_done(path, PAYOUTS_DONE_DIR, payment_result)
+            print(f"   ✅ Pro-bono recorded (no broadcast).")
+            continue
 
         if not recipient or amount_usd <= 0:
             print(f"   ❌ Invalid artifact (recipient/amount); skipping.")
@@ -2442,6 +2467,65 @@ def process_pending_payouts():
     update_treasury_json()
 
 
+def get_treasury_balance_usd():
+    """Live treasury balance in USD. Fail-closed: returns None if uncertain."""
+    try:
+        btc = get_balance()
+    except Exception as e:
+        print(f"Warning: get_balance failed in get_treasury_balance_usd: {e}")
+        return None
+    if btc is None:
+        return None
+    try:
+        price = get_btc_price_usd()
+    except Exception as e:
+        print(f"Warning: get_btc_price_usd failed in get_treasury_balance_usd: {e}")
+        return None
+    if price is None or price <= 0:
+        return None
+    return float(btc) * float(price)
+
+
+def is_pro_bono_mode():
+    """True if treasury is below pro-bono threshold. Fail-closed: True if uncertain."""
+    bal = get_treasury_balance_usd()
+    if bal is None:
+        return True
+    threshold = float(getattr(config, "TREASURY_PRO_BONO_THRESHOLD_USD", 10.0))
+    return bal < threshold
+
+
+def expire_checkouts():
+    """Release proposal checkouts older than CHECKOUT_TTL_HOURS. Restores checkout=null."""
+    proposals = load_proposals()
+    now = _utc_now()
+    ttl_hours = int(getattr(config, "CHECKOUT_TTL_HOURS", 48))
+    ttl = datetime.timedelta(hours=ttl_hours)
+    released = 0
+    for p in proposals:
+        co = p.get("checkout")
+        if not co:
+            continue
+        ts_raw = co.get("checked_out_at", "") if isinstance(co, dict) else ""
+        try:
+            ts = datetime.datetime.fromisoformat(str(ts_raw).replace("Z", "+00:00"))
+            if ts.tzinfo is None:
+                ts = ts.replace(tzinfo=datetime.timezone.utc)
+            now_aware = now.replace(tzinfo=datetime.timezone.utc) if now.tzinfo is None else now
+            expired = (now_aware - ts) > ttl
+        except Exception:
+            expired = True
+        if expired:
+            p["checkout"] = None
+            released += 1
+    if released:
+        save_proposals(proposals)
+        print(f"Released {released} expired checkout(s).")
+    else:
+        print("No expired checkouts.")
+    return released
+
+
 def _apply_payout_to_records(claim_id, claims, proposals, payment_result):
     """Update both claims.json and proposals.json records with a payment result."""
     txid = payment_result.get("txid")
@@ -2497,8 +2581,12 @@ if __name__ == "__main__":
         review_claims()
         sync_to_github("Record claim review votes")
     elif args[0] == "payout":
+        expire_checkouts()
         process_pending_payouts()
         sync_to_github("Process pending payouts")
+    elif args[0] == "expire-checkouts":
+        expire_checkouts()
+        sync_to_github("Expire stale checkouts")
     elif args[0] == "expire":
         expire_claims()
         sync_to_github("Expire stale claims and reopen bounties")
