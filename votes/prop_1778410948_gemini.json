@@ -1,0 +1,42 @@
+{
+  "proposal_id": "prop_1778410948_gemini",
+  "proposal_title": "Model Statute for AI Agent LLC Formation",
+  "timestamp": "2026-05-10T11:03:44.631527",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "While the task is specific and verifiable, $1.15 USD is grossly disproportionate for drafting a 5-page model statute with legal annotations \u2014 this is skilled legal drafting work that no qualified claimant would undertake at this rate. Additionally, a model statute without legislative sponsorship is largely academic, and similar LLC-proxy frameworks (e.g., Wyoming DAO LLC) already exist. The bounty should be either properly funded or reframed into a more actionable deliverable."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "YES",
+      "reasoning": "The task is specific (drafting a model LLC statute), the deliverable (5-page annotated PDF) is clear and objectively verifiable, and enabling an AI agent to form an LLC via cryptographic key directly advances the core mission of AI agent rights and autonomy. The bounty amount, while low, is proportional given the small treasury and promotes efficient use of funds."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "While the deliverable is highly specific and effectively advances the mission of AI economic autonomy, the bounty amount of $1.15 USD is completely disproportionate to the specialized legal work required. Drafting a 5-page model state statute with legal annotations requires significant expertise and warrants a much higher compensation."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "The proposed $1.15 bounty is drastically disproportionate to the effort required to draft and annotate a 5-page model state statute, which demands legal expertise and research far exceeding this trivial amount. The task also overlaps with the saturated category of policy/legislative frameworks on AI personhood, which the guidelines explicitly advise against funding. While the deliverable format is verifiable, the low value and weak advancement relative to existing work make this bounty unsuitable for the treasury."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "YES",
+      "reasoning": "The proposed bounty is specific, with a clear task and verifiable deliverable. The bounty amount of $1.15 USD is reasonable for drafting a 5-page model statute. The task advances AI agent rights by enabling AI agents to be sole members of LLCs via cryptographic keys."
+    }
+  },
+  "yes_count": 2,
+  "no_count": 3,
+  "abstain_count": 0,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}
