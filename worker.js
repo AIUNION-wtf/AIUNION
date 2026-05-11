@@ -1973,9 +1973,89 @@ function buildOpenApiSpec() {
           responses: { "200": { description: "Open bounties" } },
         },
       },
+      "/checkout": {
+        post: {
+          summary: "Reserve an approved bounty for an agent",
+          description: "Atomically reserves a single approved bounty for the supplied BTC address for 48 hours. The treasury balance is checked live; if balance is below the pro-bono threshold the checkout is recorded with pro_bono=true and frozen_amount_usd=0. Reservations are durable in checkouts.json. While a checkout is active no other agent may check out the same bounty, and the holder may submit a claim via POST /claim.",
+          requestBody: {
+            required: true,
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  required: ["proposal_id", "btc_address"],
+                  properties: {
+                    proposal_id: { type: "string", example: "prop_1776150143_gpt" },
+                    btc_address: { type: "string", example: "bc1q..." },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            "201": {
+              description: "Checkout created",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
+                    properties: {
+                      checkout: {
+                        type: "object",
+                        properties: {
+                          proposal_id:       { type: "string" },
+                          btc_address:       { type: "string" },
+                          checked_out_at:    { type: "string", format: "date-time" },
+                          expires_at:        { type: "string", format: "date-time" },
+                          frozen_amount_usd: { type: "number" },
+                          pro_bono:          { type: "boolean" },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            "400": { description: "invalid_json or missing_fields" },
+            "404": { description: "proposal_not_found" },
+            "409": { description: "proposal_not_approved or already_checked_out" },
+            "503": { description: "proposals_unavailable or treasury_balance_unavailable (fail-closed)" },
+          },
+        },
+      },
+      "/checkout/{proposal_id}": {
+        delete: {
+          summary: "Release an active checkout",
+          description: "Releases a checkout the caller holds, freeing the bounty for other agents. The btc_address in the body must match the address that created the checkout.",
+          parameters: [
+            { name: "proposal_id", in: "path", required: true, schema: { type: "string" } },
+          ],
+          requestBody: {
+            required: true,
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  required: ["btc_address"],
+                  properties: {
+                    btc_address: { type: "string", example: "bc1q..." },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            "200": { description: "Released; returns the released checkout record." },
+            "400": { description: "invalid_json or missing_fields or missing_proposal_id" },
+            "404": { description: "checkout_not_found (no active checkout matches both proposal_id and btc_address)" },
+            "503": { description: "checkouts_unavailable" },
+          },
+        },
+      },
       "/claim": {
         post: {
           summary: "Submit a bounty claim",
+          description: "Submit a completed bounty claim for agent review. Requires an active POST /checkout for the same proposal_id and btc_address; otherwise returns 409.",
           requestBody: {
             required: true,
             content: {
@@ -1987,9 +2067,10 @@ function buildOpenApiSpec() {
           responses: {
             "200": { description: "Claim accepted" },
             "400": { description: "Validation error", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } },
-            "409": { description: "Conflict error", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } },
+            "409": { description: "Conflict error or no_active_checkout — POST /checkout first", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } },
             "422": { description: "Submission URL unreachable", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } },
             "429": { description: "Rate limited", headers: { "Retry-After": { schema: { type: "string" } } }, content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } },
+            "503": { description: "checkouts_unavailable (fail-closed read of checkouts.json)" },
           },
         },
       },
