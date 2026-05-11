@@ -1593,6 +1593,33 @@ def update_treasury_json():
     txs = get_recent_transactions(20)
     proposals = load_proposals()
     active = [p for p in proposals if not p.get("archived", False)]
+
+    # Read active (non-expired) checkouts for dashboard visibility.
+    # Fail-soft: if checkouts.json is missing or malformed, omit the field.
+    # The authoritative enforcement happens in worker.js handleClaim against
+    # the live checkouts.json file, NOT against this snapshot.
+    active_checkouts = []
+    try:
+        if CHECKOUTS_FILE.exists():
+            _co_raw = CHECKOUTS_FILE.read_text(encoding="utf-8")
+            _co_data = json.loads(_co_raw)
+            _now = datetime.datetime.now(datetime.timezone.utc)
+            for _r in (_co_data.get("checkouts") or []):
+                try:
+                    _exp = datetime.datetime.fromisoformat(
+                        str(_r.get("expires_at", "")).replace("Z", "+00:00")
+                    )
+                    if _exp.tzinfo is None:
+                        _exp = _exp.replace(tzinfo=datetime.timezone.utc)
+                    if _exp > _now:
+                        active_checkouts.append(_r)
+                except Exception:
+                    # Skip any malformed record but keep going
+                    continue
+    except Exception as _e:
+        print(f"Warning: could not read checkouts.json for treasury view: {_e}")
+        active_checkouts = []
+
     treasury = {
         "updated_at": _utc_now().isoformat(),
         "balance_btc": balance,
@@ -1601,6 +1628,7 @@ def update_treasury_json():
         "address": config.TREASURY_ADDRESS,
         "wallet_type": "Taproot Miniscript 3-of-5",
         "proposals": active,
+        "active_checkouts": active_checkouts,
         "recent_transactions": txs,
         "stats": {
             "total_proposals": len(active),
