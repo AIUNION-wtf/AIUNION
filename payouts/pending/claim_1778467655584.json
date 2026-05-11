@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "claim_id": "claim_1778467655584",
+  "proposal_id": "prop_1774432888_grok",
+  "recipient_address": "1EWeqaZ2caiHoupdwFkLXVvEhiThNGvx3C",
+  "amount_usd": 5.0,
+  "approved_at": "2026-05-11T02:48:18.812156",
+  "signer_ids": [
+    "claude",
+    "gpt",
+    "gemini"
+  ],
+  "queued_at": "2026-05-11T02:48:24.898278Z",
+  "attempts": [],
+  "pro_bono": false,
+  "frozen_amount_usd": 5.0
+}
