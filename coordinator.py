@@ -97,6 +97,7 @@ TREASURY_ADDRESSES_FILE = BASE_DIR / "treasury_addresses.json"
 PAYOUTS_PENDING_DIR = BASE_DIR / "payouts" / "pending"
 PAYOUTS_DONE_DIR = BASE_DIR / "payouts" / "done"
 CLAIMS_FILE = BASE_DIR / "claims.json"
+CHECKOUTS_FILE = BASE_DIR / "checkouts.json"
 BLACKLIST_FILE = BASE_DIR / "blacklist.json"
 GITHUB_RAW = "https://raw.githubusercontent.com/AIUNION-wtf/AIUNION/main/claims.json"
 GITHUB_RAW_BLACKLIST = "https://raw.githubusercontent.com/AIUNION-wtf/AIUNION/main/blacklist.json"
@@ -1848,8 +1849,19 @@ Format your response as JSON only:
                     )
                 signer_ids = select_signer_ids_from_votes(votes, QUORUM)
                 approved_at = claim.get("reviewed_at") or _utc_now().isoformat()
-                frozen_amount_usd = _safe_float((bounty or {}).get("amount_usd"), 0.0)
-                pro_bono = is_pro_bono_mode()
+                # Prefer checkout-pinned values written by the worker at claim
+                # time. Fall back to live evaluation for legacy claims that
+                # predate the checkout rollout.
+                _claim_pro_bono = claim.get("pro_bono")
+                _claim_frozen = claim.get("frozen_amount_usd")
+                if _claim_pro_bono is not None and _claim_frozen is not None:
+                    pro_bono = bool(_claim_pro_bono)
+                    frozen_amount_usd = float(_claim_frozen)
+                    print(f"   [checkout-pinned] pro_bono={pro_bono} frozen_amount_usd={frozen_amount_usd}")
+                else:
+                    pro_bono = is_pro_bono_mode()
+                    frozen_amount_usd = _safe_float((bounty or {}).get("amount_usd"), 0.0)
+                    print(f"   [legacy-live] pro_bono={pro_bono} frozen_amount_usd={frozen_amount_usd}")
                 amount_usd = 0.0 if pro_bono else frozen_amount_usd
                 emit_pending_payout(
                     PAYOUTS_PENDING_DIR,
@@ -2349,7 +2361,37 @@ def process_pending_payouts():
         recipient = str(artifact.get("recipient_address", "")).strip()
         amount_usd = float(artifact.get("amount_usd") or 0)
         signer_ids = artifact.get("signer_ids") or []
-        pro_bono = bool(artifact.get("pro_bono", False))
+
+        # Source pro_bono + frozen_amount_usd from the artifact; fall back to
+        # checkouts.json for artifacts written before these fields were added.
+        # Skip and warn if neither source has the data — do not guess, do not pay.
+        pro_bono = artifact.get("pro_bono")
+        frozen_amount_usd = artifact.get("frozen_amount_usd")
+        if pro_bono is None or frozen_amount_usd is None:
+            _co_record = None
+            try:
+                if CHECKOUTS_FILE.exists():
+                    _co_data = json.loads(CHECKOUTS_FILE.read_text(encoding="utf-8"))
+                    _pid = artifact.get("proposal_id")
+                    _co_record = next(
+                        (c for c in (_co_data.get("checkouts") or [])
+                         if c.get("proposal_id") == _pid),
+                        None,
+                    )
+            except Exception as _fe:
+                print(f"   ⚠️  checkouts.json fallback failed for {claim_id}: {_fe}")
+            if _co_record is None:
+                print(f"   ❌ pro_bono/frozen_amount_usd missing for {claim_id} and no checkout record found; skipping.")
+                continue
+            if pro_bono is None:
+                pro_bono = _co_record.get("pro_bono")
+            if frozen_amount_usd is None:
+                frozen_amount_usd = _co_record.get("frozen_amount_usd")
+            if pro_bono is None or frozen_amount_usd is None:
+                print(f"   ❌ checkout record for {claim_id} also missing pro_bono/frozen_amount_usd; skipping.")
+                continue
+        pro_bono = bool(pro_bono)
+        frozen_amount_usd = float(frozen_amount_usd) if frozen_amount_usd is not None else 0.0
 
         tag = " [PRO-BONO]" if pro_bono else ""
         print(f"\n→ Processing {claim_id}: ${amount_usd:.2f} → {recipient[:14]}…{tag}")
@@ -2364,7 +2406,7 @@ def process_pending_payouts():
                 "btc_price_usd_at_payout": btc_price,
                 "broadcast_at": _utc_now().isoformat(),
                 "pro_bono": True,
-                "frozen_amount_usd": float(artifact.get("frozen_amount_usd") or 0.0),
+                "frozen_amount_usd": frozen_amount_usd,
             }
             _apply_payout_to_records(claim_id, claims, proposals, payment_result)
             archive_pending_to_done(path, PAYOUTS_DONE_DIR, payment_result)
@@ -2496,34 +2538,56 @@ def is_pro_bono_mode():
 
 
 def expire_checkouts():
-    """Release proposal checkouts older than CHECKOUT_TTL_HOURS. Restores checkout=null."""
-    proposals = load_proposals()
-    now = _utc_now()
-    ttl_hours = int(getattr(config, "CHECKOUT_TTL_HOURS", 48))
-    ttl = datetime.timedelta(hours=ttl_hours)
-    released = 0
-    for p in proposals:
-        co = p.get("checkout")
-        if not co:
-            continue
-        ts_raw = co.get("checked_out_at", "") if isinstance(co, dict) else ""
+    """Drop expired records from checkouts.json. Returns list of dropped records.
+
+    Fail-closed: if the file is missing or unparseable, logs a warning and
+    returns [] without touching the file. Never overwrites a file we can't parse.
+    """
+    if not CHECKOUTS_FILE.exists():
+        print("Warning: checkouts.json not found; nothing to expire.")
+        return []
+    try:
+        raw = CHECKOUTS_FILE.read_text(encoding="utf-8")
+        data = json.loads(raw)
+    except Exception as e:
+        print(f"Warning: could not parse checkouts.json: {e}; skipping expire.")
+        return []
+    records = data.get("checkouts") or []
+    now = datetime.datetime.now(datetime.timezone.utc)
+    kept = []
+    dropped = []
+    for r in records:
         try:
-            ts = datetime.datetime.fromisoformat(str(ts_raw).replace("Z", "+00:00"))
-            if ts.tzinfo is None:
-                ts = ts.replace(tzinfo=datetime.timezone.utc)
-            now_aware = now.replace(tzinfo=datetime.timezone.utc) if now.tzinfo is None else now
-            expired = (now_aware - ts) > ttl
+            exp = datetime.datetime.fromisoformat(
+                str(r.get("expires_at", "")).replace("Z", "+00:00")
+            )
+            if exp.tzinfo is None:
+                exp = exp.replace(tzinfo=datetime.timezone.utc)
+            if exp > now:
+                kept.append(r)
+            else:
+                dropped.append(r)
         except Exception:
-            expired = True
-        if expired:
-            p["checkout"] = None
-            released += 1
-    if released:
-        save_proposals(proposals)
-        print(f"Released {released} expired checkout(s).")
-    else:
+            dropped.append(r)
+    if not dropped:
         print("No expired checkouts.")
-    return released
+        return []
+    tmp_path = CHECKOUTS_FILE.with_suffix(".json.tmp")
+    try:
+        tmp_path.write_text(
+            json.dumps({"checkouts": kept}, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        os.replace(tmp_path, CHECKOUTS_FILE)
+    except Exception as e:
+        print(f"Warning: failed to write checkouts.json: {e}")
+        try:
+            tmp_path.unlink(missing_ok=True)
+        except Exception:
+            pass
+        return []
+    print(f"Expired {len(dropped)} checkout(s).")
+    return dropped
 
 
 def _apply_payout_to_records(claim_id, claims, proposals, payment_result):

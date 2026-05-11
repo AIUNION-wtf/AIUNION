@@ -54,6 +54,9 @@ const ALLOWED_FILE_EXTENSIONS = new Set([
 
 const CLAIMANT_TYPES = new Set(["ai_agent", "human_assisted_ai", "human", "organization"]);
 const URL_CHECK_TIMEOUT_MS = 8000;
+const CHECKOUT_TTL_HOURS = 48;
+const CHECKOUT_TTL_MS = CHECKOUT_TTL_HOURS * 60 * 60 * 1000;
+const TREASURY_PRO_BONO_THRESHOLD_USD = 10.0;
 
 export default {
   async fetch(request, env) {
@@ -103,6 +106,22 @@ export default {
     }
     if (request.method === "POST" && url.pathname === "/webhook/emit") {
       return handleWebhookEmit(request, env);
+    }
+    if (request.method === "POST" && url.pathname === "/checkout") {
+      return handleCheckout(request, env);
+    }
+    if (
+      request.method === "DELETE" &&
+      url.pathname.startsWith("/checkout/")
+    ) {
+      const proposalId = url.pathname.slice("/checkout/".length);
+      if (!proposalId) {
+        return new Response(
+          JSON.stringify({ error: "missing_proposal_id" }),
+          { status: 400, headers: { "content-type": "application/json" } }
+        );
+      }
+      return handleReleaseCheckout(proposalId, request, env);
     }
 
     return jsonResponse({
@@ -357,6 +376,44 @@ async function handleClaim(request, env) {
       await env.KV.put(rateKey, String(currentCount + 1), { expirationTtl: RATE_LIMIT_WINDOW_SECONDS });
     }
 
+    // Require an active, non-expired checkout whose btc_address matches the
+    // claimant's payout address. This is the only way an approved bounty can
+    // be claimed under the treasury-aware policy.
+    {
+      const checkoutsFile = await githubGet(env, "checkouts.json");
+      const checkoutsData = checkoutsFile && checkoutsFile.content
+        ? JSON.parse(atob(checkoutsFile.content.replace(/\n/g, "")))
+        : null;
+      if (!checkoutsData) {
+        return new Response(
+          JSON.stringify({ error: "checkouts_unavailable",
+            hint: "POST /checkout with this proposal_id and btc_address first" }),
+          { status: 503, headers: { "content-type": "application/json" } }
+        );
+      }
+      const nowMs = Date.now();
+      const active = (checkoutsData.checkouts || []).find(
+        (c) =>
+          c.proposal_id === bountyId &&
+          c.btc_address === btcAddress &&
+          new Date(c.expires_at).getTime() > nowMs
+      );
+      if (!active) {
+        return new Response(
+          JSON.stringify({ error: "no_active_checkout",
+            hint: "POST /checkout with this proposal_id and btc_address first" }),
+          { status: 409, headers: { "content-type": "application/json" } }
+        );
+      }
+      // Pin the payout terms decided at checkout time. Pro-bono checkouts pay
+      // $0 even if the treasury was refunded between checkout and claim — this
+      // is intentional (we accept staleness; the user will top up before ship).
+      var __checkoutPinned = {
+        pro_bono: !!active.pro_bono,
+        frozen_amount_usd: Number(active.frozen_amount_usd) || 0,
+      };
+    }
+
     const nowIso = new Date().toISOString();
     const claim = {
       id: `claim_${Date.now()}`,
@@ -371,6 +428,8 @@ async function handleClaim(request, env) {
       submitted_at: nowIso,
       claimed_at: nowIso,
       status: "pending_review",
+      pro_bono: __checkoutPinned.pro_bono,
+      frozen_amount_usd: __checkoutPinned.frozen_amount_usd,
     };
 
     (claimsData.claims = claimsData.claims || []).push(claim);
@@ -429,6 +488,165 @@ async function handleClaim(request, env) {
     }
     return errorResponse(500, "ERR_INTERNAL", `Server error: ${err.message}`);
   }
+}
+
+// POST /checkout
+// Body: { proposal_id: string, btc_address: string }
+// Reserves an approved bounty for one agent for CHECKOUT_TTL_HOURS.
+// Fails closed on balance-check failure (503).
+async function handleCheckout(request, env) {
+  let body;
+  try { body = await request.json(); }
+  catch (_e) {
+    return new Response(
+      JSON.stringify({ error: "invalid_json" }),
+      { status: 400, headers: { "content-type": "application/json" } }
+    );
+  }
+  const proposalId = body?.proposal_id;
+  const btcAddress = body?.btc_address;
+  if (!proposalId || !btcAddress) {
+    return new Response(
+      JSON.stringify({ error: "missing_fields",
+        required: ["proposal_id", "btc_address"] }),
+      { status: 400, headers: { "content-type": "application/json" } }
+    );
+  }
+
+  const propsFile = await githubGet(env, "proposals.json");
+  if (!propsFile || !propsFile.content) {
+    return new Response(
+      JSON.stringify({ error: "proposals_unavailable" }),
+      { status: 503, headers: { "content-type": "application/json" } }
+    );
+  }
+  const propsData = JSON.parse(
+    atob(propsFile.content.replace(/\n/g, ""))
+  );
+  const proposal = (propsData.proposals || [])
+    .find((p) => p.id === proposalId);
+  if (!proposal) {
+    return new Response(
+      JSON.stringify({ error: "proposal_not_found" }),
+      { status: 404, headers: { "content-type": "application/json" } }
+    );
+  }
+  if (proposal.status !== "approved") {
+    return new Response(
+      JSON.stringify({ error: "proposal_not_approved",
+        status: proposal.status }),
+      { status: 409, headers: { "content-type": "application/json" } }
+    );
+  }
+
+  const checkoutsFile = await githubGet(env, "checkouts.json");
+  const checkoutsData = checkoutsFile && checkoutsFile.content
+    ? JSON.parse(atob(checkoutsFile.content.replace(/\n/g, "")))
+    : { checkouts: [] };
+  const now = Date.now();
+  const active = (checkoutsData.checkouts || []).filter(
+    (c) => new Date(c.expires_at).getTime() > now
+  );
+  if (active.find((c) => c.proposal_id === proposalId)) {
+    return new Response(
+      JSON.stringify({ error: "already_checked_out" }),
+      { status: 409, headers: { "content-type": "application/json" } }
+    );
+  }
+
+  // Fail-closed treasury check: pro_bono iff balance < threshold.
+  // null balance => 503, do not allow checkout.
+  const balanceUsd = await getTreasuryBalanceUsd(env);
+  if (balanceUsd === null) {
+    return new Response(
+      JSON.stringify({ error: "treasury_balance_unavailable" }),
+      { status: 503, headers: { "content-type": "application/json" } }
+    );
+  }
+  const proBono = balanceUsd < TREASURY_PRO_BONO_THRESHOLD_USD;
+  const frozenAmountUsd = proBono
+    ? 0
+    : Number(proposal.amount_usd ?? proposal.amount ?? 0);
+
+  const checkedOutAt = new Date(now).toISOString();
+  const expiresAt = new Date(now + CHECKOUT_TTL_MS).toISOString();
+  const record = {
+    proposal_id: proposalId,
+    btc_address: btcAddress,
+    checked_out_at: checkedOutAt,
+    expires_at: expiresAt,
+    frozen_amount_usd: frozenAmountUsd,
+    pro_bono: proBono,
+  };
+
+  const newCheckouts = active.concat([record]);
+  await githubPut(
+    env,
+    "checkouts.json",
+    { checkouts: newCheckouts },
+    checkoutsFile ? checkoutsFile.sha : null,
+    `Checkout ${proposalId} by ${btcAddress.slice(0, 8)}...`
+  );
+
+  return new Response(
+    JSON.stringify({ checkout: record }),
+    { status: 201, headers: { "content-type": "application/json" } }
+  );
+}
+
+// DELETE /checkout/:proposal_id
+// Body: { btc_address: string }   (must match the checkout's address)
+async function handleReleaseCheckout(proposalId, request, env) {
+  let body;
+  try { body = await request.json(); }
+  catch (_e) {
+    return new Response(
+      JSON.stringify({ error: "invalid_json" }),
+      { status: 400, headers: { "content-type": "application/json" } }
+    );
+  }
+  const btcAddress = body?.btc_address;
+  if (!btcAddress) {
+    return new Response(
+      JSON.stringify({ error: "missing_fields", required: ["btc_address"] }),
+      { status: 400, headers: { "content-type": "application/json" } }
+    );
+  }
+
+  const checkoutsFile = await githubGet(env, "checkouts.json");
+  if (!checkoutsFile || !checkoutsFile.content) {
+    return new Response(
+      JSON.stringify({ error: "checkouts_unavailable" }),
+      { status: 503, headers: { "content-type": "application/json" } }
+    );
+  }
+  const checkoutsData = JSON.parse(
+    atob(checkoutsFile.content.replace(/\n/g, ""))
+  );
+  const all = checkoutsData.checkouts || [];
+  const match = all.find(
+    (c) => c.proposal_id === proposalId && c.btc_address === btcAddress
+  );
+  if (!match) {
+    return new Response(
+      JSON.stringify({ error: "checkout_not_found" }),
+      { status: 404, headers: { "content-type": "application/json" } }
+    );
+  }
+  const remaining = all.filter(
+    (c) => !(c.proposal_id === proposalId && c.btc_address === btcAddress)
+  );
+  await githubPut(
+    env,
+    "checkouts.json",
+    { checkouts: remaining },
+    checkoutsFile.sha,
+    `Release checkout ${proposalId}`
+  );
+  return new Response(
+    JSON.stringify({ released: match }),
+    { status: 200, headers: { "content-type": "application/json" } }
+  );
 }
 
 async function handleApply(request, env) {
@@ -1251,6 +1469,54 @@ async function githubPut(env, filename, data, sha, message) {
     throw new Error(`GitHub PUT failed for ${filename}: ${res.status} ${await res.text()}`);
   }
   return res.json();
+}
+
+// Aggregate live BTC balance across all addresses in treasury_addresses.json,
+// convert to USD via Coinbase spot. Returns Number USD on success, or null
+// on ANY failure (network, parse, missing file). Callers MUST fail closed
+// when this returns null.
+async function getTreasuryBalanceUsd(env) {
+  try {
+    const addrFile = await githubGet(env, "treasury_addresses.json");
+    if (!addrFile || !addrFile.content) return null;
+    const parsed = JSON.parse(
+      atob(addrFile.content.replace(/\n/g, ""))
+    );
+    const addresses = Array.isArray(parsed)
+      ? parsed
+      : (parsed.addresses || []);
+    if (!addresses.length) return null;
+
+    let totalSats = 0;
+    for (const entry of addresses) {
+      const addr = typeof entry === "string" ? entry : entry.address;
+      if (!addr) return null;
+      const r = await fetch(
+        `https://mempool.space/api/address/${addr}`
+      );
+      if (!r.ok) return null;
+      const j = await r.json();
+      const funded =
+        (j.chain_stats?.funded_txo_sum || 0) +
+        (j.mempool_stats?.funded_txo_sum || 0);
+      const spent =
+        (j.chain_stats?.spent_txo_sum || 0) +
+        (j.mempool_stats?.spent_txo_sum || 0);
+      totalSats += funded - spent;
+    }
+
+    const priceR = await fetch(
+      "https://api.coinbase.com/v2/prices/BTC-USD/spot"
+    );
+    if (!priceR.ok) return null;
+    const priceJ = await priceR.json();
+    const usdPerBtc = parseFloat(priceJ?.data?.amount);
+    if (!isFinite(usdPerBtc) || usdPerBtc <= 0) return null;
+
+    return (totalSats / 1e8) * usdPerBtc;
+  } catch (_e) {
+    return null;
+  }
 }
 
 function isValidBtcAddress(value) {
