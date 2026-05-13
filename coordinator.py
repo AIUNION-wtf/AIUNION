@@ -2409,8 +2409,12 @@ def process_pending_payouts():
             except Exception as _fe:
                 print(f"   ⚠️  checkouts.json fallback failed for {claim_id}: {_fe}")
             if _co_record is None:
-                print(f"   ❌ pro_bono/frozen_amount_usd missing for {claim_id} and no checkout record found; skipping.")
-                continue
+                # Pre-checkout-era artifact: these fields didn't exist yet.
+                # All pre-era bounties were real (non-pro-bono) payments; use
+                # the artifact's own amount_usd as the frozen value.
+                print(f"   ⚠️  {claim_id}: no checkout record; assuming non-pro-bono, frozen_amount_usd={amount_usd}")
+                pro_bono = False
+                frozen_amount_usd = amount_usd
             if pro_bono is None:
                 pro_bono = _co_record.get("pro_bono")
             if frozen_amount_usd is None:
