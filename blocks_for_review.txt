@@ -1,0 +1,366 @@
+﻿=== BLOCK 1: process_pending_payouts (lines 2251-2445) ===
+#  Pending payouts (laptop side, Shape B)  
+def process_pending_payouts():
+    """Laptop-side: read payouts/pending/, build+sign+broadcast each, record results.
+
+    Architecture: the cloud (review_claims) only writes pending artifacts. The
+    descriptor and encrypted signers never leave the laptop. amount_btc is
+    recomputed from a live BTC price at sign time so the claimant always
+    receives the bounty's stated USD value.
+
+    Each pending payout goes through:
+      1. on-chain pre-check via mempool.space (skip + stamp \'broadcast\' if
+         already paid)
+      2. PSBT build via TreasuryWallet.from_config(config)
+      3. 3-of-5 sign via AgentPsbtSigner.from_config(config)
+      4. broadcast via TreasuryWallet.broadcast_transaction (mempool.space)
+      5. proposals.json + claims.json bookkeeping
+      6. archive payout artifact to payouts/done/
+    """
+    if list_pending_payouts is None or emit_pending_payout is None:
+        print(f"âš ï¸  payouts_module unavailable: {AUTOMATED_PAYMENT_IMPORT_ERROR}")
+        return
+    if TreasuryWallet is None or AgentPsbtSigner is None:
+        print(f"âš ï¸  Treasury wallet/signer unavailable: {AUTOMATED_PAYMENT_IMPORT_ERROR}")
+        return
+
+    pending = list_pending_payouts(PAYOUTS_PENDING_DIR)
+    if not pending:
+        print("No pending payouts.")
+        return
+
+    print(f"Found {len(pending)} pending payout(s).")
+
+    # Defensive: detect git merge-conflict markers in proposals.json/claims.json
+    # before parsing. If the laptop's working tree has unresolved conflicts,
+    # load_proposals() crashes with an opaque JSONDecodeError. Abort early
+    # with a clear actionable error instead.
+    _conflict_markers = ("<<<<<<<", "=======", ">>>>>>>")
+    for _state_path in (PROPOSALS_FILE, CLAIMS_FILE):
+        if not _state_path.exists():
+            continue
+        try:
+            _raw = _state_path.read_text(encoding="utf-8")
+        except Exception:
+            continue
+        if any(m in _raw for m in _conflict_markers):
+            print(f"âŒ Merge conflict markers detected in {_state_path.name}.")
+            print("   Resolve the conflict before running payout. Common fix:")
+            print("     git checkout --theirs " + _state_path.name)
+            print("     git add " + _state_path.name)
+            print("     git commit -m 'Resolve merge'")
+            print("   Aborting; pending payouts left untouched.")
+            return
+
+    # Load claim/proposal records once for cross-validation and bookkeeping.
+    proposals = load_proposals()
+    claims_doc = {"claims": []}
+    claims = []
+    if CLAIMS_FILE.exists():
+        try:
+            claims_doc = json.loads(CLAIMS_FILE.read_text())
+        except Exception:
+            claims_doc = {"claims": []}
+        # claims.json is {"claims": [...]} but tolerate a bare list too.
+        if isinstance(claims_doc, dict):
+            claims = claims_doc.get("claims") or []
+        elif isinstance(claims_doc, list):
+            claims = claims_doc
+            claims_doc = {"claims": claims}
+        else:
+            claims = []
+            claims_doc = {"claims": []}
+    treasury_addresses = []
+    try:
+        treasury_addresses = [
+            e if isinstance(e, str) else e.get("address")
+            for e in (_load_treasury_addresses() or [])
+        ]
+        treasury_addresses = [a for a in treasury_addresses if a]
+    except Exception:
+        pass
+
+    btc_price = get_btc_price_usd()
+    if btc_price is None or btc_price <= 0:
+        print("âŒ Cannot process payouts: BTC price unavailable.")
+        return
+
+    wallet = TreasuryWallet.from_config(config)
+    signer = AgentPsbtSigner.from_config(config)
+
+    for artifact in pending:
+        path = Path(artifact.get("__path"))
+        claim_id = artifact.get("claim_id")
+        recipient = str(artifact.get("recipient_address", "")).strip()
+        amount_usd = float(artifact.get("amount_usd") or 0)
+        signer_ids = artifact.get("signer_ids") or []
+
+        print(f"\nâ†’ Processing {claim_id}: ${amount_usd:.2f} â†’ {recipient[:14]}â€¦")
+
+        if not recipient or amount_usd <= 0:
+            print(f"   âŒ Invalid artifact (recipient/amount); skipping.")
+            continue
+
+        # Cross-validate against claims.json so a tampered artifact cannot
+        # change the recipient between approval and signing.
+        claim_record = next((c for c in claims if c.get("id") == claim_id), None)
+        if claim_record:
+            cr_addr = str(claim_record.get("btc_address", "")).strip()
+            if cr_addr and cr_addr != recipient:
+                msg = (
+                    f"Recipient mismatch for {claim_id}: artifact={recipient!r} "
+                    f"vs claims.json={cr_addr!r}; refusing to sign."
+                )
+                print(f"   âŒ {msg}")
+                _payout_record_attempt(path, {
+                    "at": _utc_now().isoformat(),
+                    "result": "rejected_recipient_mismatch",
+                    "error": msg,
+                })
+                continue
+
+        amount_btc = round(amount_usd / btc_price, 8)
+        amount_sats = max(1, int(round(amount_btc * 100_000_000)))
+
+        # On-chain pre-check: did a previous attempt already succeed?
+        already, onchain_txid, onchain_value = recipient_already_paid_on_chain(
+            recipient, amount_sats, treasury_addresses,
+        )
+        if already:
+            print(f"   âœ“ Already paid on-chain (txid={onchain_txid}, {onchain_value} sats); reconciling.")
+            payment_result = {
+                "status": "broadcast",
+                "txid": onchain_txid,
+                "amount_sats": onchain_value,
+                "amount_usd_at_payout": amount_usd,
+                "btc_price_usd_at_payout": btc_price,
+                "broadcast_at": _utc_now().isoformat(),
+                "reconciled_from_onchain": True,
+            }
+            _apply_payout_to_records(claim_id, claims, proposals, payment_result)
+            archive_pending_to_done(path, PAYOUTS_DONE_DIR, payment_result)
+            continue
+
+        # Build + sign + broadcast.
+        try:
+            build_result = wallet.create_payment_psbt(
+                recipient_address=recipient,
+                amount_btc=amount_btc,
+            )
+            psbt = build_result.psbt
+            # Reconstruct a synthetic votes dict from the cloud-suggested
+            # signer_ids so AgentPsbtSigner.select_signers picks them.
+            synth_votes = {sid: {"vote": "YES"} for sid in (signer_ids or [])}
+            chosen_ids = signer.select_signers(votes=synth_votes, minimum=QUORUM)
+            if len(chosen_ids) < QUORUM:
+                raise PaymentError(
+                    f"Need at least {QUORUM} signer ids, got {len(chosen_ids)}"
+                )
+            for sid in chosen_ids[:QUORUM]:
+                _attempt, psbt = signer.sign_psbt(psbt, sid)
+            txid_hex, _serialized, tx = wallet.finalize_psbt(psbt)
+            broadcast_txid = wallet.broadcast_transaction(tx)
+            payment_result = {
+                "status": "broadcast",
+                "txid": broadcast_txid or txid_hex,
+                "amount_sats": amount_sats,
+                "amount_btc": amount_btc,
+                "amount_usd_at_payout": amount_usd,
+                "btc_price_usd_at_payout": btc_price,
+                "broadcast_at": _utc_now().isoformat(),
+            }
+            print(f"   âœ… Broadcast: {payment_result['txid']}")
+            _apply_payout_to_records(claim_id, claims, proposals, payment_result)
+            archive_pending_to_done(path, PAYOUTS_DONE_DIR, payment_result)
+        except Exception as exc:
+            err = str(exc)
+            print(f"   âŒ Payout failed (will retry next run): {err}")
+            _payout_record_attempt(path, {
+                "at": _utc_now().isoformat(),
+                "result": "error",
+                "error": err,
+            })
+
+    # Persist updated proposals/claims back to disk.
+    save_proposals(proposals)
+    if CLAIMS_FILE.exists():
+        # Keep the document wrapper intact; claims list mutated in place above.
+        if isinstance(claims_doc, dict):
+            claims_doc["claims"] = claims
+            CLAIMS_FILE.write_text(json.dumps(claims_doc, indent=2))
+        else:
+            CLAIMS_FILE.write_text(json.dumps({"claims": claims}, indent=2))
+    update_treasury_json()
+
+
+def _apply_payout_to_records(claim_id, claims, proposals, payment_result):
+
+=== BLOCK 2: review_claims payout-queue section (lines 1830-1900) ===
+                bounty["claim_btc_address"] = None
+                bounty["claimed_at"] = None
+
+        print(f"\n{'âœ… APPROVED' if passed else 'âŒ REJECTED'}: {yes_count}/5 votes YES (needed {QUORUM})")
+
+        payment_message = "Claim rejected. You may resubmit after reviewing requirements."
+        payment_txid = None
+        payment_status = None
+        if passed:
+            # Cloud-side: queue the payout as a pending artifact only. Do not
+            # build PSBTs or sign in CI â€” the watch-only descriptor and
+            # encrypted signers live exclusively on the laptop. The laptop
+            # picks up payouts/pending/<claim_id>.json on the next
+            # `python coordinator.py payout` run.
+            try:
+                if emit_pending_payout is None or select_signer_ids_from_votes is None:
+                    raise RuntimeError(
+                        f"payouts_module unavailable: {AUTOMATED_PAYMENT_IMPORT_ERROR}"
+                    )
+                signer_ids = select_signer_ids_from_votes(votes, QUORUM)
+                approved_at = claim.get("reviewed_at") or _utc_now().isoformat()
+                amount_usd = _safe_float((bounty or {}).get("amount_usd"), 0.0)
+                emit_pending_payout(
+                    PAYOUTS_PENDING_DIR,
+                    claim_id=claim.get("id"),
+                    proposal_id=claim.get("bounty_id") or (bounty or {}).get("id"),
+                    recipient_address=str(claim.get("btc_address", "")).strip(),
+                    amount_usd=amount_usd,
+                    approved_at=approved_at,
+                    signer_ids=signer_ids,
+                )
+                payment_status = "pending_signature"
+                claim["payment"] = {
+                    "status": "pending_signature",
+                    "queued_at": _utc_now().isoformat(),
+                    "amount_usd": amount_usd,
+                    "recipient_address": str(claim.get("btc_address", "")).strip(),
+                    "signer_ids": signer_ids,
+                }
+                claim.pop("payment_error", None)
+                if bounty:
+                    bounty["payment_status"] = "pending_signature"
+                    bounty.pop("payment_error", None)
+                print(
+                    f"   ðŸ“¥ Payout queued for offline signer "
+                    f"({claim.get('id')}, ${amount_usd:.2f} â†’ "
+                    f"{str(claim.get('btc_address',''))[:14]}â€¦)"
+                )
+                payment_message = (
+                    "Claim approved. Payout queued for offline signer; "
+                    "the laptop will broadcast on the next payout run."
+                )
+            except Exception as queue_error:
+                payment_status = "queue_failed"
+                claim["payment"] = {
+                    "status": "queue_failed",
+                    "error": str(queue_error),
+                    "queued_at": _utc_now().isoformat(),
+                }
+                if bounty:
+                    bounty["payment_status"] = "queue_failed"
+                    bounty["payment_error"] = str(queue_error)
+                print(f"   âš ï¸  Failed to queue payout artifact: {queue_error}")
+                payment_message = (
+                    "Claim approved but failed to queue payout artifact. "
+                    "Will retry on next review."
+                )
+
+        # Fire webhook for this reviewed claim.
+        fire_webhooks(
+            "claim_reviewed",
+
+=== BLOCK 3: args dispatcher (lines 2490-2528) ===
+            print("Usage: python coordinator.py vote <proposal_id>")
+            print("Run 'python coordinator.py status' to see pending proposal IDs.")
+        else:
+            vote_on_proposal(args[1])
+            update_treasury_json()
+            sync_to_github(f"Record vote on {args[1]}")
+    elif args[0] == "review":
+        review_claims()
+        sync_to_github("Record claim review votes")
+    elif args[0] == "payout":
+        process_pending_payouts()
+        sync_to_github("Process pending payouts")
+    elif args[0] == "expire":
+        expire_claims()
+        sync_to_github("Expire stale claims and reopen bounties")
+    elif args[0] == "blacklist":
+        addr = None
+        name = None
+        reason = None
+        i = 1
+        while i < len(args):
+            if args[i] == "--address" and i + 1 < len(args):
+                addr = args[i + 1]; i += 2
+            elif args[i] == "--name" and i + 1 < len(args):
+                name = args[i + 1]; i += 2
+            elif args[i] == "--reason" and i + 1 < len(args):
+                reason = args[i + 1]; i += 2
+            else:
+                i += 1
+        blacklist_agent(btc_address=addr, claimant_name=name, reason=reason)
+        sync_to_github("Update blacklist")
+    elif args[0] == "sync":
+        update_treasury_json()
+        sync_to_github("Sync treasury data")
+
+    else:
+        print(__doc__)
+
+=== BLOCK 4: get_balance + get_btc_price_usd (lines 416-880) - just sigs and 5 lines after ===
+def get_balance():
+    """Get current treasury balance in BTC.
+
+    Aggregates across all addresses in treasury_addresses.json via mempool API
+    (no Bitcoin Core dependency). Falls back to Bitcoin Core RPC only if the
+    mempool aggregate fails AND BITCOIN_CLI/WALLET_NAME are configured.
+    """
+    try:
+        agg = aggregate_treasury_balance()
+        if agg is not None:
+            return float(agg)
+    except Exception as e:
+        print(f"Warning: aggregate_treasury_balance failed: {e}")
+    bitcoin_cli = getattr(config, "BITCOIN_CLI", "").strip()
+    wallet_name = getattr(config, "WALLET_NAME", "").strip()
+    if bitcoin_cli and wallet_name:
+        try:
+            return float(rpc("getbalance"))
+        except Exception as e:
+            print(f"Warning: Bitcoin Core balance fallback failed: {e}")
+    return None
+
+
+def get_recent_transactions(count=10):
+    """Recent treasury transactions, merged across all known addresses."""
+    try:
+        return aggregate_treasury_transactions(count=count)
+    except Exception as e:
+        print(f"Warning: aggregate_treasury_transactions failed: {e}")
+    bitcoin_cli = getattr(config, "BITCOIN_CLI", "").strip()
+---
+def get_btc_price_usd():
+    """Get current BTC price in USD, tries multiple sources."""
+    import urllib.request
+    sources = [
+        ("https://api.coinbase.com/v2/prices/BTC-USD/spot", lambda d: float(d["data"]["amount"])),
+        ("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT", lambda d: float(d["price"])),
+        ("https://mempool.space/api/v1/prices", lambda d: float(d["USD"])),
+    ]
+    for url, parser in sources:
+        try:
+            with urllib.request.urlopen(url, timeout=5) as r:
+                data = json.loads(r.read())
+                price = parser(data)
+                if price > 0:
+                    return price
+        except:
+            continue
+    print("Warning: Could not get BTC price from any source")
+    return None
+
+# ---------------------------------------------------------------------------
+# LLM JSON response repair
+# ---------------------------------------------------------------------------
+# LLMs (especially Gemini) occasionally emit JSON with:
+#   - real unescaped newlines / tabs inside string values

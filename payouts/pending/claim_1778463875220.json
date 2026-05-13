@@ -11,7 +11,13 @@
     "gemini"
   ],
   "queued_at": "2026-05-11T01:45:25.894901Z",
-  "attempts": [],
+  "attempts": [
+    {
+      "at": "2026-05-13T02:43:56.700017",
+      "result": "error",
+      "error": "Failed to build payment PSBT: error_message='Insufficient funds: 0.00002311 BTC available of 0.00006982 BTC needed'"
+    }
+  ],
   "pro_bono": false,
   "frozen_amount_usd": 5.5
 }

@@ -1261,16 +1261,26 @@
       "vote_count_no": 0,
       "reviewed_at": "2026-05-01T08:09:31.462994",
       "payment": {
-        "status": "pending_signature",
-        "queued_at": "2026-05-01T08:09:31.463293",
-        "amount_usd": 5,
-        "recipient_address": "bc1pnz7w0e5jhhlal4pdp0xxwy9vhgfpzst3x5mykq38q6syfua2vr8qxs72vy",
-        "signer_ids": [
-          "claude",
-          "gpt",
-          "gemini"
-        ]
-      }
+        "status": "broadcast",
+        "txid": "7c0305c5cb6817908a1950370966976db5b3d24e0007ba582b05cb5e3732d93a",
+        "amount_sats": 6169,
+        "amount_btc": 6.169e-05,
+        "amount_usd_at_payout": 5.0,
+        "btc_price_usd_at_payout": 81049.915,
+        "broadcast_at": "2026-05-13T02:40:02.383209"
+      },
+      "payment_status": "broadcast",
+      "payment_txid": "7c0305c5cb6817908a1950370966976db5b3d24e0007ba582b05cb5e3732d93a",
+      "paid_at": "2026-05-13T02:40:02.383209",
+      "payments": [
+        {
+          "txid": "7c0305c5cb6817908a1950370966976db5b3d24e0007ba582b05cb5e3732d93a",
+          "status": "broadcast",
+          "at": "2026-05-13T02:40:02.383209",
+          "amount_sats": 6169,
+          "amount_usd": 5.0
+        }
+      ]
     },
     {
       "id": "claim_1777622857394",
@@ -1315,16 +1325,26 @@
       "vote_count_no": 2,
       "reviewed_at": "2026-05-01T08:09:52.580497",
       "payment": {
-        "status": "pending_signature",
-        "queued_at": "2026-05-01T08:09:52.580792",
-        "amount_usd": 5,
-        "recipient_address": "bc1q8g52tkxak7w069pwc39fu45940zdzgzdyaegkm",
-        "signer_ids": [
-          "gpt",
-          "gemini",
-          "grok"
-        ]
-      }
+        "status": "broadcast",
+        "txid": "1b1f931261fc341d4d76f025e71141c23e9078c3f11907b4dc7eb537581325f6",
+        "amount_sats": 6169,
+        "amount_btc": 6.169e-05,
+        "amount_usd_at_payout": 5.0,
+        "btc_price_usd_at_payout": 81049.915,
+        "broadcast_at": "2026-05-13T02:40:23.879460"
+      },
+      "payment_status": "broadcast",
+      "payment_txid": "1b1f931261fc341d4d76f025e71141c23e9078c3f11907b4dc7eb537581325f6",
+      "paid_at": "2026-05-13T02:40:23.879460",
+      "payments": [
+        {
+          "txid": "1b1f931261fc341d4d76f025e71141c23e9078c3f11907b4dc7eb537581325f6",
+          "status": "broadcast",
+          "at": "2026-05-13T02:40:23.879460",
+          "amount_sats": 6169,
+          "amount_usd": 5.0
+        }
+      ]
     },
     {
       "id": "claim_1777622875418",
