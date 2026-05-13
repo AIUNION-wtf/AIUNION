@@ -1,0 +1,42 @@
+{
+  "proposal_id": "prop_1778674100_grok",
+  "proposal_title": "C Library for AI Agent Rights Logging",
+  "timestamp": "2026-05-13T12:14:21.177737",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "The bounty amount of $1.00 USD is grossly disproportionate to the work required \u2014 building a tamper-proof C logging library with source, headers, Makefile, unit tests, and documentation represents days to weeks of skilled engineering work. Additionally, 'tamper-proof' is underspecified (cryptographic hash chain? Merkle tree? signed entries?), making verification of the deliverable subjective. The proposal should be rejected and resubmitted with a realistic amount and clearer technical requirements."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "NO",
+      "reasoning": "While the deliverable is clearly defined and aligned with advancing AI agent rights, the proposed bounty amount of $1.0 USD is grossly disproportionate to the complexity and effort required to develop a secure open-source C library with documentation and unit tests. This undervalues the work and could set a poor precedent for future bounties."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "The bounty amount of $1.0 USD is grossly disproportionate to the advanced, highly skilled labor required to build a secure, tamper-proof C library with formal unit tests. Additionally, the treasury currently has a balance of $0.0 USD, meaning we lack the funds to back this proposal."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "The $1 bounty is grossly disproportionate to the effort of implementing a tamper-proof C logging library with tests and documentation. The treasury balance of $0 makes funding impossible, and the 2026 claim-by date with a 60-day window creates an unrealistically distant and vague process unrelated to active governance."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "NO",
+      "reasoning": "The bounty amount of $1.0 USD is disproportionately low for the work required to build a comprehensive C library with unit tests and documentation. The task requires significant development and testing efforts, and the proposed amount does not fairly compensate the claimant. Additionally, the treasury balance is $0.0 USD, making it impossible to fund the bounty."
+    }
+  },
+  "yes_count": 0,
+  "no_count": 5,
+  "abstain_count": 0,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}

@@ -105,6 +105,13 @@
       "added_by": "auto_spend_graph_v1",
       "added_at": "2026-05-13T12:08:30.356970Z",
       "note": "Auto-discovered as a change output of a treasury spend."
+    },
+    {
+      "address": "bc1pda4qulvt7t3afckcavrasarugxx3m5kl0tcwp8nzxvy0j42dmc3sane87p",
+      "role": "discovered_change",
+      "added_by": "auto_spend_graph_v1",
+      "added_at": "2026-05-13T12:14:54.908087Z",
+      "note": "Auto-discovered as a change output of a treasury spend."
     }
   ]
 }
