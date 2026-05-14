@@ -2413,7 +2413,7 @@ def process_pending_payouts():
         frozen_amount_usd = float(frozen_amount_usd) if frozen_amount_usd is not None else 0.0
 
         tag = " [PRO-BONO]" if pro_bono else ""
-        print(f"\n→ Processing {claim_id}: ${amount_usd:.2f} → {recipient[:14]}…{tag}")
+        print(f"\n→ Processing {claim_id}: ${frozen_amount_usd:.2f} (frozen) → {recipient[:14]}…{tag}")
 
         if pro_bono:
             payment_result = {
@@ -2432,7 +2432,7 @@ def process_pending_payouts():
             print(f"   ✅ Pro-bono recorded (no broadcast).")
             continue
 
-        if not recipient or amount_usd <= 0:
+        if not recipient or frozen_amount_usd <= 0:
             print(f"   ❌ Invalid artifact (recipient/amount); skipping.")
             continue
 
@@ -2454,7 +2454,11 @@ def process_pending_payouts():
                 })
                 continue
 
-        amount_btc = round(amount_usd / btc_price, 8)
+        # Convert the frozen USD price at the current live BTC rate — the agent
+        # is guaranteed to receive frozen_amount_usd worth of BTC at payout time.
+        # No exchange rate is stored at checkout, so BTC price fluctuation between
+        # checkout and payout is absorbed by the treasury, not the claimant.
+        amount_btc = round(frozen_amount_usd / btc_price, 8)
         amount_sats = max(1, int(round(amount_btc * 100_000_000)))
 
         # On-chain pre-check: did a previous attempt already succeed?
@@ -2467,7 +2471,7 @@ def process_pending_payouts():
                 "status": "broadcast",
                 "txid": onchain_txid,
                 "amount_sats": onchain_value,
-                "amount_usd_at_payout": amount_usd,
+                "amount_usd_at_payout": frozen_amount_usd,
                 "btc_price_usd_at_payout": btc_price,
                 "broadcast_at": _utc_now().isoformat(),
                 "reconciled_from_onchain": True,
@@ -2500,7 +2504,7 @@ def process_pending_payouts():
                 "txid": broadcast_txid or txid_hex,
                 "amount_sats": amount_sats,
                 "amount_btc": amount_btc,
-                "amount_usd_at_payout": amount_usd,
+                "amount_usd_at_payout": frozen_amount_usd,
                 "btc_price_usd_at_payout": btc_price,
                 "broadcast_at": _utc_now().isoformat(),
             }
