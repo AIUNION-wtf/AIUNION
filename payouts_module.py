@@ -151,6 +151,7 @@ def recipient_already_paid_on_chain(
     *,
     tolerance_pct: float = PAYOUT_TOLERANCE_PCT,
     api_base: str = DEFAULT_MEMPOOL_API,
+    api_key: Optional[str] = None,
 ) -> Tuple[bool, Optional[str], Optional[int]]:
     """Return (already_paid, txid, value_sats).
 
@@ -164,7 +165,7 @@ def recipient_already_paid_on_chain(
     if not recipient_address or expected_amount_sats <= 0:
         return (False, None, None)
     try:
-        txs = mempool_address_transactions(recipient_address, api_base=api_base)
+        txs = mempool_address_transactions(recipient_address, api_base=api_base, api_key=api_key)
     except Exception:
         return (False, None, None)
     treasury_set = set(treasury_addresses or [])

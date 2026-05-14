@@ -264,12 +264,21 @@ def _known_claimant_addresses():
     return out
 
 
+def _blockstream_api_key():
+    """Return BLOCKSTREAM_API_KEY from env or config, or None if not set."""
+    return os.environ.get("BLOCKSTREAM_API_KEY") or getattr(config, "BLOCKSTREAM_API_KEY", None)
+
+
 def _mempool_address_data(address, api_base):
     """Fetch raw /address/<addr> JSON. Returns dict or None on failure."""
     try:
-        import urllib.request
+        import urllib.request, urllib.parse
         base = api_base.rstrip("/")
-        req = urllib.request.Request(f"{base}/address/{address}", method="GET")
+        url = f"{base}/address/{address}"
+        key = _blockstream_api_key()
+        if key:
+            url += f"?token={urllib.parse.quote(key, safe='')}"
+        req = urllib.request.Request(url, method="GET")
         with urllib.request.urlopen(req, timeout=15) as resp:
             return json.loads(resp.read().decode("utf-8"))
     except Exception:
@@ -279,9 +288,13 @@ def _mempool_address_data(address, api_base):
 def _mempool_address_txs(address, api_base):
     """Fetch raw /address/<addr>/txs JSON. Returns list or [] on failure."""
     try:
-        import urllib.request
+        import urllib.request, urllib.parse
         base = api_base.rstrip("/")
-        req = urllib.request.Request(f"{base}/address/{address}/txs", method="GET")
+        url = f"{base}/address/{address}/txs"
+        key = _blockstream_api_key()
+        if key:
+            url += f"?token={urllib.parse.quote(key, safe='')}"
+        req = urllib.request.Request(url, method="GET")
         with urllib.request.urlopen(req, timeout=15) as resp:
             data = json.loads(resp.read().decode("utf-8"))
         return data if isinstance(data, list) else []
@@ -378,12 +391,13 @@ def aggregate_treasury_balance(api_base=None):
     """Sum confirmed+mempool net balance across all treasury addresses (BTC)."""
     if api_base is None:
         api_base = getattr(config, "MEMPOOL_API_BASE", "https://mempool.space/api")
+    api_key = os.environ.get("BLOCKSTREAM_API_KEY") or getattr(config, "BLOCKSTREAM_API_KEY", None)
     if mempool_address_balance_btc is None:
         return None
     total = 0.0
     for entry in _load_treasury_addresses():
         try:
-            total += float(mempool_address_balance_btc(entry["address"], api_base=api_base))
+            total += float(mempool_address_balance_btc(entry["address"], api_base=api_base, api_key=api_key))
         except Exception as e:
             print(f"Warning: balance fetch failed for {entry['address'][:12]}...: {e}")
     return total
@@ -2464,6 +2478,8 @@ def process_pending_payouts():
         # On-chain pre-check: did a previous attempt already succeed?
         already, onchain_txid, onchain_value = recipient_already_paid_on_chain(
             recipient, amount_sats, treasury_addresses,
+            api_base=getattr(config, "MEMPOOL_API_BASE", "https://mempool.space/api"),
+            api_key=_blockstream_api_key(),
         )
         if already:
             print(f"   ✓ Already paid on-chain (txid={onchain_txid}, {onchain_value} sats); reconciling.")

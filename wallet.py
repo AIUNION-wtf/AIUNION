@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import urllib.error
+import urllib.parse
 import urllib.request
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
@@ -58,17 +59,24 @@ def _parse_policy_path(raw: Any) -> Optional[Dict[str, List[int]]]:
     raise PaymentError("PAYMENT_POLICY_PATH must be dict, JSON string, or null")
 
 
-def _http_json(url: str, timeout: int = 15) -> Any:
+def _http_json(url: str, timeout: int = 15, api_key: Optional[str] = None) -> Any:
+    if api_key:
+        sep = "&" if "?" in url else "?"
+        url = f"{url}{sep}token={urllib.parse.quote(api_key, safe='')}"
     req = urllib.request.Request(url, method="GET")
     with urllib.request.urlopen(req, timeout=timeout) as response:
         payload = response.read().decode("utf-8")
     return json.loads(payload) if payload else {}
 
 
-def mempool_address_balance_btc(address: str, api_base: str = DEFAULT_MEMPOOL_API) -> float:
-    """Read confirmed + mempool net balance from mempool Esplora API."""
+def mempool_address_balance_btc(
+    address: str,
+    api_base: str = DEFAULT_MEMPOOL_API,
+    api_key: Optional[str] = None,
+) -> float:
+    """Read confirmed + mempool net balance from mempool/Esplora API."""
     base = api_base.rstrip("/")
-    data = _http_json(f"{base}/address/{address}")
+    data = _http_json(f"{base}/address/{address}", api_key=api_key)
 
     chain = data.get("chain_stats", {}) or {}
     mempool = data.get("mempool_stats", {}) or {}
@@ -83,10 +91,11 @@ def mempool_address_transactions(
     address: str,
     count: int = 10,
     api_base: str = DEFAULT_MEMPOOL_API,
+    api_key: Optional[str] = None,
 ) -> List[Dict[str, Any]]:
     """Return simplified transaction history for dashboard consumption."""
     base = api_base.rstrip("/")
-    txs = _http_json(f"{base}/address/{address}/txs")
+    txs = _http_json(f"{base}/address/{address}/txs", api_key=api_key)
     if not isinstance(txs, list):
         return []
 
