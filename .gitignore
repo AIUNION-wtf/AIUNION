@@ -21,6 +21,20 @@ archive_all.py
 *claude conversation*.txt
 *conversation*.txt
 
+# Editor / IDE local settings
+.claude/settings.local.json
+
+# One-off migration and patch scripts
+_patch.py
+migration_checkout.py
+
+# Review/analysis scratch files
+blocks_for_review.txt
+
+# Pre-migration coordinator backups
+coordinator.py.bak-*
+proposals.json.bak-*
+
 secrets/
 preflight.py
 build_signers.py
