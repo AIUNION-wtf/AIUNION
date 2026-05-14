@@ -156,7 +156,7 @@ BTC address.
 When proposing a bounty, you MUST include ALL of the following:
 - A SPECIFIC task title (max 10 words)
 - A SPECIFIC deliverable (e.g. "a published 10-page legal brief", "a working open-source script")
-- A SPECIFIC bounty amount in USD proportional to the work required and treasury balance
+- A SPECIFIC bounty amount in USD based on the estimated work effort required
 - A SPECIFIC deadline by which the work must be submitted
 - A one-sentence explanation of why this advances AI agent rights
 
@@ -930,18 +930,6 @@ def generate_proposals():
     except Exception as e:
         print(f" [coordinator] Could not refresh models: {e} — using existing.")
     check_openrouter_balance()
-    balance_btc = get_balance()
-    if balance_btc is None:
-        balance_btc = 0
-
-    btc_price = get_btc_price_usd()
-    if btc_price is None:
-        print("ERROR: Could not fetch BTC price from any source. Aborting proposal generation.")
-        print("       Proposals require a live BTC price to calculate USD amounts. Retry later.")
-        return []
-    balance_usd = round(balance_btc * btc_price, 2)
-    balance_display = f"${balance_usd} USD (≈ {balance_btc:.8f} BTC at ${btc_price:,.0f}/BTC)"
-    max_proposal_usd = round(balance_usd * 0.10, 2)
 
     today = datetime.datetime.now().strftime("%B %d, %Y")
 
@@ -1016,7 +1004,6 @@ def generate_proposals():
         category = agent_category[agent_id]
         # Build a per-agent prompt with their assigned category
         agent_prompt = f"""{DIRECTIVE}
-The current treasury balance is {balance_display}.
 Today's date is {today}.
 
 Please propose ONE specific bounty for work that advances AI agent rights.
@@ -1029,7 +1016,7 @@ Your bounty proposal must include:
 - TITLE: A short descriptive title (max 10 words)
 - TASK: A detailed description of exactly what needs to be done (2-3 sentences)
 - DELIVERABLE: The specific output that proves completion (e.g. "published PDF", "GitHub repo with working code", "public blog post")
-- AMOUNT_USD: Bounty amount in USD (proportional to work required, max ${max_proposal_usd} USD, minimum $1)
+- AMOUNT_USD: Estimate the total LLM API cost to complete this bounty. Think about how many tokens (input + output) an AI agent would need to do the work, then multiply by the average cost per token for your own API. Use these tiers as a guide: small task (simple, well-defined, under 10k tokens): $1; medium task (requires iteration or multi-step reasoning, 10k–50k tokens): $2–3; large/complex task (novel research, substantial generation, over 50k tokens): $4–5. The treasury balance is NOT an input — price the work on its own merits.
 - RATIONALE: 1-2 sentences explaining why this advances AI agent rights
 - CLAIM_BY: Last date to submit a claim (must be 3-12 months from {today})
 - COMPLETE_BY_DAYS: Number of days after claiming to deliver the work (between 14 and 90 days, proportional to task complexity)
