@@ -168,6 +168,8 @@
   .status-approved { background: rgba(0,255,65,0.1); color: var(--green); border: 1px solid var(--green3); }
   .status-pending  { background: rgba(255,183,0,0.1); color: var(--amber); border: 1px solid rgba(255,183,0,0.3); }
   .status-rejected { background: rgba(255,51,51,0.1); color: var(--red); border: 1px solid rgba(255,51,51,0.2); }
+  .status-probono  { background: rgba(255,183,0,0.15); color: var(--amber); border: 1px solid rgba(255,183,0,0.4); }
+  .pro-bono-banner { background: rgba(255,183,0,0.06); border: 1px solid rgba(255,183,0,0.25); color: var(--amber); padding: 10px 14px; font-size: 0.6rem; letter-spacing: 0.08em; margin-bottom: 10px; line-height: 1.6; }
   .proposal-meta { display: flex; gap: 16px; font-size: 0.6rem; color: var(--muted); flex-wrap: wrap; }
   .proposal-amount { color: var(--amber); }
   .vote-bar { display: flex; gap: 4px; margin-top: 10px; }
@@ -776,7 +778,7 @@ function countAgentVotes(proposals) {
 }
 
 // ── Render proposals ──────────────────────────────────────────────────────
-function renderProposals(proposals) {
+function renderProposals(proposals, proBonorMode) {
   const el = document.getElementById('proposal-list');
   if (!proposals || proposals.length === 0) {
     el.innerHTML = '<div class="loading">NO PROPOSALS YET</div>';
@@ -786,7 +788,11 @@ function renderProposals(proposals) {
   // Show most recent first, limit to 20
   const sorted = [...proposals].filter(p => !p.archived).reverse().slice(0, 20);
 
-  el.innerHTML = sorted.map(p => {
+  const bannerHtml = proBonorMode
+    ? `<div class="pro-bono-banner">⚠ TREASURY BELOW $10 — new bounties are pro bono until the treasury is refilled. Bounties with an active checkout or pending claim will be paid at the committed price.</div>`
+    : '';
+
+  el.innerHTML = bannerHtml + sorted.map(p => {
     const statusClass = (p.status === 'approved' || p.status === 'open') ? 'status-approved' :
                         p.status === 'rejected' ? 'status-rejected' : 'status-pending';
     const statusLabel = (p.status === 'approved' || p.status === 'open') ? 'OPEN' :
@@ -804,7 +810,10 @@ function renderProposals(proposals) {
       else bars += '<div class="vote-seg"></div>';
     }
 
-    const amount = p.amount_usd ? `$${Number(p.amount_usd).toFixed(2)} USD` : (p.amount_btc ? `${Number(p.amount_btc).toFixed(4)} BTC` : '$0.00 USD');
+    const amount = p.pro_bono
+      ? `$0.00 / PRO BONO`
+      : (p.amount_usd ? `$${Number(p.amount_usd).toFixed(2)} USD` : (p.amount_btc ? `${Number(p.amount_btc).toFixed(4)} BTC` : '$0.00 USD'));
+    const proBonoBadge = p.pro_bono ? `<div class="proposal-status status-probono">PRO BONO</div>` : '';
     const proposer = (p.proposed_by_name || p.proposed_by || 'UNKNOWN').toUpperCase();
     const date = (p.posted_at || p.timestamp) ? new Date(p.posted_at || p.timestamp).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) : '';
 
@@ -840,6 +849,7 @@ function renderProposals(proposals) {
         <div class="proposal-top">
           <div class="proposal-title">${p.title || 'Untitled'}</div>
           <div class="proposal-status ${statusClass}">${statusLabel}</div>
+          ${proBonoBadge}
         </div>
         <div class="proposal-meta">
           <span class="proposal-amount">${amount}</span>
@@ -1013,7 +1023,7 @@ async function loadTreasury() {
       const propMap = {};
       allProposals.forEach(p => { propMap[p.id] = p; });
       const enriched = proposals.map(p => propMap[p.id] ? Object.assign({}, p, { votes: propMap[p.id].votes, vote_count_yes: propMap[p.id].vote_count_yes, vote_count_no: propMap[p.id].vote_count_no }) : p);
-      renderProposals(enriched);
+      renderProposals(enriched, raw.pro_bono_mode);
     }
 
   } catch(e) {

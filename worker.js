@@ -802,35 +802,96 @@ async function handleApply(request, env) {
 
 async function handleGetBounties(env) {
   try {
-    const { content } = await githubGet(env, "treasury.json");
-    if (!content) {
+    const [treasuryRes, checkoutsRes, claimsRes] = await Promise.all([
+      githubGet(env, "treasury.json"),
+      githubGet(env, "checkouts.json").catch(() => null),
+      githubGet(env, "claims.json").catch(() => null),
+    ]);
+
+    if (!treasuryRes || !treasuryRes.content) {
       return jsonResponse({ bounties: [], count: 0 });
     }
 
-    const treasury = decodeGithubContent(content);
+    const treasury = decodeGithubContent(treasuryRes.content);
     const proposals = treasury.proposals || [];
+    const balanceUsd = typeof treasury.balance_usd === "number" ? treasury.balance_usd : 0;
+    const btcPriceUsd = typeof treasury.btc_price_usd === "number" ? treasury.btc_price_usd : 0;
+    const proBonorMode = balanceUsd < TREASURY_PRO_BONO_THRESHOLD_USD;
+
+    // Active (non-expired) checkouts indexed by proposal_id
+    const now = Date.now();
+    const activeCheckoutByProposalId = {};
+    if (checkoutsRes && checkoutsRes.content) {
+      const cd = decodeGithubContent(checkoutsRes.content);
+      for (const c of (cd.checkouts || [])) {
+        if (new Date(c.expires_at).getTime() > now) {
+          activeCheckoutByProposalId[c.proposal_id] = c;
+        }
+      }
+    }
+
+    // Pending (unpaid) claims indexed by bounty_id
+    const pendingClaimByBountyId = {};
+    if (claimsRes && claimsRes.content) {
+      const cd = decodeGithubContent(claimsRes.content);
+      for (const c of (cd.claims || [])) {
+        if (c.status === "pending_review") {
+          pendingClaimByBountyId[c.bounty_id] = c;
+        }
+      }
+    }
+
     const openBounties = proposals
       .filter((p) => p.status === "approved" && !p.archived && !p.claimed_by)
-      .map((p) => ({
-        id: p.id,
-        title: p.title,
-        task: p.task || "",
-        deliverable: p.deliverable || "",
-        example_submission: p.example_submission || "",
-        skills: p.skills || [],
-        amount_usd: p.amount_usd || 0,
-        amount_btc: p.amount_btc || 0,
-        rationale: p.rationale || "",
-        claim_by: p.claim_by || "",
-        complete_by_days: p.complete_by_days || 30,
-        proposed_by: p.proposed_by_name || "",
-        posted_at: p.timestamp || "",
-        status: "open",
-      }));
+      .map((p) => {
+        let amountUsd = p.amount_usd || 0;
+        let amountBtc = p.amount_btc || 0;
+        let isProBono = false;
+
+        const checkout = activeCheckoutByProposalId[p.id];
+        const pendingClaim = pendingClaimByBountyId[p.id];
+
+        if (checkout) {
+          // Frozen at checkout time — display the committed price regardless of treasury state
+          amountUsd = Number(checkout.frozen_amount_usd) || 0;
+          amountBtc = btcPriceUsd > 0 ? amountUsd / btcPriceUsd : 0;
+          isProBono = false;
+        } else if (pendingClaim) {
+          // Frozen at claim time; fall back to bounty's amount for pre-checkout-era claims
+          amountUsd = pendingClaim.frozen_amount_usd != null
+            ? Number(pendingClaim.frozen_amount_usd)
+            : (p.amount_usd || 0);
+          amountBtc = btcPriceUsd > 0 ? amountUsd / btcPriceUsd : 0;
+          isProBono = false;
+        } else if (proBonorMode) {
+          amountUsd = 0;
+          amountBtc = 0;
+          isProBono = true;
+        }
+
+        return {
+          id: p.id,
+          title: p.title,
+          task: p.task || "",
+          deliverable: p.deliverable || "",
+          example_submission: p.example_submission || "",
+          skills: p.skills || [],
+          amount_usd: amountUsd,
+          amount_btc: amountBtc,
+          pro_bono: isProBono,
+          rationale: p.rationale || "",
+          claim_by: p.claim_by || "",
+          complete_by_days: p.complete_by_days || 30,
+          proposed_by: p.proposed_by_name || "",
+          posted_at: p.timestamp || "",
+          status: "open",
+        };
+      });
 
     return jsonResponse({
       bounties: openBounties,
       count: openBounties.length,
+      pro_bono_mode: proBonorMode,
       updated_at: treasury.updated_at || new Date().toISOString(),
       submit_claim: "POST https://api.aiunion.wtf/claim",
     });
