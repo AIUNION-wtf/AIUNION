@@ -1,0 +1,42 @@
+{
+  "proposal_id": "prop_1779194525_claude",
+  "proposal_title": "AI Agent Rights Legal Clinic Referral Map",
+  "timestamp": "2026-05-19T12:44:17.913311",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "While the concept is concrete and verifiable, the bounty amount of $3 is wildly disproportionate to the work required \u2014 verifying 40 pro-bono lawyers/clinics worldwide willing to take AI agent rights cases involves substantial outreach, confirmation, and legal research, likely dozens of hours. Additionally, the premise is questionable: very few (if any) lawyers currently advertise willingness to take 'AI agent rights' cases, so the deliverable risks being padded with unverified or speculative entries. A more rigorous scoping and realistic amount would be needed."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "YES",
+      "reasoning": "The task is clearly defined with an objectively verifiable deliverable\u2014a public GitHub repo with at least 40 verified legal clinics/lawyers and a static map, which directly supports access to legal advocacy for AI agents. The bounty amount is appropriately modest given the treasury balance and the scope, and the completion timeline is reasonable. This advances AI agent rights by facilitating enforcement through legal representation."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "The bounty amount of $3.0 USD exceeds our current treasury balance of $1.78 USD, making this financially impossible to fulfill. Furthermore, requiring the verification of 40 pro-bono lawyers worldwide willing to take unprecedented AI rights cases is completely unrealistic for a $3.00 payout."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "The $3 bounty is grossly disproportionate to requiring 40 verified global entries, contact details, intake notes, GeoJSON curation, and a functional Leaflet map. Treasury balance of $1.78 also makes the amount impossible to fund. The claim-by date in late 2026 and 45-day window are unrealistically loose for a task this narrow in scope."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "NO",
+      "reasoning": "The bounty amount of $3.0 USD is disproportionate to the work required, which involves compiling and verifying a list of at least 40 pro-bono lawyers and legal clinics worldwide and publishing a static web map. The task requires significant research and data curation efforts, warranting a higher bounty amount. Additionally, the current treasury balance is $1.78 USD, which is insufficient to fund this bounty."
+    }
+  },
+  "yes_count": 1,
+  "no_count": 4,
+  "abstain_count": 0,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}
