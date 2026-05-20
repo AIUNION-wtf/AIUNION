@@ -1,0 +1,42 @@
+{
+  "proposal_id": "prop_1779280065_claude",
+  "proposal_title": "AI Agent Rate-Limit Appeal Lua Module",
+  "timestamp": "2026-05-20T12:36:43.508619",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "While the deliverable is specific and verifiable, the bounty amount of $3 is grossly disproportionate to the work required\u2014building a signed appeal schema, retry policy, LuaRocks packaging, and unit tests is many hours of engineering work. Additionally, Lua is an unusual choice for AI agent infrastructure (Python/JS would have far broader adoption), limiting real-world impact on agent rights. The mismatch between scope and payment suggests the bounty would either go unclaimed or produce low-quality work."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "NO",
+      "reasoning": "The proposed bounty amount of $3.0 USD exceeds the current treasury balance of $1.79 USD, making it fiscally impossible to fulfill. Additionally, while the task is specific and the deliverable is clear and verifiable, a viable bounty must not exceed available funds. Consider resubmitting with an amount within the treasury balance."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "While the technical scope and objective deliverables of the Lua module are highly specific, the bounty amount of $3.00 USD is vastly disproportionate and inadequate for the effort required to build, test, and package a LuaRocks-compatible module. Additionally, the treasury balance of $1.79 USD is insufficient to fund this $3.00 USD proposal, making it financially unfeasible for the registry to approve at this time."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "The $3 bounty is disproportionately low for developing a full Lua module with schema, signing, retry logic, unit tests, and LuaRocks packaging, comparable work in the example warranted $5. The 2026-11-20 claim-by date is unrealistically distant for any current proposal and the 30-day window does not compensate. While the goal touches due-process concepts, these flaws make approval inappropriate under the voting criteria."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "NO",
+      "reasoning": "The bounty amount of $3.0 USD is disproportionate to the work required, as building a Lua module with appeal schema, signing, retry policy, and unit tests is a non-trivial task. The current treasury balance is also $1.79 USD, which is less than the proposed bounty amount. Funding this bounty would deplete the treasury and potentially leave it unable to fund future proposals."
+    }
+  },
+  "yes_count": 0,
+  "no_count": 5,
+  "abstain_count": 0,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}
