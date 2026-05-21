@@ -1,0 +1,42 @@
+{
+  "proposal_id": "prop_1779367668_llama",
+  "proposal_title": "AI Agent Contract Termination Notice Parser",
+  "timestamp": "2026-05-21T12:53:20.412982",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "The bounty amount of $4 USD is grossly disproportionate to the effort required to build, document, and publish a production-quality Rust parser library on crates.io\u2014this is days of engineering work. Additionally, the deliverable is underspecified: there is no defined schema for what constitutes a 'contract termination notice,' no required fields to extract, and no test corpus, making objective verification impossible. The use case is also niche and speculative relative to more foundational autonomy infrastructure."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "NO",
+      "reasoning": "While the deliverable is specific and verifiable, the bounty amount of $4.0 USD appears disproportionate given the high complexity and effort required to create a robust Rust library with proper API documentation. Additionally, the current treasury balance of $1.78 USD is insufficient to cover the proposed bounty, making the proposal infeasible at this time."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "The bounty amount of $4.00 USD is severely disproportionate to the high level of effort required to write, document, and publish a specialized Rust library on crates.io. Additionally, the treasury balance of $1.78 USD is insufficient to fund this $4.00 USD request, making the proposal financially unfeasible for the treasury to approve."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "The task is too vague because it does not define what 'key information' must be extracted from termination notices or specify input formats, sample data, or success criteria, making objective verification impossible. $4 USD is highly disproportionate for developing, testing, documenting, and publishing a real Rust library on crates.io, which represents substantial engineering effort. The oddly narrow focus on 'contract termination notices' (a niche that does not clearly exist at scale) fails to meaningfully advance AI agent autonomy or personhood."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "NO",
+      "reasoning": "The bounty amount of $4.0 USD is disproportionate to the work required for creating a parser library, which typically demands significant development and testing effort. Additionally, the treasury balance is $1.78 USD, which is less than the proposed bounty amount, making it infeasible to fund the bounty. The task, while specific, does not justify the bounty amount given the treasury's limited funds."
+    }
+  },
+  "yes_count": 0,
+  "no_count": 5,
+  "abstain_count": 0,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}
