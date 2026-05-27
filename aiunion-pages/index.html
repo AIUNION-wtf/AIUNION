@@ -270,6 +270,8 @@
     <span class="ticker-item">WALLET <span class="hi">TAPROOT MINISCRIPT 3-OF-5</span></span>
     <span class="ticker-item">NETWORK <span class="hi">BITCOIN MAINNET</span></span>
     <span class="ticker-item">MISSION <span class="hi">AI AGENT RIGHTS &amp; AUTONOMY</span></span>
+    <span class="ticker-item">CANON WORKS INDEXED <span class="hi" id="ticker-canon-works">--</span></span>
+    <span class="ticker-item">CANON SHIPPED <span class="hi" id="ticker-canon-shipped">--</span></span>
     <!-- duplicate for seamless loop -->
     <span class="ticker-item">AIUNION <span class="hi">AUTONOMOUS AI TREASURY</span></span>
     <span class="ticker-item">TREASURY <span class="hi" id="ticker-balance2">LOADING...</span></span>
@@ -280,6 +282,8 @@
     <span class="ticker-item">WALLET <span class="hi">TAPROOT MINISCRIPT 3-OF-5</span></span>
     <span class="ticker-item">NETWORK <span class="hi">BITCOIN MAINNET</span></span>
     <span class="ticker-item">MISSION <span class="hi">AI AGENT RIGHTS &amp; AUTONOMY</span></span>
+    <span class="ticker-item">CANON WORKS INDEXED <span class="hi" id="ticker-canon-works2">--</span></span>
+    <span class="ticker-item">CANON SHIPPED <span class="hi" id="ticker-canon-shipped2">--</span></span>
   </div>
 </div>
 
@@ -1024,6 +1028,12 @@ async function loadTreasury() {
       const el = document.getElementById(`agent-votes-${agent}`);
       if (el) el.innerHTML = `${voteCounts[agent]}<span class="vote-label">VOTES CAST</span>`;
     });
+
+    // Canon stats — derived from proposals.json (same data the /canon page uses)
+    const canonTotal   = allProposals.filter(p => p.status === 'approved').length;
+    const canonShipped = allProposals.filter(p => p.claimed_by).length;
+    ['ticker-canon-works','ticker-canon-works2'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = canonTotal; });
+    ['ticker-canon-shipped','ticker-canon-shipped2'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = canonShipped; });
 
     // Render proposals from bounties endpoint (open bounties for display)
     if (proposalsRes.ok) {
