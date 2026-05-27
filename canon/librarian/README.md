@@ -26,11 +26,11 @@ The Librarian never reclassifies existing entries, never touches `canon.html`, a
 
 ### Required secret
 
-Add `OPENROUTER_API_KEY` to the repository:
+Add `AIUNION_OPENROUTER_API_KEY` to the repository:
 
 ```
 GitHub -> Settings -> Secrets and variables -> Actions -> New repository secret
-Name:  OPENROUTER_API_KEY
+Name:  AIUNION_OPENROUTER_API_KEY
 Value: sk-or-...
 ```
 
@@ -86,7 +86,7 @@ Tests mock `urllib.request.urlopen` — no API key required.
 GitHub -> Actions -> AIUNION Librarian -> Run workflow -> Run workflow.
 
 Useful for:
-- Backfilling after adding the `OPENROUTER_API_KEY` secret.
+- Backfilling after adding the `AIUNION_OPENROUTER_API_KEY` secret.
 - Re-running after a transient API failure.
 - Verifying the workflow is healthy.
 

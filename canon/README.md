@@ -80,7 +80,7 @@ What it does on each run:
 
 **If something goes wrong**: check the Actions tab for the failing run, or search the commit log for `librarian:` commits. Fallback entries are logged in the commit message.
 
-**Required secret**: `OPENROUTER_API_KEY` — add via Settings → Secrets → Actions.
+**Required secret**: `AIUNION_OPENROUTER_API_KEY` — add via Settings → Secrets → Actions.
 
 Full documentation: `canon/librarian/README.md`.
 
