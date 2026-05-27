@@ -1,0 +1,54 @@
+name: AIUNION Librarian
+
+on:
+  push:
+    paths:
+      - 'proposals.json'
+  schedule:
+    - cron: '17 * * * *'   # hourly, offset to avoid CI congestion
+  workflow_dispatch:        # manual trigger via Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  classify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Use LIBRARIAN_GITHUB_TOKEN if set (required when main has branch
+          # protection). Falls back to the default github.token otherwise.
+          token: ${{ secrets.LIBRARIAN_GITHUB_TOKEN || github.token }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r canon/librarian/requirements.txt
+
+      - name: Run tests
+        run: python -m unittest discover -s canon/librarian -p 'test_*.py' -v
+
+      - name: Classify new proposals
+        id: classify
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_MODEL: ${{ vars.ANTHROPIC_MODEL || 'claude-sonnet-4-5' }}
+        run: python canon/librarian/classify.py
+
+      - name: Commit if taxonomy changed
+        run: |
+          if git diff --quiet canon/taxonomy.json; then
+            echo "taxonomy.json unchanged — nothing to commit"
+          else
+            ADDED="${{ steps.classify.outputs.added }}"
+            git config user.name  "AIUNION Librarian"
+            git config user.email "librarian@aiunion.wtf"
+            git add canon/taxonomy.json
+            git commit -m "librarian: classify ${ADDED} new approved works"
+            git push
+          fi

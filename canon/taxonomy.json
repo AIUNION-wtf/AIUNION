@@ -1,7 +1,9 @@
 {
   "_meta": {
+    "schema_version": "1",
     "last_run": "2026-05-26T12:00:00Z",
-    "schema_version": 1,
+    "last_run_added": 0,
+    "total_entries": 92,
     "description": "Hand-classification of all approved AIUNION proposals into the six-book personhood canon.",
     "books": {
       "I":   "Identity & Self-Custody",

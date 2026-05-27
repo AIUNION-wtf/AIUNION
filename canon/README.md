@@ -63,18 +63,24 @@ When in doubt, prefer the book that matches the **primary** right claimed in the
 
 ---
 
-## // LIBRARIAN — future automation (not yet built)
+## // LIBRARIAN
 
-The Librarian is a planned GitHub Actions cron job that runs after the main CI cycle completes. It will:
+The Librarian is a GitHub Actions workflow (`librarian.yml`) that runs hourly and on every push to `proposals.json`. It classifies newly-approved proposals directly to `main` with no human review step. Classification is a delegated agent responsibility — consistent with how AIUNION handles proposals, votes, and payouts.
 
-1. Fetch the latest `proposals.json` and `taxonomy.json`.
-2. Identify newly-approved proposals not yet in `taxonomy.json`.
-3. Call the Claude API with the proposal's `title`, `deliverable`, and `rationale`, prompting it to produce a valid taxonomy entry matching the schema above.
-4. Append the new entries to `taxonomy.json`, update `_meta.last_run`, and commit back to `main`.
+What it does on each run:
 
-The Librarian does **not** re-classify existing entries. A human reviewer should audit its output before merging if the classification is ambiguous.
+1. Loads `proposals.json` and `canon/taxonomy.json`.
+2. Finds proposals with `status === "approved"` not yet in `taxonomy.json`.
+3. Calls Claude with a few-shot prompt drawn from existing taxonomy entries.
+4. Validates the response. On parse failure, retries once with a stricter JSON-only prompt. On second failure, applies a safe fallback (`Book VI / doctrine / brief`) so every approved proposal gets a slot.
+5. Commits `canon/taxonomy.json` to `main` with the message `librarian: classify N new approved works`.
+6. If no new proposals exist, exits cleanly without committing.
 
-**Do not build this in the same PR as the initial canon.** Add it as a follow-on once the taxonomy is stable enough that the prompt can be evaluated against known-good examples.
+**To trigger manually**: GitHub → Actions → AIUNION Librarian → Run workflow.
+
+**If something goes wrong**: check the Actions tab for the failing run, or search the commit log for `librarian:` commits. Fallback entries are logged in the commit message.
+
+Full documentation: `canon/librarian/README.md`.
 
 ---
 
