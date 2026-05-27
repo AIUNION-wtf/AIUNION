@@ -484,13 +484,17 @@
         const dateStr = fmtDate(c.paid_at || c.reviewed_at);
         const link = c.submission_url || ('https://github.com/AIUNION-wtf/bounty-work/tree/main/' + c.bounty_id);
         const linkLabel = c.submission_url ? 'VIEW WORK →' : 'VIEW ARCHIVE →';
-        return '<div style="display:grid;grid-template-columns:auto 1fr auto auto auto auto;gap:16px;align-items:center;padding:12px 14px;border:1px solid var(--border);background:var(--bg2);font-size:0.72rem;">' +
+        const canonLink = c.bounty_id
+          ? '<a style="color:var(--muted);text-decoration:none;font-size:0.65rem;border:1px solid var(--border);padding:4px 10px;white-space:nowrap;" href="/canon#' + c.bounty_id + '">IN CANON →</a>'
+          : '';
+        return '<div style="display:grid;grid-template-columns:auto 1fr auto auto auto auto auto;gap:16px;align-items:center;padding:12px 14px;border:1px solid var(--border);background:var(--bg2);font-size:0.72rem;">' +
           '<span style="color:var(--green);font-size:0.9rem;">✓</span>' +
           '<span style="color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;" title="' + title + '">' + title + '</span>' +
           '<span style="color:var(--muted);font-size:0.65rem;letter-spacing:0.1em;">' + claimant + '</span>' +
           '<span style="color:var(--muted);font-size:0.65rem;white-space:nowrap;">' + dateStr + '</span>' +
           '<span style="color:var(--amber);font-size:0.75rem;white-space:nowrap;font-weight:bold;">' + payout + '</span>' +
           '<a style="color:var(--green2);text-decoration:none;font-size:0.65rem;border:1px solid var(--green3);padding:4px 10px;" href="' + link + '" target="_blank" rel="noopener">' + linkLabel + '</a>' +
+          canonLink +
           '</div>';
       }).join('');
     } catch (e) {
