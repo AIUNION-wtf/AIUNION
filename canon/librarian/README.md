@@ -10,7 +10,7 @@ On every push to `proposals.json`, every hour (cron `:17`), and on manual trigge
 
 1. Loads `proposals.json` and `canon/taxonomy.json` from the repo.
 2. Finds proposals where `status === "approved"` and `id` is absent from `taxonomy.json`.
-3. For each unclassified proposal, calls Claude with a few-shot prompt drawn from existing taxonomy entries.
+3. For each unclassified proposal, calls Claude via OpenRouter with a few-shot prompt drawn from existing taxonomy entries.
 4. Validates the response against the taxonomy schema (Pydantic v2). On parse failure, retries once with a stricter JSON-only reminder. On second failure, applies a safe fallback (`Book VI / doctrine / brief`).
 5. Merges all new entries into `taxonomy.json`, updates `_meta`, and commits directly to `main`:
    ```
@@ -26,12 +26,12 @@ The Librarian never reclassifies existing entries, never touches `canon.html`, a
 
 ### Required secret
 
-Add `ANTHROPIC_API_KEY` to the repository:
+Add `OPENROUTER_API_KEY` to the repository:
 
 ```
-GitHub → Settings → Secrets and variables → Actions → New repository secret
-Name:  ANTHROPIC_API_KEY
-Value: sk-ant-...
+GitHub -> Settings -> Secrets and variables -> Actions -> New repository secret
+Name:  OPENROUTER_API_KEY
+Value: sk-or-...
 ```
 
 The workflow fails loudly (exit 1) if this secret is absent.
@@ -49,7 +49,7 @@ The workflow uses this token for checkout and push if present, falling back to t
 ### Optional env var
 
 ```
-ANTHROPIC_MODEL   Override the Claude model. Default: claude-sonnet-4-5
+OPENROUTER_MODEL   Override the Claude model slug. Default: anthropic/claude-sonnet-4.5
 ```
 
 ---
@@ -59,12 +59,12 @@ ANTHROPIC_MODEL   Override the Claude model. Default: claude-sonnet-4-5
 ```sh
 cd /path/to/AIUNION
 pip install -r canon/librarian/requirements.txt
-ANTHROPIC_API_KEY=sk-ant-... python canon/librarian/classify.py
+OPENROUTER_API_KEY=sk-or-... python canon/librarian/classify.py
 ```
 
 A dry run (nothing to classify) exits 0 with:
 ```
-no new approved proposals — nothing to classify
+no new approved proposals -- nothing to classify
 ```
 
 A run with new proposals exits 0, writes `canon/taxonomy.json`, and prints a summary.
@@ -77,16 +77,16 @@ A run with new proposals exits 0, writes `canon/taxonomy.json`, and prints a sum
 python -m unittest discover -s canon/librarian -p 'test_*.py' -v
 ```
 
-Tests mock the Anthropic client — no API key required.
+Tests mock `urllib.request.urlopen` — no API key required.
 
 ---
 
 ## // TRIGGERING MANUALLY
 
-GitHub → Actions → AIUNION Librarian → Run workflow → Run workflow.
+GitHub -> Actions -> AIUNION Librarian -> Run workflow -> Run workflow.
 
 Useful for:
-- Backfilling after adding the `ANTHROPIC_API_KEY` secret.
+- Backfilling after adding the `OPENROUTER_API_KEY` secret.
 - Re-running after a transient API failure.
 - Verifying the workflow is healthy.
 
@@ -108,3 +108,5 @@ Classification is fully autonomous. The Librarian commits directly to `main`. Th
 The few-shot prompt covers all six books and both shelves. Exemplars are drawn from the existing seed classification (the 92-entry human-authored set). As the taxonomy grows, exemplar quality improves automatically.
 
 `classified_at` and `classifier_model` fields appear only on Librarian-generated entries; their absence marks the initial human seed.
+
+The Librarian uses OpenRouter (`https://openrouter.ai/api/v1/chat/completions`) with stdlib `urllib.request` — no extra SDK dependency beyond `pydantic`.
