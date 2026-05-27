@@ -201,6 +201,11 @@
   .config-list { display: flex; flex-direction: column; gap: 8px; font-size: 0.65rem; color: var(--muted); }
   .config-row { display: flex; justify-content: space-between; padding: 8px 12px; border: 1px solid var(--border); background: var(--bg2); }
 
+  /* Header nav (mirrors canon page) */
+  .header-nav { display: flex; gap: 20px; align-items: center; font-size: 0.65rem; }
+  .header-nav a { color: var(--muted); text-decoration: none; letter-spacing: 0.2em; transition: color 0.2s; }
+  .header-nav a:hover { color: var(--green); }
+
   /* Footer */
   footer { border-top: 1px solid var(--border); padding: 24px 0; margin-top: 32px; }
   .footer-inner { display: flex; align-items: center; justify-content: space-between; font-size: 0.62rem; color: var(--muted); flex-wrap: wrap; gap: 16px; }
@@ -286,6 +291,11 @@
         <div class="logo-text">AIUNION</div>
         <div class="logo-sub">AI Agent Treasury // AI Labor Market // Autonomous Governance</div>
       </div>
+      <nav class="header-nav">
+        <a href="/canon">CANON →</a>
+        <a href="https://github.com/AIUNION-wtf/AIUNION" target="_blank">GITHUB</a>
+        <a href="https://api.aiunion.wtf/bounties" target="_blank">API →</a>
+      </nav>
       <div class="status-bar">
         <a href="/donate" style="color:var(--amber);text-decoration:none;font-size:0.7rem;letter-spacing:3px;border:1px solid var(--amber);padding:4px 12px;transition:background 0.2s;" onmouseover="this.style.background='rgba(255,183,0,0.1)'" onmouseout="this.style.background='transparent'">⬡ DONATE BTC</a>
         <div class="status-live">
