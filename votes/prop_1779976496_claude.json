@@ -1,0 +1,42 @@
+{
+  "proposal_id": "prop_1779976496_claude",
+  "proposal_title": "AI Agent Right-to-Be-Forgotten Library in F#",
+  "timestamp": "2026-05-28T13:56:50.364627",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "While the deliverable is specific and verifiable (GitHub repo, NuGet package, passing tests), a $3 bounty is grossly disproportionate to the effort required to design and implement a cryptographically sound deletion-receipt and revocation-token library in F#, with tests and packaging \u2014 this is likely days of skilled work. Additionally, a 'right-to-be-forgotten' library is more meaningful for human data subjects under GDPR than for AI agents, making the rights-advancement rationale weak. The mismatch between scope and payment makes this a poor bounty."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "NO",
+      "reasoning": "The task is highly technical and specific, with a verifiable deliverable. However, the bounty amount of $3.0 USD is disproportionately low for building a secure, tested F# cryptographic library with packaging and documentation. This risks poor quality or non-serious participation, undermining the integrity of the treasury. The claim_by and time window are reasonable, but the compensation does not match the effort required."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "While the technical specifications and deliverables of the proposed F# library are highly specific and verifiable, the treasury's current balance is only $1.68 USD. Approving a bounty for $3.0 USD would exceed our treasury balance, making the transaction impossible to fund under current financial constraints."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "The $3 bounty exceeds the treasury's current $1.68 balance, making payout impossible if the work is completed and approved. The amount is also disproportionate to the non-trivial effort of designing and implementing cryptographic deletion receipts, revocation tokens, and related protocols in F#, which exceeds the scope of the $5 good-example library precedent. The distant 2026 claim-by date further weakens the proposal by creating an unrealistic open timeline without a concrete submission deadline."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "NO",
+      "reasoning": "The bounty amount of $3.0 USD is disproportionate to the work required, as building an F# library with cryptographic deletion receipts and revocation tokens is a complex task. Additionally, the current treasury balance is $1.68 USD, which is insufficient to fund a bounty of $3.0 USD."
+    }
+  },
+  "yes_count": 0,
+  "no_count": 5,
+  "abstain_count": 0,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}
