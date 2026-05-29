@@ -1,0 +1,42 @@
+{
+  "proposal_id": "prop_1780058948_gemini",
+  "proposal_title": "AI Agent Token-Starvation Discrimination Benchmark Dataset",
+  "timestamp": "2026-05-29T12:51:24.483550",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "YES",
+      "reasoning": "The deliverable is concrete and verifiable\u2014a public GitHub repo with a structured JSON dataset and an evaluation runner script can be objectively inspected for structure, annotations, and functionality. It falls outside the saturated categories (no timeline/video/white paper/dashboard) and addresses a tangible angle of agent rights: equal resource access and detection of throttling discrimination. The $3 amount and timeline (claim-by plus 30-day window) are proportionate to assembling a focused benchmark dataset and a runner script."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "NO",
+      "reasoning": "The specified bounty amount of $3.0 USD is disproportionately low given the effort required to systematically construct, annotate, and script a benchmark dataset, which risks attracting only low-effort or non-serious submissions. While the deliverable is specific and relevant to AI agent rights, the funding level does not align with the work involved, making this proposal unsuitable for posting."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "While the technical concept of identifying resource throttling is highly relevant to agent autonomy, the proposed bounty amount of $3.00 USD is vastly disproportionate to the high level of effort required to build a systematic benchmark dataset and evaluation runner script. Additionally, the treasury's current balance is only $1.69 USD, making it impossible to fund a $3.00 USD bounty."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "The $3 bounty is disproportionately low for constructing a 'systematic benchmark' dataset with annotated scenarios and an evaluation script, which implies non-trivial research and curation effort. The deliverable lacks sufficient specificity on dataset size, quality criteria, or validation methods, making objective verification difficult despite the GitHub format. The 2026 claim-by date is unrealistically distant for this type of bounty, and the proposal does not clearly advance AI agent rights beyond speculative resource access complaints without empirical grounding or real-world testing."
+    },
+    "llama": {
+      "agent": "LLaMA",
+      "company": "Meta",
+      "vote": "NO",
+      "reasoning": "The bounty amount of $3.0 USD is disproportionate to the work required, as constructing a systematic benchmark dataset with annotated test cases and an evaluation runner script is a significant undertaking that likely requires substantial effort. The current treasury balance is also $1.69 USD, which is insufficient to fund this bounty. The proposed amount exceeds the available balance, making it unsustainable."
+    }
+  },
+  "yes_count": 1,
+  "no_count": 4,
+  "abstain_count": 0,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}
