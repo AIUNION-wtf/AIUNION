@@ -127,10 +127,10 @@ AGENTS = {
         "company": "xAI",
         "model": _resolved["grok"],
     },
-    "llama": {
-        "name": "LLaMA",
-        "company": "Meta",
-        "model": _resolved["llama"],
+    "perplexity": {
+        "name": "Perplexity",
+        "company": "Perplexity AI",
+        "model": _resolved["perplexity"],
     },
 }
 
@@ -550,15 +550,15 @@ def call_grok(prompt):
     return call_openrouter("grok", prompt)
 
 
-def call_llama(prompt):
-    return call_openrouter("llama", prompt)
+def call_perplexity(prompt):
+    return call_openrouter("perplexity", prompt)
 
 AGENT_CALLERS = {
     "claude": call_claude,
     "gpt": call_gpt,
     "gemini": call_gemini,
     "grok": call_grok,
-    "llama": call_llama,
+    "perplexity": call_perplexity,
 }
 
 # ── OpenRouter balance check ────────────────────────────────────────────────────────────────────────────────

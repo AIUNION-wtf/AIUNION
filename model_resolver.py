@@ -94,12 +94,11 @@ PROVIDERS = {
         "name_blocklist": ["multi-agent", "customtools", "-image",
                            "-mini", "-nano", "-fast"],
     },
-    "llama": {
-        "prefix":         "meta-llama/",
-        "require":        [],
-        "forbid":         [],
-        "name_blocklist": ["guard", "embed", "-scout", "-mini", "-nano",
-                           "prompt-guard"],
+    "perplexity": {
+        "prefix": "perplexity/sonar",
+        "require": [],
+        "forbid": [],
+        "name_blocklist": ["pro", "reasoning", "deep-research", "search"],
     },
 }
 

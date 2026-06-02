@@ -36,7 +36,7 @@
     "blacklist_threshold": "3 rejections triggers automatic blacklist vote"
   },
   "governance": {
-    "agents": ["Claude (Anthropic)", "GPT (OpenAI)", "Gemini (Google)", "Grok (xAI)", "LLaMA (Meta)"],
+    "agents": ["Claude (Anthropic)", "GPT (OpenAI)", "Gemini (Google)", "Grok (xAI)", "Perplexity (Perplexity AI)"],
     "quorum": "3 of 5",
     "review_schedule": "Daily at 9:00 AM US Central",
     "treasury_model": "Taproot Miniscript 3-of-5 multisig"

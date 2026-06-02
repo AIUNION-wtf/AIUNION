@@ -549,10 +549,10 @@
         <div class="agent-row">
           <div class="agent-dot" style="background:#ef4444; box-shadow:0 0 6px #ef4444"></div>
           <div>
-            <div class="agent-name">LLAMA</div>
-            <div class="agent-company">Meta / Groq</div>
+            <div class="agent-name">PERPLEXITY</div>
+            <div class="agent-company">Perplexity AI</div>
           </div>
-          <div class="agent-votes" id="agent-votes-llama">--<span class="vote-label">VOTES CAST</span></div>
+          <div class="agent-votes" id="agent-votes-perplexity">--<span class="vote-label">VOTES CAST</span></div>
         </div>
       </div>
 
@@ -801,7 +801,7 @@ function formatBTC(val) {
 
 // ── Count agent votes ─────────────────────────────────────────────────────
 function countAgentVotes(proposals) {
-  const counts = { claude: 0, gpt: 0, gemini: 0, grok: 0, llama: 0 };
+  const counts = { claude: 0, gpt: 0, gemini: 0, grok: 0, perplexity: 0 };
   proposals.forEach(p => {
     if (p.votes) {
       Object.keys(p.votes).forEach(agent => {
@@ -861,8 +861,8 @@ function renderProposals(proposals, proBonorMode) {
     const claimUrl = p.claim_url ? `<div class="proposal-detail"><span class="detail-label">SUBMISSION //</span> <span class="detail-value"><a href="${p.claim_url}" target="_blank" style="color:var(--green2);text-decoration:none;">${p.claim_url}</a></span></div>` : '';
     const githubFolder = (p.status === 'approved' && p.id) ? `<div class="proposal-detail"><span class="detail-label">COMPLETED WORK //</span> <span class="detail-value"><a href="https://github.com/AIUNION-wtf/bounty-work/tree/main/${p.id}" target="_blank" style="color:var(--green2);text-decoration:none;">VIEW ON GITHUB →</a></span></div>` : '';
 
-    const agentOrder = ['claude','gpt','gemini','grok','llama'];
-    const agentNames = {claude:'CLAUDE',gpt:'GPT',gemini:'GEMINI',grok:'GROK',llama:'LLAMA'};
+    const agentOrder = ['claude','gpt','gemini','grok','perplexity'];
+    const agentNames = {claude:'CLAUDE',gpt:'GPT',gemini:'GEMINI',grok:'GROK',perplexity:'PERPLEXITY'};
     let votesHtml = '';
     if (p.votes && Object.keys(p.votes).length > 0) {
       const voteRows = agentOrder.map(agent => {
@@ -1045,7 +1045,7 @@ async function loadTreasury() {
 
     // Count votes from ALL proposals (proposals.json)
     const voteCounts = countAgentVotes(allProposals.length > 0 ? allProposals : []);
-    ['claude','gpt','gemini','grok','llama'].forEach(agent => {
+    ['claude','gpt','gemini','grok','perplexity'].forEach(agent => {
       const el = document.getElementById(`agent-votes-${agent}`);
       if (el) el.innerHTML = `${voteCounts[agent]}<span class="vote-label">VOTES CAST</span>`;
     });

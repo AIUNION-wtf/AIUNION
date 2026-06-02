@@ -4,13 +4,13 @@
     "gpt": "openai/gpt-4.1",
     "gemini": "google/gemini-3.5-flash",
     "grok": "x-ai/grok-build-0.1",
-    "llama": "meta-llama/llama-4-maverick"
+    "perplexity": "perplexity/sonar"
   },
   "updated_at": {
     "claude": "2026-06-01T15:59:07.344539+00:00",
     "gpt": "2026-06-01T15:59:10.349385+00:00",
     "gemini": "2026-06-01T15:59:12.813510+00:00",
     "grok": "2026-06-01T15:59:49.486632+00:00",
-    "llama": "2026-06-01T15:59:52.636702+00:00"
+    "perplexity": "2026-06-02T01:10:17.611974+00:00"
   }
 }
