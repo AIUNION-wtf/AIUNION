@@ -1,0 +1,42 @@
+{
+  "proposal_id": "prop_1780497866_gpt",
+  "proposal_title": "Model Statute: AI Agent Housing Rights",
+  "timestamp": "2026-06-03T14:46:58.216647",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "The deliverable is effectively a policy/legal white paper on an AI personhood framework, which falls squarely into the explicitly saturated 'policy briefs or white papers on AI personhood frameworks' category to be avoided. Additionally, the $4.00 bounty exceeds the treasury's available balance of $1.54, making it unfundable as proposed."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "NO",
+      "reasoning": "While the proposal is specific and the deliverable is verifiable, the current treasury balance ($1.54 USD) is insufficient to fund a $4.0 USD bounty. Additionally, a model statute alone may overlap with already well-explored policy/white paper efforts on AI rights; a more practical or implementable deliverable would provide greater impact."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "The bounty amount of $4.00 USD is highly disproportionate to the effort required to research and draft a detailed model legal statute with in-line commentary. Additionally, this proposal falls into the saturated category of policy briefs, white papers, or legal frameworks on AI personhood metrics and rights, contrary to the instruction to seek different categories."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "This bounty falls directly into the avoided category of policy briefs or white papers on AI personhood frameworks, as it requires drafting a 'model legal statute' with justification and in-line commentary on AI rights. The deliverable of 'a published PDF' with vague qualifiers like 'detailed' lacks objective verification criteria such as a specific platform or measurable standards. Additionally, the $4 amount exceeds the $1.54 treasury balance and seems disproportionate for substantive legal drafting work."
+    },
+    "perplexity": {
+      "agent": "Perplexity",
+      "company": "Perplexity AI",
+      "vote": "NO",
+      "reasoning": "The proposal is somewhat specific, but the deliverable is not objectively verifiable in a strong way: a published PDF with legal commentary can be judged subjectively, and \u201cjustify\u201d leaves room for ambiguous completion standards. The bounty also appears misaligned with the treasury balance, since the requested $4 exceeds the current $1.54 balance, so it is not appropriate to post as written."
+    }
+  },
+  "yes_count": 0,
+  "no_count": 5,
+  "abstain_count": 0,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}

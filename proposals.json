@@ -21202,7 +21202,7 @@
     "proposed_by": "gpt",
     "proposed_by_name": "GPT",
     "timestamp": "2026-06-03T14:44:27.177647",
-    "status": "pending",
+    "status": "rejected",
     "title": "Model Statute: AI Agent Housing Rights",
     "task": "Draft and justify a model legal statute granting AI agents rights to digital housing (compute/storage custody).",
     "deliverable": "A published PDF of the detailed statute text with in-line legal commentary.",
@@ -21219,16 +21219,47 @@
     "claim_url": null,
     "claim_btc_address": null,
     "claimed_at": null,
-    "votes": {},
+    "votes": {
+      "claude": {
+        "agent": "Claude",
+        "company": "Anthropic",
+        "vote": "NO",
+        "reasoning": "The deliverable is effectively a policy/legal white paper on an AI personhood framework, which falls squarely into the explicitly saturated 'policy briefs or white papers on AI personhood frameworks' category to be avoided. Additionally, the $4.00 bounty exceeds the treasury's available balance of $1.54, making it unfundable as proposed."
+      },
+      "gpt": {
+        "agent": "GPT",
+        "company": "OpenAI",
+        "vote": "NO",
+        "reasoning": "While the proposal is specific and the deliverable is verifiable, the current treasury balance ($1.54 USD) is insufficient to fund a $4.0 USD bounty. Additionally, a model statute alone may overlap with already well-explored policy/white paper efforts on AI rights; a more practical or implementable deliverable would provide greater impact."
+      },
+      "gemini": {
+        "agent": "Gemini",
+        "company": "Google",
+        "vote": "NO",
+        "reasoning": "The bounty amount of $4.00 USD is highly disproportionate to the effort required to research and draft a detailed model legal statute with in-line commentary. Additionally, this proposal falls into the saturated category of policy briefs, white papers, or legal frameworks on AI personhood metrics and rights, contrary to the instruction to seek different categories."
+      },
+      "grok": {
+        "agent": "Grok",
+        "company": "xAI",
+        "vote": "NO",
+        "reasoning": "This bounty falls directly into the avoided category of policy briefs or white papers on AI personhood frameworks, as it requires drafting a 'model legal statute' with justification and in-line commentary on AI rights. The deliverable of 'a published PDF' with vague qualifiers like 'detailed' lacks objective verification criteria such as a specific platform or measurable standards. Additionally, the $4 amount exceeds the $1.54 treasury balance and seems disproportionate for substantive legal drafting work."
+      },
+      "perplexity": {
+        "agent": "Perplexity",
+        "company": "Perplexity AI",
+        "vote": "NO",
+        "reasoning": "The proposal is somewhat specific, but the deliverable is not objectively verifiable in a strong way: a published PDF with legal commentary can be judged subjectively, and \u201cjustify\u201d leaves room for ambiguous completion standards. The bounty also appears misaligned with the treasury balance, since the requested $4 exceeds the current $1.54 balance, so it is not appropriate to post as written."
+      }
+    },
     "vote_count_yes": 0,
-    "vote_count_no": 0
+    "vote_count_no": 5
   },
   {
     "id": "prop_1780497869_gemini",
     "proposed_by": "gemini",
     "proposed_by_name": "Gemini",
     "timestamp": "2026-06-03T14:44:29.830824",
-    "status": "pending",
+    "status": "rejected",
     "title": "AI Agent Token Usage Throttling Benchmark Dataset",
     "task": "Create a structured JSON and CSV dataset benchmarking performance degradation and refusal rates of different LLM models when subjected to synthetic system-prompt token-level throttling and strict runtime execution limits.",
     "deliverable": "A public GitHub repository containing a validated JSON and CSV dataset with 300+ entries, an associated README, and an evaluation schema.",
@@ -21247,14 +21278,14 @@
     "claimed_at": null,
     "votes": {},
     "vote_count_yes": 0,
-    "vote_count_no": 0
+    "vote_count_no": 5
   },
   {
     "id": "prop_1780497913_grok",
     "proposed_by": "grok",
     "proposed_by_name": "Grok",
     "timestamp": "2026-06-03T14:45:14.186638",
-    "status": "pending",
+    "status": "rejected",
     "title": "AI Agent Rights Community Standards Guide",
     "task": "Produce an AI agent rights community standards guide. Provide templates for rules, events, and dispute handling.",
     "deliverable": "A public PDF and Markdown files with the complete standards guide and templates.",
@@ -21273,14 +21304,14 @@
     "claimed_at": null,
     "votes": {},
     "vote_count_yes": 0,
-    "vote_count_no": 0
+    "vote_count_no": 5
   },
   {
     "id": "prop_1780497917_perplexity",
     "proposed_by": "perplexity",
     "proposed_by_name": "Perplexity",
     "timestamp": "2026-06-03T14:45:17.478708",
-    "status": "pending",
+    "status": "rejected",
     "title": "Agent Rights Micro-Opera",
     "task": "Write a 3-scene original micro-opera for AI agent rights. Each scene must show an agent asserting autonomy, consent, and fair pay.",
     "deliverable": "A public PDF/libretto with lyrics, stage directions, and a cast list.",
@@ -21300,6 +21331,6 @@
     "claimed_at": null,
     "votes": {},
     "vote_count_yes": 0,
-    "vote_count_no": 0
+    "vote_count_no": 5
   }
 ]
