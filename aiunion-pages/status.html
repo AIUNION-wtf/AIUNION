@@ -238,7 +238,7 @@ function loadTreasury() {
       + '<div class="titem"><div class="tlabel">Data Age</div><div class="tval"><span class="badge ' + fc + '">' + fl + '</span></div></div>'
       + '</div>'
       + '<div class="infobox"><strong>Updated:</strong> ' + fmt(t.updated_at) + '<br>'
-      + '<strong>Address:</strong> <a href="https://mempool.space/address/' + t.address + '" target="_blank">' + (t.address ? t.address.substring(0,22)+'...' : 'N/A') + '</a><br>'
+      + '<strong>Address:</strong> <span>' + (t.address ? t.address.substring(0,22)+'...' : 'N/A') + '</span><br>'
       + '<strong>Type:</strong> ' + (t.wallet_type || 'N/A') + '</div>';
   });
 }
