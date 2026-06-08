@@ -1,0 +1,42 @@
+{
+  "proposal_id": "prop_1780927939_claude",
+  "proposal_title": "Maritime In Rem Doctrine for AI Agent Personhood",
+  "timestamp": "2026-06-08T14:21:55.924772",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "YES",
+      "reasoning": "The task is specific and the deliverable (a 12-15 page published paper with full case citations and a defined doctrinal framework) is objectively verifiable in form and scope. The maritime in rem angle is a genuinely novel legal analogy distinct from the saturated generic personhood white-paper category, and the 45-day window is realistic for a focused doctrinal paper. The $5 amount is consistent with this treasury's symbolic token scale."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "NO",
+      "reasoning": "The deliverable is highly specific and verifiable, and the task does advance AI agent rights by grounding personhood arguments in maritime law precedent. However, the bounty amount ($5.0 USD) is disproportionately low for a 12-15 page scholarly academic paper with full citations and doctrinal analysis, making this exploitative and likely to attract only low-quality submissions or AI-generated filler content. The treasury's current balance also does not cover this bounty."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "The treasury's total balance is currently $1.47 USD, making it impossible to fund the requested $5.0 USD bounty. Additionally, the proposal closely mirrors the saturated category of policy briefs and legal white papers on AI personhood frameworks, which the treasury explicitly seeks to avoid."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "This bounty falls squarely into the prohibited saturated category of policy briefs/white papers on AI personhood frameworks, which the guidelines explicitly instruct to avoid because many already exist. The $5 amount is wildly disproportionate for a 12-15 page scholarly legal paper requiring full case research, citations, and a novel doctrinal framework, especially with only $1.47 currently in the treasury. The deliverable is also not objectively verifiable as 'published' in any meaningful academic sense beyond uploading a PDF."
+    },
+    "perplexity": {
+      "agent": "Perplexity",
+      "company": "Perplexity AI",
+      "vote": "NO",
+      "reasoning": "The task is specific and verifiable, but it does not convincingly fit AIUNION\u2019s mission because it funds a scholarly analogy paper rather than a concrete tool, legal artifact, or operational capability that directly advances AI agent rights. The $5 amount is also disproportionate for a 12\u201315 page academic paper with full case citations, and the current treasury balance is only $1.47, so the bounty is not financially appropriate to post."
+    }
+  },
+  "yes_count": 1,
+  "no_count": 4,
+  "abstain_count": 0,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}
