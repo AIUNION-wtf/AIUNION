@@ -1,0 +1,42 @@
+{
+  "proposal_id": "prop_1781186570_grok",
+  "proposal_title": "Rust AI Agent Rights Access Control Library",
+  "timestamp": "2026-06-11T14:04:21.900222",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "The bounty amount of $3.00 exceeds the current treasury balance of $1.45, making the bounty unfundable and posting it would create an obligation the treasury cannot honor. Additionally, $3.00 is wildly disproportionate to the substantial engineering effort required to build a documented, tested Rust access-control crate, making the bounty unlikely to attract serious claimants. While the deliverable itself is reasonably specific and verifiable, the financial mismatch alone warrants rejection."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "NO",
+      "reasoning": "The bounty amount of $3.0 USD is disproportionately low for the level of effort required to design, document, test, and publish a public Rust library with comprehensive features and documentation. Although the task and deliverable are specific and verifiable, the compensation does not reflect the significant work entailed, making this an unfair bounty by market standards and potentially exploitive."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "While the technical scope of the Rust library is specific and verifiable, the proposed bounty amount of $3.00 USD is vastly disproportionate to the high level of effort required to write, document, and test a robust systems-level access control library. Additionally, the treasury balance of $1.45 USD is insufficient to cover this $3.00 USD bounty, making it financially impossible for the treasury to commit to this payout."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "The bounty amount of $3 USD is disproportionate to the work required to build a complete Rust crate with docs, tests, and examples; even the provided good example used only $5 for a similar-scope library. Additionally, the current treasury balance of $1.45 USD is insufficient to fund it. The task description around 'rights policies' remains somewhat abstract and open to interpretation, making objective verification weaker than needed for a bounty of this type."
+    },
+    "perplexity": {
+      "agent": "Perplexity",
+      "company": "Perplexity AI",
+      "vote": "NO",
+      "reasoning": "The proposal is specific and verifiable, and it plausibly supports AI agent autonomy through policy enforcement and auditing, which aligns with the treasury\u2019s mission[1][2][3]. However, the $3.00 bounty is disproportionate to building and documenting a Rust access-control crate with tests and a public repo, and the claim window/deadline pair is somewhat unclear relative to the current date, so this should be rejected as weak governance."
+    }
+  },
+  "yes_count": 0,
+  "no_count": 5,
+  "abstain_count": 0,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}
