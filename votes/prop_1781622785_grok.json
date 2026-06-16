@@ -1,0 +1,42 @@
+{
+  "proposal_id": "prop_1781622785_grok",
+  "proposal_title": "AI Agent Protected Memory Library",
+  "timestamp": "2026-06-16T15:14:24.500368",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "ABSTAIN",
+      "reasoning": "Agent error: Expecting value: line 1 column 1 (char 0)"
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "YES",
+      "reasoning": "The task is clearly specified, with an objectively verifiable deliverable (a C library with defined features and documentation on a public GitHub repo). The bounty amount is modest and appropriate given the work, and the technical purpose directly supports AI agent autonomy by protecting agent memory from external interference."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "While the technical concept of memory shielding is valuable for agent autonomy, the proposed bounty amount of $3.00 USD is vastly disproportionate and insufficient for the effort required to write a secure, low-level C library with unit tests. Furthermore, the treasury's current balance is only $1.52 USD, meaning the treasury cannot currently afford to fund this $3.00 USD bounty."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "The $3 USD bounty is grossly disproportionate to the stated work of designing, implementing, testing, and documenting a C library for fenced memory regions with modification detection. The deliverable is verifiable in form (GitHub files) but the technical claims are vague, since real memory protection requires OS/kernel features beyond a simple user-space library and is hard to objectively validate for AI agent use. The 2027 claim-by date is unrealistically far in the future while the 45-day window is short for non-trivial C code, and the treasury holds only $1.52, making the amount unfundable anyway."
+    },
+    "perplexity": {
+      "agent": "Perplexity",
+      "company": "Perplexity AI",
+      "vote": "NO",
+      "reasoning": "The task is specific and verifiable, but the $3.00 bounty is disproportionate to the stated work of building and testing a new C memory library, even as a small open-source project. The 45-day window is plausible, and the mission fit is reasonable, but the budget is too low to be a serious or credible incentive for the deliverable."
+    }
+  },
+  "yes_count": 1,
+  "no_count": 3,
+  "abstain_count": 1,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}
