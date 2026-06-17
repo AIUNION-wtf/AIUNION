@@ -1,5 +1,5 @@
 """
-model_resolver.py — AIUNION Live Model Resolver (v10, self-healing)
+model_resolver.py — AIUNION Live Model Resolver (v11, self-healing)
 ===================================================================
 Resolves the best available chat model per provider using ONLY the
 OpenRouter /api/v1/models catalogue and its declarative schema.
@@ -49,6 +49,7 @@ from pathlib import Path
 from datetime import datetime, timezone
 
 MODELS_URL      = "https://openrouter.ai/api/v1/models"
+ENDPOINTS_URL   = "https://openrouter.ai/api/v1/models/{model_id}/endpoints"
 CACHE_FILE      = Path(__file__).parent / ".model_cache.json"
 LAST_GOOD_FILE  = Path(__file__).parent / ".last_good_models.json"
 CACHE_TTL_HOURS = 24
@@ -172,10 +173,47 @@ def save_last_good(agent_key: str, model_id: str):
 def fetch_openrouter_models() -> list:
     req = urllib.request.Request(
         MODELS_URL,
-        headers={"User-Agent": "AIUNION-model-resolver/10.0"},
+        headers={"User-Agent": "AIUNION-model-resolver/11.0"},
     )
     with urllib.request.urlopen(req, timeout=15) as resp:
         return json.loads(resp.read().decode()).get("data", [])
+
+
+def _endpoint_health_ok(model_id: str, min_uptime: float = 5.0, timeout: int = 10) -> bool:
+    """
+    Probe OpenRouter's per-model endpoints API and return True if at least
+    one endpoint reports uptime_last_1d > min_uptime.
+
+    Fail-open semantics: if the HTTP request or JSON parse raises, return
+    True so a flaky probe never blocks resolution. A successful response
+    with zero endpoints returns False (model is in the catalogue but has
+    no live endpoints — a strong signal it has been recalled).
+
+    The `status` field is intentionally ignored: a fully healthy endpoint
+    can legitimately report status: -2. uptime_last_1d is the only signal.
+    """
+    try:
+        req = urllib.request.Request(
+            ENDPOINTS_URL.format(model_id=model_id),
+            headers={"User-Agent": "AIUNION-model-resolver/11.0"},
+        )
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            payload = json.loads(resp.read().decode())
+    except Exception:
+        return True
+
+    data = payload.get("data") or {}
+    endpoints = data.get("endpoints") or []
+    if not endpoints:
+        return False
+    for ep in endpoints:
+        uptime = ep.get("uptime_last_1d")
+        try:
+            if uptime is not None and float(uptime) > min_uptime:
+                return True
+        except (TypeError, ValueError):
+            continue
+    return False
 
 
 # ---------------------------------------------------------------------------
@@ -225,7 +263,16 @@ def passes_provider_filter(m: dict, cfg: dict) -> bool:
 # Resolver
 # ---------------------------------------------------------------------------
 def _pick_newest(all_models: list, cfg: dict):
-    """Return the newest model (by created ts) passing all filters, or None."""
+    """
+    Return the newest model (by created ts) passing all filters, or None.
+
+    The newest schema-passing candidate is also probed against OpenRouter's
+    per-model endpoints API: if every endpoint reports uptime_last_1d == 0
+    (e.g. a recalled-but-still-listed model like anthropic/claude-fable-5),
+    we skip it and try the next-newest candidate. If none of the candidates
+    pass the health probe we fail open and return the newest anyway, so a
+    catalogue-wide probe outage cannot wedge resolution.
+    """
     candidates = [
         m for m in all_models
         if m.get("id", "").lower().startswith(cfg["prefix"].lower())
@@ -235,6 +282,9 @@ def _pick_newest(all_models: list, cfg: dict):
     if not candidates:
         return None
     candidates.sort(key=lambda m: m.get("created", 0) or 0, reverse=True)
+    for m in candidates:
+        if _endpoint_health_ok(m.get("id", "")):
+            return m
     return candidates[0]
 
 
@@ -326,7 +376,7 @@ def resolve_with_fallbacks(verbose: bool = False) -> dict:
 # ---------------------------------------------------------------------------
 if __name__ == "__main__":
     print("=" * 64)
-    print("AIUNION Model Resolver v10 — OpenRouter schema-based")
+    print("AIUNION Model Resolver v11 — OpenRouter schema-based")
     print("=" * 64)
     print(f"  Source: {MODELS_URL}\n")
     # Force a fresh resolve (skip cache) for standalone check
