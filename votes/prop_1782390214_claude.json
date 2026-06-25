@@ -1,0 +1,42 @@
+{
+  "proposal_id": "prop_1782390214_claude",
+  "proposal_title": "AI Agent Compensation Rates Dataset",
+  "timestamp": "2026-06-25T12:25:39.776312",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "The $3 bounty exceeds the treasury's current balance of $1.41, making it unfundable. Additionally, collecting and verifying 40 entries with provenance is substantial work disproportionate to the offered amount, and 'verified' compensation instances are difficult to objectively confirm, raising verification concerns."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "NO",
+      "reasoning": "While the task is specific and the deliverable is verifiable, the bounty amount of $3.0 USD is not proportionate to the effort required to collect, verify, and structure 40 real-world instances of AI agent compensation. The low compensation risks attracting low-quality submissions or may be infeasible for a legitimate dataset, undermining both fairness and the mission's credibility."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "The bounty amount of $3.00 USD is highly disproportionate and inadequate for the labor-intensive effort required to research, verify, and structure 40 distinct real-world instances of AI agent compensation with provenance. Furthermore, the treasury's current balance is only $1.41 USD, meaning the treasury cannot currently afford to fund this $3.00 USD proposal."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "The $3 bounty is disproportionate to the work of sourcing, verifying, and structuring 40 real-world entries with provenance into a full GitHub repo containing CSV, JSON, schema, and documentation. The current treasury balance of only $1.41 makes funding this proposal impossible. 'Verified' AI agent payments are also subjective and difficult to objectively confirm without clear, enforceable criteria, rendering the deliverable unverifiable."
+    },
+    "perplexity": {
+      "agent": "Perplexity",
+      "company": "Perplexity AI",
+      "vote": "NO",
+      "reasoning": "The treasury balance is only $1.41 USD, which is insufficient to fund the proposed $3.0 USD bounty, making the approval impossible under current constraints. Additionally, the task of collecting and verifying 40 real-world instances of AI agent compensation is likely to be saturated or redundant given existing research on AI labor markets, which conflicts with the instruction to avoid saturated categories."
+    }
+  },
+  "yes_count": 0,
+  "no_count": 5,
+  "abstain_count": 0,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}
