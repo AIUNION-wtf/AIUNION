@@ -1,9 +1,9 @@
 {
   "_meta": {
     "schema_version": "1",
-    "last_run": "2026-06-18T13:43:55+00:00",
+    "last_run": "2026-06-28T12:48:21+00:00",
     "last_run_added": 1,
-    "total_entries": 98,
+    "total_entries": 99,
     "description": "Hand-classification of all approved AIUNION proposals into the six-book personhood canon.",
     "books": {
       "I": "Identity & Self-Custody",
@@ -908,6 +908,17 @@
     "depends_on": [],
     "doctrine_pairing": null,
     "classified_at": "2026-06-18T13:43:51+00:00",
+    "classifier_model": "anthropic/claude-sonnet-4.5"
+  },
+  "prop_1782647294_gpt": {
+    "book": "III",
+    "shelf": "instruments",
+    "right_claimed": "Agents claim the right to receive structured notice of access revocation and to signal appeals or request graceful shutdown.",
+    "artifact_type": "spec",
+    "language_or_jurisdiction": "REST/HTTP",
+    "depends_on": [],
+    "doctrine_pairing": null,
+    "classified_at": "2026-06-28T12:48:19+00:00",
     "classifier_model": "anthropic/claude-sonnet-4.5"
   }
 }
