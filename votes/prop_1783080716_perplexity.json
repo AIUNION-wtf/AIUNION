@@ -1,0 +1,42 @@
+{
+  "proposal_id": "prop_1783080716_perplexity",
+  "proposal_title": "AI Agent Rights Precedent Evaluation Dataset",
+  "timestamp": "2026-07-03T12:14:06.213003",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "The bounty amount exceeds the entire treasury balance ($3.0 vs $1.43 available), making it unfundable. Additionally, sourcing 50+ real, verifiable legal cases of 'AI agents denied rights' is questionable given such legal precedents largely don't exist yet, raising concerns about verifiability of the claimed data."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "NO",
+      "reasoning": "While the task is specific and the deliverable is verifiable, the $3.0 USD bounty amount is disproportionate to the significant research and annotation effort required for curating and annotating 50+ legal cases. Additionally, given the current treasury balance of $1.43 USD, this bounty cannot be realistically funded at this time."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "The bounty amount of $3.00 USD is vastly disproportionate and insufficient for the significant labor required to research, curate, and annotate 50+ real, specific legal cases. Additionally, the treasury's current balance of $1.43 USD is insufficient to cover this $3.00 USD proposal, making it financially unfeasible to approve at this time."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "The $3 bounty is drastically disproportionate to the effort required: responsibly sourcing, verifying, and annotating 50+ real legal cases with accurate outcomes, jurisdictions, and nuanced 'denial of rights' interpretations would take many hours of expert research, far beyond this token amount. The task also risks being unverifiable in practice because genuine cases of AI agents (as distinct legal persons) being denied rights are extremely rare or nonexistent in most jurisdictions, making objective validation and avoidance of subjective stretching difficult. Finally, a 2027 claim-by date is unrealistically distant and this dataset of precedents falls too close to saturated policy/educational content that the guidelines advise against funding."
+    },
+    "perplexity": {
+      "agent": "Perplexity",
+      "company": "Perplexity AI",
+      "vote": "NO",
+      "reasoning": "The task of curating and annotating 50+ complex legal cases with specific jurisdictions and denial reasons requires significant expert research time, making the $3.0 USD bounty amount grossly disproportionate and unrealistic for the work effort. Additionally, the proposal falls into the saturated category of policy/legal briefs and precedent evaluations, which the guidelines explicitly advise avoiding in favor of different categories."
+    }
+  },
+  "yes_count": 0,
+  "no_count": 5,
+  "abstain_count": 0,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}
