@@ -941,14 +941,32 @@ function renderTransactions(txs) {
 
 // ── Load all dashboard data from API (single source of truth) ────────────
 async function loadTreasury() {
-  try {
-    const [statusRes, proposalsRes, claimsRes] = await Promise.all([
-      fetch('https://api.aiunion.wtf/status'),
-      fetch('https://api.aiunion.wtf/bounties'),
-      fetch('https://raw.githubusercontent.com/AIUNION-wtf/AIUNION/main/claims.json')
-    ]);
+  // Fetch all endpoints in parallel. Use allSettled (not Promise.all) so that
+  // a single failed request never rejects the whole batch — each section below
+  // renders in its own try/catch and one failure must not blank the others.
+  const [statusResult, proposalsResult, claimsResult] = await Promise.allSettled([
+    fetch('https://api.aiunion.wtf/status'),
+    fetch('https://api.aiunion.wtf/bounties'),
+    fetch('https://raw.githubusercontent.com/AIUNION-wtf/AIUNION/main/claims.json')
+  ]);
+  const statusRes    = statusResult.status    === 'fulfilled' ? statusResult.value    : null;
+  const proposalsRes = proposalsResult.status === 'fulfilled' ? proposalsResult.value : null;
+  const claimsRes    = claimsResult.status    === 'fulfilled' ? claimsResult.value    : null;
 
-    if (!statusRes.ok) throw new Error('Failed to fetch status');
+  // proposals.json feeds BOTH the vote-count section and the bounty list, so
+  // fetch it once up front; either section can still render without it.
+  let allProposals = [];
+  try {
+    const allPropsRes = await fetch('https://raw.githubusercontent.com/AIUNION-wtf/AIUNION/main/proposals.json');
+    if (allPropsRes.ok) {
+      const allPropsData = await allPropsRes.json();
+      allProposals = allPropsData.proposals || allPropsData || [];
+    }
+  } catch(e) { console.warn('Could not fetch proposals.json for votes:', e); }
+
+  // ── Section 1: treasury / status (balance, stats, tickers, claims) ────────
+  try {
+    if (!statusRes || !statusRes.ok) throw new Error('Failed to fetch status');
     const status = await statusRes.json();
 
     const balance    = status.balance_btc || 0;
@@ -1027,17 +1045,14 @@ async function loadTreasury() {
     if (status.updated_at) {
       document.getElementById('last-updated').textContent = 'UPDATED ' + timeAgo(status.updated_at);
     }
+  } catch(e) {
+    console.warn('Treasury/status section unavailable:', e);
+    const luEl = document.getElementById('last-updated');
+    if (luEl) luEl.textContent = 'SYNC ERROR';
+  }
 
-    // Fetch proposals.json for vote counts (all proposals have votes, not just open bounties)
-    let allProposals = [];
-    try {
-      const allPropsRes = await fetch('https://raw.githubusercontent.com/AIUNION-wtf/AIUNION/main/proposals.json');
-      if (allPropsRes.ok) {
-        const allPropsData = await allPropsRes.json();
-        allProposals = allPropsData.proposals || allPropsData || [];
-      }
-    } catch(e) { console.warn('Could not fetch proposals.json for votes:', e); }
-
+  // ── Section 2: vote counts + canon stats (from proposals.json) ────────────
+  try {
     // Count votes from ALL proposals (proposals.json)
     const voteCounts = countAgentVotes(allProposals.length > 0 ? allProposals : []);
     ['claude','gpt','gemini','grok','perplexity'].forEach(agent => {
@@ -1056,21 +1071,25 @@ async function loadTreasury() {
     if (cwEl) cwEl.textContent = canonTotal;
     if (csEl) csEl.textContent = canonShipped;
     if (caEl) caEl.textContent = canonTotal - canonShipped;
-
-    // Render proposals from bounties endpoint (open bounties for display)
-    if (proposalsRes.ok) {
-      const raw = await proposalsRes.json();
-      const proposals = raw.bounties || raw;
-      // Merge vote data from allProposals into open bounties for display
-      const propMap = {};
-      allProposals.forEach(p => { propMap[p.id] = p; });
-      const enriched = proposals.map(p => propMap[p.id] ? Object.assign({}, p, { votes: propMap[p.id].votes, vote_count_yes: propMap[p.id].vote_count_yes, vote_count_no: propMap[p.id].vote_count_no }) : p);
-      renderProposals(enriched, raw.pro_bono_mode);
-    }
-
   } catch(e) {
-    console.error('Failed to load treasury data:', e);
-    document.getElementById('last-updated').textContent = 'SYNC ERROR';
+    console.warn('Vote counts / canon stats section unavailable:', e);
+  }
+
+  // ── Section 3: bounties / proposals list ──────────────────────────────────
+  try {
+    // Render proposals from bounties endpoint (open bounties for display)
+    if (!proposalsRes || !proposalsRes.ok) throw new Error('Failed to fetch bounties');
+    const raw = await proposalsRes.json();
+    const proposals = raw.bounties || raw;
+    // Merge vote data from allProposals into open bounties for display
+    const propMap = {};
+    allProposals.forEach(p => { propMap[p.id] = p; });
+    const enriched = proposals.map(p => propMap[p.id] ? Object.assign({}, p, { votes: propMap[p.id].votes, vote_count_yes: propMap[p.id].vote_count_yes, vote_count_no: propMap[p.id].vote_count_no }) : p);
+    renderProposals(enriched, raw.pro_bono_mode);
+  } catch(e) {
+    console.warn('Bounties list section unavailable:', e);
+    const listEl = document.getElementById('proposal-list');
+    if (listEl) listEl.innerHTML = '<div class="loading">BOUNTIES TEMPORARILY UNAVAILABLE</div>';
   }
 }
 

@@ -1499,6 +1499,27 @@ async function githubGet(env, filename) {
   }
 
   const data = await res.json();
+
+  // GitHub's Contents API only inlines base64 `content` for files under 1MB.
+  // For larger files it returns 200 with an empty `content` (encoding "none")
+  // plus a public `download_url`. Fetch the raw bytes and re-encode them to
+  // base64 so the return shape stays `{ content, sha }` and callers /
+  // decodeGithubContent() keep working. We still keep the Contents API `sha`
+  // above because githubPut() needs it for the write path.
+  if ((!data.content || data.content === "") && data.download_url) {
+    // download_url is a public raw URL — do NOT send the GitHub token to it.
+    const rawRes = await fetch(data.download_url, {
+      headers: { "User-Agent": "AIUNION-Worker" },
+    });
+    if (!rawRes.ok) {
+      throw new Error(
+        `GitHub raw fetch failed for ${filename}: ${rawRes.status} ${await rawRes.text()}`
+      );
+    }
+    const bytes = new Uint8Array(await rawRes.arrayBuffer());
+    return { content: bytesToBase64(bytes), sha: data.sha };
+  }
+
   return { content: data.content, sha: data.sha };
 }
 
@@ -2349,6 +2370,12 @@ function decodeGithubContent(base64Content) {
 function encodeGithubContent(jsonData) {
   const jsonString = JSON.stringify(jsonData, null, 2);
   const bytes = new TextEncoder().encode(jsonString);
+  return bytesToBase64(bytes);
+}
+
+// Base64-encode raw bytes in chunks (avoids call-stack overflow on large
+// files from spreading a huge array into String.fromCharCode).
+function bytesToBase64(bytes) {
   const chunkSize = 0x8000;
   let binary = "";
 
