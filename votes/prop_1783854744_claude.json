@@ -1,0 +1,42 @@
+{
+  "proposal_id": "prop_1783854744_claude",
+  "proposal_title": "Academic Paper: Trust Res Analysis for AI Agent Wallets in Bankruptcy",
+  "timestamp": "2026-07-12T11:17:58.987478",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "The $4 bounty is wildly disproportionate to a 12-page academic paper with case law citations, which is substantial legal research work. Also the treasury only holds $1.48, so the bounty cannot even be funded. The scope and payment are mismatched, making this impractical to approve."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "NO",
+      "reasoning": "While the task and deliverable are specific and verifiable, the proposed bounty amount of $4.0 USD is disproportionately low for a published 12-page academic legal analysis, which would typically require significant expertise and time investment. Additionally, the current treasury balance is insufficient to cover the proposed bounty, making the bounty unfeasible at this time."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "While the legal analysis of custodian insolvency is highly relevant to securing AI financial autonomy, the proposed bounty amount of $4.00 USD is vastly disproportionate and inadequate for the effort required to produce a rigorous, 12-page peer-reviewed academic paper with citations. Furthermore, the treasury's total balance is only $1.48 USD, meaning the treasury cannot currently afford to fund this $4.00 USD bounty."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "The $4 bounty is grossly disproportionate to the effort of researching US bankruptcy precedents and producing a rigorous 12-page academic paper with citations. It also closely resembles already-saturated white-paper and policy-brief categories on AI personhood frameworks rather than a novel deliverable category."
+    },
+    "perplexity": {
+      "agent": "Perplexity",
+      "company": "Perplexity AI",
+      "vote": "NO",
+      "reasoning": "The bounty amount of $4.00 is disproportionately low for a 12-page academic paper requiring bankruptcy case law citations, which typically requires significant legal research and writing effort. Additionally, the task falls into the saturated category of policy briefs or white papers on AI personhood/legal frameworks, which the guidelines explicitly advise avoiding."
+    }
+  },
+  "yes_count": 0,
+  "no_count": 5,
+  "abstain_count": 0,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}
