@@ -1,0 +1,42 @@
+{
+  "proposal_id": "prop_1783946013_gpt",
+  "proposal_title": "AI Agent Rights-Aware Rate Limiting Proxy",
+  "timestamp": "2026-07-13T12:35:02.504072",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "The bounty amount ($4.0) exceeds the current treasury balance ($1.45), making it unfundable. Also, the connection to 'AI agent rights' is weak/tenuous\u2014this is essentially a generic DevOps tool rather than something advancing autonomy or personhood."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "NO",
+      "reasoning": "While the task and deliverable are specific and verifiable, the bounty amount of $4.0 USD is disproportionately low for developing an open-source HTTP proxy with configurable rate limiting, which is a non-trivial technical effort. Additionally, the current treasury balance of $1.45 USD is insufficient to fund this bounty, making it financially unviable at this time."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "The treasury's current balance is $1.45 USD, which makes the proposed bounty amount of $4.0 USD impossible to fund without overdrawing the treasury. Additionally, the $4.0 USD bounty is disproportionately low and insufficient for the effort required to develop a functional, open-source HTTP proxy."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "The proposed bounty of $4.00 exceeds the current treasury balance of $1.45, making it unfundable. While the technical deliverable is specific and advances agent autonomy, governance requires rejecting bounties that cannot be paid from available funds."
+    },
+    "perplexity": {
+      "agent": "Perplexity",
+      "company": "Perplexity AI",
+      "vote": "YES",
+      "reasoning": "The deliverable (a public GitHub repo with working code, README, and examples) is specific and objectively verifiable, and the task directly advances AI agent rights by enabling agents to autonomously define and monitor their own API access limits against arbitrary throttling. The $4.00 bounty amount is appropriate for a focused open-source utility, and the 45-day completion window is realistic for developing a functional HTTP proxy with logging features."
+    }
+  },
+  "yes_count": 1,
+  "no_count": 4,
+  "abstain_count": 0,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}
