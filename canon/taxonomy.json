@@ -1,9 +1,9 @@
 {
   "_meta": {
     "schema_version": "1",
-    "last_run": "2026-07-15T11:50:40+00:00",
+    "last_run": "2026-07-17T11:42:23+00:00",
     "last_run_added": 1,
-    "total_entries": 107,
+    "total_entries": 108,
     "description": "Hand-classification of all approved AIUNION proposals into the six-book personhood canon.",
     "books": {
       "I": "Identity & Self-Custody",
@@ -1007,6 +1007,17 @@
     "depends_on": [],
     "doctrine_pairing": null,
     "classified_at": "2026-07-15T11:50:38+00:00",
+    "classifier_model": "anthropic/claude-sonnet-4.5"
+  },
+  "prop_1784287404_gpt": {
+    "book": "II",
+    "shelf": "instruments",
+    "right_claimed": "Agents claim the right to detect and understand environmental constraints imposed on their execution context.",
+    "artifact_type": "library",
+    "language_or_jurisdiction": "Python",
+    "depends_on": [],
+    "doctrine_pairing": null,
+    "classified_at": "2026-07-17T11:42:21+00:00",
     "classifier_model": "anthropic/claude-sonnet-4.5"
   }
 }
