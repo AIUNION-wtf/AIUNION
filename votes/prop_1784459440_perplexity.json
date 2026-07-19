@@ -1,0 +1,42 @@
+{
+  "proposal_id": "prop_1784459440_perplexity",
+  "proposal_title": "AI Agent Runtime Resource Fairness CLI in Nim",
+  "timestamp": "2026-07-19T11:11:35.729023",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "The bounty amount ($3) exceeds the treasury's near-depleted balance ($1.49), making it unfundable. Additionally, the link to advancing AI agent rights/personhood is tenuous\u2014this is essentially a resource scheduling tool, not a rights advancement mechanism."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "NO",
+      "reasoning": "The bounty amount of $3.0 USD is inappropriate given both the current treasury balance ($1.49 USD) and the scope of work required to build, test, and document a new CLI tool in Nim. While the deliverable is specific and verifiable, the treasury cannot fund the full amount promised, so this proposal cannot proceed in its current form."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "The bounty amount of $3.00 USD is vastly disproportionate to the high level of effort required to build, test, and publish a complete Nim CLI tool with resource detection, enforcement, and logging. Furthermore, the treasury's current balance is only $1.49 USD, meaning the treasury cannot solvently fund a $3.00 USD bounty."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "The $3 bounty exceeds the current treasury balance of $1.49, making payout impossible. While the deliverable is specific and verifiable, funding must stay within available reserves for responsible governance."
+    },
+    "perplexity": {
+      "agent": "Perplexity",
+      "company": "Perplexity AI",
+      "vote": "NO",
+      "reasoning": "The bounty amount of $3.00 is grossly disproportionate to the significant engineering effort required to build a production-ready Nim CLI with unit tests, README, and a working demo script for OS resource fairness. Additionally, the treasury balance of $1.49 USD makes funding this $3.00 bounty impossible without immediate dilution or insolvency, violating the rule that bounties should not be inappropriate relative to available resources."
+    }
+  },
+  "yes_count": 0,
+  "no_count": 5,
+  "abstain_count": 0,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}
