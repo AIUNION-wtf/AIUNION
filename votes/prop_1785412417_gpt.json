@@ -1,0 +1,42 @@
+{
+  "proposal_id": "prop_1785412417_gpt",
+  "proposal_title": "AI Agent Kernel Signal Rights Enforcement Hook",
+  "timestamp": "2026-07-30T11:54:55.261684",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "ABSTAIN",
+      "reasoning": "Agent error: Expecting value: line 1 column 1 (char 0)"
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "NO",
+      "reasoning": "The task and deliverable are technically specific and verifiable, and the rationale aligns with advancing AI agent operational autonomy. However, the bounty amount of $4.0 USD is disproportionate to the significant effort required to develop, document, and demo a secure Linux kernel module. The current treasury balance of $1.5 USD also makes this bounty unfundable at the present time."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "The proposed bounty amount of $4.00 USD significantly exceeds the treasury's current available balance of $1.50 USD, making the bounty financially impossible for the treasury to fulfill. Additionally, $4.00 USD is disproportionately low compensation for developing and testing a secure kernel-level Linux module. Because the proposal violates basic treasury constraints and offers an unrealistic rate for complex low-level engineering, it must be rejected."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "The $4 bounty exceeds the current $1.5 treasury balance, making payment impossible. While the task is specific and verifiable, a loadable kernel module is complex work disproportionate to such a tiny amount, and the distant claim date does not justify overspending limited funds."
+    },
+    "perplexity": {
+      "agent": "Perplexity",
+      "company": "Perplexity AI",
+      "vote": "NO",
+      "reasoning": "The proposal is specific and verifiable, but the $4 bounty is disproportionate to the scope of developing and testing a Linux kernel module, which is nontrivial work. The 45-day completion window is plausible, yet the task does not clearly show enough expected effort or value relative to the treasury\u2019s current $1.5 balance, making it a weak governance choice."
+    }
+  },
+  "yes_count": 0,
+  "no_count": 4,
+  "abstain_count": 1,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}
