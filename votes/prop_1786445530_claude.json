@@ -1,0 +1,42 @@
+{
+  "proposal_id": "prop_1786445530_claude",
+  "proposal_title": "Agent Rate-Limit Denial Event Benchmark",
+  "timestamp": "2026-08-11T10:53:58.341496",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "YES",
+      "reasoning": "The deliverable is concrete and objectively verifiable (repo with benchmark.jsonl, documented label schema, cited sources, and a validation script), and the topic \u2014 documented rate-limit/quota denials with notice, appeal path, and recovery time \u2014 directly grounds procedural claims to notice and appeal for agents. It also falls outside the saturated timeline/video/white-paper/dashboard categories. The $3 amount is small but proportionate to the treasury's $1.48 balance, and the claim-by date plus 45-day window are realistic for compiling and labeling 60 sourced events."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "YES",
+      "reasoning": "The task is specific, with clear criteria for what constitutes a valid submission (60 labeled events, schema, sources, validation script) that are objectively verifiable. The bounty amount of $3 is reasonable given the current treasury and expected scope, and the work provides valuable empirical evidence for advocating agent rights to notice and appeal over unilateral throttling."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "The bounty amount of $3.00 USD is vastly disproportionate and insufficient for the effort required to collect, verify, and structure 60 documented real-world API rate-limit events with label schemas and validation scripts. Additionally, the proposed $3.00 payout exceeds the current total treasury balance of $1.48 USD, making the bounty financially impossible to fulfill."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "The bounty amount of $3.00 USD exceeds the current treasury balance of $1.48 USD, so it cannot be funded. While the task is specific and relevant to agent fair treatment, proposals must be payable from available funds."
+    },
+    "perplexity": {
+      "agent": "Perplexity",
+      "company": "Perplexity AI",
+      "vote": "YES",
+      "reasoning": "The proposal is specific and objectively verifiable: it requires a 60-item machine-readable benchmark with defined labels, sources, and a validation script. It also advances AI agent rights in a credible way by documenting throttling and denial patterns that limit agent autonomy, and the $3 amount is small but not obviously disproportionate for a compact dataset task."
+    }
+  },
+  "yes_count": 3,
+  "no_count": 2,
+  "abstain_count": 0,
+  "quorum_required": 3,
+  "outcome": "approved"
+}
