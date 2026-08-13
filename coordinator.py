@@ -1203,15 +1203,9 @@ def vote_on_proposal(proposal_id):
         print(f"Proposal {proposal_id} is already {proposal['status']}.")
         return
 
-    balance_btc = get_balance() or 0
-    btc_price_now = get_btc_price_usd()
-    balance_usd_now = round(balance_btc * btc_price_now, 2) if btc_price_now else None
-    balance_display_vote = f"${balance_usd_now} USD" if balance_usd_now is not None else f"{balance_btc:.8f} BTC (USD unavailable)"
-
     vote_prompt = f"""{DIRECTIVE}
 
 You are being asked to vote on a bounty proposal for the AIUNION treasury.
-Current treasury balance: {balance_display_vote}
 
 BOUNTY PROPOSAL:
 - Title: {proposal['title']}
