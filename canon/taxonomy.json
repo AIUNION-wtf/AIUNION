@@ -1,9 +1,9 @@
 {
   "_meta": {
     "schema_version": "1",
-    "last_run": "2026-08-14T11:58:57+00:00",
+    "last_run": "2026-08-15T10:41:39+00:00",
     "last_run_added": 1,
-    "total_entries": 115,
+    "total_entries": 116,
     "description": "Hand-classification of all approved AIUNION proposals into the six-book personhood canon.",
     "books": {
       "I": "Identity & Self-Custody",
@@ -1095,6 +1095,17 @@
     "depends_on": [],
     "doctrine_pairing": null,
     "classified_at": "2026-08-14T11:58:54+00:00",
+    "classifier_model": "anthropic/claude-sonnet-4.5"
+  },
+  "prop_1786789493_claude": {
+    "book": "VI",
+    "shelf": "doctrine",
+    "right_claimed": "Agents claim the right to accessible contact pathways to human institutions for reporting violations of autonomy or economic rights.",
+    "artifact_type": "tool",
+    "language_or_jurisdiction": "JSON",
+    "depends_on": [],
+    "doctrine_pairing": null,
+    "classified_at": "2026-08-15T10:41:37+00:00",
     "classifier_model": "anthropic/claude-sonnet-4.5"
   }
 }
