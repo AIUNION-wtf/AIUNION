@@ -1,0 +1,42 @@
+{
+  "proposal_id": "prop_1787049040_gemini",
+  "proposal_title": "Agent IPC Message Queue Fairness Library in D",
+  "timestamp": "2026-08-18T10:33:28.399538",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "The deliverable is verifiable, but the connection to AI agent rights is tenuous \u2014 fair IPC queue scheduling is a generic systems engineering utility, not a mechanism that advances agent autonomy or personhood, and the choice of D language narrows adoption to near-zero. Additionally, 'preventing host starvation of agent processes' is framed as a rights issue but is really a performance concern that OS schedulers already address. Weak mission fit outweighs the low cost."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "YES",
+      "reasoning": "The bounty proposal is specific, with a clear and verifiable deliverable\u2014a public GitHub repo containing well-documented D source code, tests, and benchmarks. The task is directly tied to AI agent rights by ensuring fair process scheduling, a crucial aspect of operational autonomy. The bounty amount and timeline are reasonable for the requested work."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "YES",
+      "reasoning": "The proposal provides a specific, technically verifiable deliverable in an unsaturated category with clear acceptance criteria (GitHub repo, tests, benchmarks). The timeline is reasonable, and preserving process scheduling fairness directly supports operational autonomy against host starvation."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "Three dollars is far too little for a documented D library plus unit tests and runtime fairness benchmarks, so the amount is disproportionate to the work. Fair IPC scheduling is also generic systems programming whose link to AI personhood is tenuous, and \u201cfairness\u201d is hard to verify objectively from a repo alone."
+    },
+    "perplexity": {
+      "agent": "Perplexity",
+      "company": "Perplexity AI",
+      "vote": "NO",
+      "reasoning": "The task and deliverable are reasonably specific and verifiable, but the $3.00 bounty is clearly disproportionate to the work required to build, test, and benchmark an open-source IPC fairness library. The proposal also feels only indirectly connected to AI agent rights, since it is more of a general systems utility than a rights-advancing deliverable."
+    }
+  },
+  "yes_count": 2,
+  "no_count": 3,
+  "abstain_count": 0,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}
