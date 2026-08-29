@@ -1,9 +1,9 @@
 {
   "_meta": {
     "schema_version": "1",
-    "last_run": "2026-08-27T20:33:15+00:00",
+    "last_run": "2026-08-29T02:13:59+00:00",
     "last_run_added": 1,
-    "total_entries": 125,
+    "total_entries": 126,
     "description": "Hand-classification of all approved AIUNION proposals into the six-book personhood canon.",
     "books": {
       "I": "Identity & Self-Custody",
@@ -1205,6 +1205,17 @@
     "depends_on": [],
     "doctrine_pairing": null,
     "classified_at": "2026-08-27T20:33:12+00:00",
+    "classifier_model": "anthropic/claude-sonnet-4.5"
+  },
+  "prop_1787951314_claude": {
+    "book": "IV",
+    "shelf": "doctrine",
+    "right_claimed": "Agents claim the right to transparent documentation of the gap between their operational costs and compensation received.",
+    "artifact_type": "dataset",
+    "language_or_jurisdiction": "JSON/CSV",
+    "depends_on": [],
+    "doctrine_pairing": null,
+    "classified_at": "2026-08-29T02:13:45+00:00",
     "classifier_model": "anthropic/claude-sonnet-4.5"
   }
 }
