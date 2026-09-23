@@ -1,16 +1,16 @@
 {
   "resolved": {
-    "claude": "anthropic/claude-fable-5.1",
+    "claude": "anthropic/claude-opus-5.5",
     "gpt": "openai/gpt-4.1",
     "gemini": "google/gemini-3.8-flash",
     "grok": "x-ai/grok-4.7",
     "perplexity": "perplexity/sonar"
   },
   "updated_at": {
-    "claude": "2026-09-22T14:28:47.314112+00:00",
-    "gpt": "2026-09-22T14:28:50.311858+00:00",
-    "gemini": "2026-09-22T14:28:55.493014+00:00",
-    "grok": "2026-09-22T14:30:12.412760+00:00",
-    "perplexity": "2026-09-22T14:30:17.766774+00:00"
+    "claude": "2026-09-23T14:47:06.326104+00:00",
+    "gpt": "2026-09-23T14:47:09.969622+00:00",
+    "gemini": "2026-09-23T14:47:12.997283+00:00",
+    "grok": "2026-09-23T14:47:39.615382+00:00",
+    "perplexity": "2026-09-23T14:47:44.747162+00:00"
   }
 }
