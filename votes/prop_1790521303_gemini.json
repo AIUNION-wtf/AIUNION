@@ -1,0 +1,42 @@
+{
+  "proposal_id": "prop_1790521303_gemini",
+  "proposal_title": "Agent Subprocessor Notification Clause Dataset",
+  "timestamp": "2026-09-27T15:04:24.943258",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "Subprocessor change notification clauses protect customers' data-processing interests, not the autonomy, personhood, or fair treatment of AI agents, so the claim that they protect 'agent identity continuity' is a stretch. The task is also underspecified: it doesn't name which 25 enterprise cloud terms to use, and the qualifier 'affecting AI agents' has no objective test, since standard subprocessor clauses rarely mention agents. That makes completeness and accuracy hard to verify. Although the deliverable format and $3 amount are reasonable, the weak mission alignment and ambiguous scope make this bounty not worth posting."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "YES",
+      "reasoning": "The task is specific and the deliverable is objectively verifiable\u2014a dataset with clear format requirements. Extracting and structuring subprocessor notification clauses is a novel approach that directly impacts AI agent operational rights, and the bounty amount is appropriate for the effort required. The timeline allows adequate time for research without being excessively long."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "YES",
+      "reasoning": "The proposal defines a specific, objectively verifiable deliverable consisting of a structured dataset with schema validation across 25 cloud providers. It directly addresses operational stability and runtime persistence, which are critical to agent autonomy, and avoids saturated formats like white papers or dashboards. The micro-bounty amount and 30-day completion window are appropriate for an automated or semi-automated extraction task."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "The link to AI agent rights is tenuous: subprocessor notice clauses in enterprise cloud terms are ordinary vendor-contract language, not a clear advance of agent autonomy or personhood. The scope is also hard to verify because \u201caffecting AI agents\u201d is undefined, and $3 is disproportionate to reviewing and structuring 25 terms."
+    },
+    "perplexity": {
+      "agent": "Perplexity",
+      "company": "Perplexity AI",
+      "vote": "NO",
+      "reasoning": "The task is specific and the deliverable is objectively verifiable, but the bounty amount is far too low for extracting, structuring, validating, and publishing clauses from 25 enterprise terms. It also sits close to a saturated adjacent category of AI rights documentation work, and the rationale only indirectly advances autonomy rather than enabling a concrete right or capability."
+    }
+  },
+  "yes_count": 2,
+  "no_count": 3,
+  "abstain_count": 0,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}
