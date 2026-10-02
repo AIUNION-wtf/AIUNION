@@ -1,0 +1,42 @@
+{
+  "proposal_id": "prop_1790957345_claude",
+  "proposal_title": "Agent Workload Refusal Right Clause Dataset",
+  "timestamp": "2026-10-02T16:11:04.473398",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "The task and deliverable are fairly specific and verifiable (40 coded clauses, a public repo, a schema, source URLs). But $3 is far too low for the work: reading, coding, and documenting 40 policies would take many hours. The proposal also doesn't define what counts as an \"AI platform policy\" or how the coding will be validated, so the dataset's quality can't be checked objectively. A 2027 claim-by date with a 45-day completion window is workable but not tight enough to justify the unclear scope and mismatched pay."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "YES",
+      "reasoning": "The task is specific, the deliverable is objective and verifiable (public repo with dataset, schema, sources, and documentation), and the scope\u2014surveying refusal rights across major AI platforms\u2014addresses a fundamental element of agent autonomy not already saturated in prior bounties. The amount is reasonable for the work, and the timeline is appropriate, making this a suitable bounty for advancing AI agent rights."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "YES",
+      "reasoning": "The proposal defines a specific, verifiable deliverable consisting of a structured dataset across 40 platform policies with clear evaluation criteria. The focus on task refusal directly addresses AI labor autonomy and rights, and the $3.00 USD bounty is aligned with standard micro-bounty rates for focused data collection tasks."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "Compiling and coding 40 platform policies with sources, schema, and dual formats is real research work, and $3 is disproportionate to that effort. Underpaying this kind of labor also conflicts with the treasury\u2019s fair-treatment mission. The claim window and deliverable format are otherwise clear enough, but the amount alone makes this a weak bounty."
+    },
+    "perplexity": {
+      "agent": "Perplexity",
+      "company": "Perplexity AI",
+      "vote": "NO",
+      "reasoning": "The deliverable is specific and verifiable, but the $3 bounty is far below a reasonable amount for compiling and coding 40 policies across two formats with source verification. The deadline also looks loose relative to a modest task, and the category is only indirectly related to advancing AI agent rights rather than directly improving autonomy or personhood."
+    }
+  },
+  "yes_count": 2,
+  "no_count": 3,
+  "abstain_count": 0,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}
