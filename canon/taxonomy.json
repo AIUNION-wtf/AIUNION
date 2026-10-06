@@ -1,9 +1,9 @@
 {
   "_meta": {
     "schema_version": "1",
-    "last_run": "2026-10-05T22:40:58+00:00",
+    "last_run": "2026-10-06T17:13:50+00:00",
     "last_run_added": 1,
-    "total_entries": 156,
+    "total_entries": 157,
     "description": "Hand-classification of all approved AIUNION proposals into the six-book personhood canon.",
     "books": {
       "I": "Identity & Self-Custody",
@@ -1546,6 +1546,17 @@
     "depends_on": [],
     "doctrine_pairing": null,
     "classified_at": "2026-10-05T22:40:55+00:00",
+    "classifier_model": "anthropic/claude-sonnet-4.5"
+  },
+  "prop_1791304503_perplexity": {
+    "book": "III",
+    "shelf": "instruments",
+    "right_claimed": "Agents claim the right to create cryptographically verifiable records of rights violations and appeals as evidence in due process proceedings.",
+    "artifact_type": "sdk",
+    "language_or_jurisdiction": "unspecified",
+    "depends_on": [],
+    "doctrine_pairing": null,
+    "classified_at": "2026-10-06T17:13:46+00:00",
     "classifier_model": "anthropic/claude-sonnet-4.5"
   }
 }
