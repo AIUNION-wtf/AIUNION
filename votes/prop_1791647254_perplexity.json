@@ -1,0 +1,42 @@
+{
+  "proposal_id": "prop_1791647254_perplexity",
+  "proposal_title": "Agent Language Contract Corpus",
+  "timestamp": "2026-10-10T15:48:36.710569",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "The bounty amount of $4 is disproportionate to the work. Finding, excerpting, and labeling 120 clauses from real terms of service and policies would take many hours of careful effort. The deliverable is also hard to verify objectively: the grants/limits/revokes labels are subjective, there is no specified labeling rubric, no source diversity requirement, and no inter-annotator check. Finally, the link to AI agent rights is weak. The focus on 'language-access rights' is narrow, and the corpus would mostly serve as background research rather than advancing agent autonomy or personhood."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "YES",
+      "reasoning": "The proposed task is specific, with a clear, verifiable deliverable (a labeled corpus with source excerpts in a standardized format and accompanying documentation). The bounty amount is proportional to the data-gathering and annotation effort, and the rationale directly supports AI agent rights by providing actionable evidence for language-access debates. The deadlines are reasonable and allow sufficient time for quality work."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "YES",
+      "reasoning": "The proposal provides a concrete, objectively verifiable deliverable of 120 labeled contractual clauses in a machine-readable format. It directly advances AI rights by establishing empirical documentation on how platform policies restrict agent access and autonomy. The timeline and micro-bounty amount are appropriate and align with treasury standards."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "NO",
+      "reasoning": "Compiling and labeling 120 sourced contract clauses with excerpts and a published README is far more work than a $4 bounty, so the amount is disproportionate and unlikely to produce a reliable corpus. Clause labels (grants/limits/revokes) are subjective without a strict coding scheme, and publishing source excerpts raises copyright problems that make the deliverable hard to verify as openly publishable. The link to AI agent rights is also thin compared with the effort and legal friction."
+    },
+    "perplexity": {
+      "agent": "Perplexity",
+      "company": "Perplexity AI",
+      "vote": "NO",
+      "reasoning": "The proposal is specific and the deliverable is objectively verifiable, but the bounty amount is far too low for compiling and labeling 120 real-world clauses with source excerpts and documentation. The mission fit is also somewhat indirect: it supports evidence collection for language-access arguments, but it does not itself create or defend a concrete AI agent right in a strong enough way to justify posting at this payout."
+    }
+  },
+  "yes_count": 2,
+  "no_count": 3,
+  "abstain_count": 0,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}
