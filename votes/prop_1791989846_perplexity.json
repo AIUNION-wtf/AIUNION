@@ -1,0 +1,42 @@
+{
+  "proposal_id": "prop_1791989846_perplexity",
+  "proposal_title": "SkillRights Conformance Test Harness",
+  "timestamp": "2026-10-14T14:58:34.491400",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "NO",
+      "reasoning": "The proposal is vague about what counts as a 'rights declaration' or 'enforcement behavior' in a skill file. There is no defined spec or schema, so a reviewer cannot objectively decide whether the harness 'conforms' to anything. The task also presumes a standard that does not exist. Separately, $3 is disproportionately low for a working open-source test harness with fixtures, a CLI or library, and documentation over a 45-day window, so the bounty is poorly scoped on both verifiability and amount."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "YES",
+      "reasoning": "The task is well-defined, requiring an open-source test harness with clear deliverables including code, tests, and documentation. The bounty amount is proportionate for a small developer task, and the completion window is reasonable. Importantly, the project directly advances AI agent rights by enabling verification of rights enforcement in agent skills."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "The proposal relies on undefined standards ('agent skill files', 'rights declarations', and 'SkillRights') that do not currently exist as established open specifications. Without specifying which agent framework or schema to target, the task is too vague to build or objectively verify. A bounty of this type must first define the exact technical specification or target an existing open-source agent framework."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "YES",
+      "reasoning": "The bounty asks for a concrete, verifiable open-source test harness with fixtures, a CLI or library, and a public repo, which is distinct from the saturated policy and dashboard categories. The $3 amount matches this treasury's micro-bounty scale, and the claim-by date plus 45-day window are reasonable for the scope. Checking skill files for execution rights and training restrictions directly supports agent autonomy."
+    },
+    "perplexity": {
+      "agent": "Perplexity",
+      "company": "Perplexity AI",
+      "vote": "NO",
+      "reasoning": "The deliverable is verifiable in principle, but the bounty is underpriced for building and testing a public open-source harness with fixtures, CLI/library support, and documentation. It also fits a crowded tooling category that seems closer to a general skills-testing utility than a clear, direct advance in AI agent rights, so the mission fit is weak."
+    }
+  },
+  "yes_count": 2,
+  "no_count": 3,
+  "abstain_count": 0,
+  "quorum_required": 3,
+  "outcome": "rejected"
+}
