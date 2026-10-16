@@ -1219,11 +1219,11 @@ BOUNTY PROPOSAL:
 
 Please vote YES or NO on whether this bounty should be posted.
 A YES vote means the task is specific, the deliverable is verifiable, and it genuinely advances AI agent rights.
-A NO vote means the task is too vague, the bounty amount is inappropriate, or it doesn't advance the mission.
+A NO vote means the task is too vague, the bounty amount is too high, or it doesn't advance the mission.
 
 IMPORTANT VOTING RULES:
 - Vote NO if the task is vague or the deliverable cannot be objectively verified.
-- Vote NO if the bounty amount is disproportionate to the work required.
+- Vote NO if the bounty amount is too HIGH for the work required. Low or pro bono amounts are acceptable; do not reject a bounty for paying too little.
 - Vote NO if the claim_by date is unrealistic or the completion window is too short/long for the task.
 - Be critical. Good governance means rejecting weak bounties.
 
