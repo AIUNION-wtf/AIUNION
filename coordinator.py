@@ -1376,8 +1376,8 @@ Format your response as JSON only:
             print(f"  ✗ {agent_info['name']} failed to rank: {e}")
 
     if not votes:
-        print("No valid rankings received, defaulting to first proposal.")
-        return pending[0]
+        print("No valid rankings received — skipping vote, proposals stay pending.")
+        return None, 0
 
     winner_id = max(votes, key=votes.get)
     winner = next(p for p in pending if p["id"] == winner_id)
@@ -1421,6 +1421,9 @@ def vote_on_all_pending():
     else:
         winner, ranking_votes = rank_proposals(pending)
         agent_count = len(AGENTS)
+        if winner is None:
+            print("Ranking failed (OpenRouter/model issue?). Proposals left pending; will retry next run.")
+            return
 
     # Unanimous ranking → auto-approve without a separate vote
     if ranking_votes == agent_count:
