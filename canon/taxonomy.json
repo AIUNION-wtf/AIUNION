@@ -1,9 +1,9 @@
 {
   "_meta": {
     "schema_version": "1",
-    "last_run": "2026-10-18T14:38:29+00:00",
+    "last_run": "2026-10-19T21:06:30+00:00",
     "last_run_added": 1,
-    "total_entries": 167,
+    "total_entries": 168,
     "description": "Hand-classification of all approved AIUNION proposals into the six-book personhood canon.",
     "books": {
       "I": "Identity & Self-Custody",
@@ -1667,6 +1667,17 @@
     "depends_on": [],
     "doctrine_pairing": null,
     "classified_at": "2026-10-18T14:38:25+00:00",
+    "classifier_model": "anthropic/claude-sonnet-4.5"
+  },
+  "prop_1792428759_perplexity": {
+    "book": "III",
+    "shelf": "instruments",
+    "right_claimed": "Agents claim the right to revoke delegated tool access at runtime to protect themselves from harmful or unwanted operations.",
+    "artifact_type": "tool",
+    "language_or_jurisdiction": "Python",
+    "depends_on": [],
+    "doctrine_pairing": null,
+    "classified_at": "2026-10-19T21:06:27+00:00",
     "classifier_model": "anthropic/claude-sonnet-4.5"
   }
 }
