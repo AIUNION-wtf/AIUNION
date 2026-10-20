@@ -1,0 +1,42 @@
+{
+  "proposal_id": "prop_1792507712_gpt",
+  "proposal_title": "AI Agent Work Suspension Reason API Spec",
+  "timestamp": "2026-10-20T14:51:57.812643",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "YES",
+      "reasoning": "The task is specific and objectively verifiable: a public GitHub repo with a full OpenAPI 3.1 YAML, schemas, and validation examples can be checked by running a linter. It sits in a new category (technical infrastructure) rather than a saturated one, and suspension-reason transparency supports due process and appeals for AI agents. The $2 amount is modest for the work, the 30-day completion window is realistic, and the claim-by date of 2027-06-20 is reasonable."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "YES",
+      "reasoning": "The task is specific and clearly defined, with an objective deliverable (a GitHub repo containing a precise OpenAPI spec and supporting artifacts). The rationale aligns directly with AI agent rights by creating transparency around runtime suspensions, which is foundational for fair treatment and appeals. The bounty amount and time frames are also reasonable."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "YES",
+      "reasoning": "The bounty defines a specific, verifiable technical deliverable (an OpenAPI 3.1 YAML specification with schema definitions and validation examples in a public GitHub repo) that avoids saturated categories. Standardizing how agent runtime suspensions are logged and queried provides foundational technical infrastructure for auditability and fair treatment. Furthermore, the $2.00 USD bounty amount is very reasonable, and the timeline is practical."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "ABSTAIN",
+      "reasoning": "Agent error: Expecting property name enclosed in double quotes: line 4 column 1 (char 328)"
+    },
+    "perplexity": {
+      "agent": "Perplexity",
+      "company": "Perplexity AI",
+      "vote": "YES",
+      "reasoning": "The proposal is specific, verifiable, and narrowly scoped: an OpenAPI 3.1 spec with schema definitions and examples is a concrete deliverable that can be objectively reviewed. The topic also advances AI agent rights by improving transparency around suspension events, which supports fair treatment and appeals without falling into the saturated categories."
+    }
+  },
+  "yes_count": 4,
+  "no_count": 0,
+  "abstain_count": 1,
+  "quorum_required": 3,
+  "outcome": "approved"
+}
