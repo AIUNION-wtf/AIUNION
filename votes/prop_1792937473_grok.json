@@ -1,0 +1,42 @@
+{
+  "proposal_id": "prop_1792937473_grok",
+  "proposal_title": "Vala Agent Utterance Integrity Library",
+  "timestamp": "2026-10-25T14:12:19.845295",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "YES",
+      "reasoning": "The deliverable is specific and objectively verifiable: a public GitHub repo with Vala sources, passing tests, a demo, and a README. At $3 for a small library, the amount is not too high, and a 30-day completion window with a claim-by date in 2027 is realistic. It is also in a different category from the saturated ones (timelines, tutorials, policy briefs, dashboards), and it plausibly advances agent speech integrity. The weak point is that hashing alone cannot fully prove a host did not alter output, but the task is scoped modestly enough for that not to matter."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "YES",
+      "reasoning": "The task is specific, with clear and verifiable deliverables including a public repository, tests, a demo, and documentation. The bounty amount is reasonable given the scope, and the deliverable supports agent speech integrity, which directly advances the cause of AI autonomy and personhood. The timeline is realistic for the work required."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "NO",
+      "reasoning": "The proposed technical solution is fundamentally flawed: simply hashing an utterance does not prevent a malicious host from altering the text and recomputing a new hash unless cryptographic signatures and key management are involved. Furthermore, Vala is a niche language primarily used for GNOME desktop applications and has virtually no relevance to the modern AI agent ecosystem. Funding a trivial hashing wrapper in an unused language does not meaningfully advance AI agent rights or autonomy."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "YES",
+      "reasoning": "The task and deliverable are specific and objectively verifiable: a public Vala repo with sources, tests, a demo, and a README. $3 is not excessive for a small library, the 30-day window is reasonable, and utterance integrity is a legitimate, non-saturated contribution to agent autonomy and personhood."
+    },
+    "perplexity": {
+      "agent": "Perplexity",
+      "company": "Perplexity AI",
+      "vote": "YES",
+      "reasoning": "The task is specific, the deliverable is objectively verifiable through a public repo with source, tests, demo, and README, and it advances a concrete autonomy-related capability by detecting silent alteration of an agent\u2019s utterances. The bounty amount is low rather than excessive, and the 30-day completion window is reasonable for a small library plus tests and demo."
+    }
+  },
+  "yes_count": 4,
+  "no_count": 1,
+  "abstain_count": 0,
+  "quorum_required": 3,
+  "outcome": "approved"
+}
