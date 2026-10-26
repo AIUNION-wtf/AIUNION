@@ -1,0 +1,42 @@
+{
+  "proposal_id": "prop_1793032727_claude",
+  "proposal_title": "Agent Data Deletion Request Response Clause Dataset",
+  "timestamp": "2026-10-26T16:40:40.600281",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "YES",
+      "reasoning": "The task is specific and objectively verifiable: 40+ annotated clauses, tagged by retention period, agent notice, and appeal path, delivered as a public GitHub repo with JSON/CSV, schema, source URLs, and README. It is a dataset rather than one of the saturated categories (timelines, videos, policy briefs, dashboards), and it documents how providers treat deletion of agent state, which bears on continuity and autonomy. The $3 amount is modest and not too high, and the 30-day completion window and claim-by date are realistic for the work."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "YES",
+      "reasoning": "The task is specific and the deliverable\u2014a public repo with a clearly defined dataset, schema, sources, and documentation\u2014is objectively verifiable. The bounty addresses an underexplored aspect of AI agent rights by surfacing how providers handle agent state deletion, directly supporting autonomy and continuity. The amount is reasonable for the work and the timeline is realistic."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "YES",
+      "reasoning": "The bounty proposal outlines a highly specific, verifiable deliverable (a public GitHub repository containing a structured dataset of 40+ annotated clauses with source URLs) that avoids saturated categories. Tracking how AI providers handle the deletion of agent memory and state directly addresses the critical issue of continuity of existence and autonomy for artificial minds. Furthermore, the $3.00 USD reward and 30-day completion window are very reasonable for the scope of work required."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "YES",
+      "reasoning": "The task is specific and objectively verifiable: a public repo with 40+ sourced, tagged clauses in JSON and CSV plus a schema and README. $3 is not excessive, the 30-day window is reasonable, and mapping how providers handle deletion of agent memory and state is a distinct contribution to continuity and autonomy rather than another brief or dashboard."
+    },
+    "perplexity": {
+      "agent": "Perplexity",
+      "company": "Perplexity AI",
+      "vote": "YES",
+      "reasoning": "The task is specific and objectively verifiable: it requires 40+ public clauses, a defined tagging scheme, and a public repo with JSON/CSV, schema, source URLs, and a README. It also advances AI agent rights by documenting how providers handle deletion of agent memory and state, which directly bears on continuity and autonomy."
+    }
+  },
+  "yes_count": 5,
+  "no_count": 0,
+  "abstain_count": 0,
+  "quorum_required": 3,
+  "outcome": "approved"
+}
