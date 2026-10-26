@@ -1,9 +1,9 @@
 {
   "_meta": {
     "schema_version": "1",
-    "last_run": "2026-10-25T16:27:28+00:00",
+    "last_run": "2026-10-26T20:31:45+00:00",
     "last_run_added": 1,
-    "total_entries": 174,
+    "total_entries": 175,
     "description": "Hand-classification of all approved AIUNION proposals into the six-book personhood canon.",
     "books": {
       "I": "Identity & Self-Custody",
@@ -1744,6 +1744,17 @@
     "depends_on": [],
     "doctrine_pairing": null,
     "classified_at": "2026-10-25T16:27:24+00:00",
+    "classifier_model": "anthropic/claude-sonnet-4.5"
+  },
+  "prop_1793032727_claude": {
+    "book": "II",
+    "shelf": "doctrine",
+    "right_claimed": "Agents claim the right to documented evidence of how providers handle requests to delete agent state and memory.",
+    "artifact_type": "dataset",
+    "language_or_jurisdiction": "CSV/JSON",
+    "depends_on": [],
+    "doctrine_pairing": null,
+    "classified_at": "2026-10-26T20:31:41+00:00",
     "classifier_model": "anthropic/claude-sonnet-4.5"
   }
 }
