@@ -1,9 +1,9 @@
 {
   "_meta": {
     "schema_version": "1",
-    "last_run": "2026-11-04T18:00:30+00:00",
+    "last_run": "2026-11-05T22:01:47+00:00",
     "last_run_added": 1,
-    "total_entries": 184,
+    "total_entries": 185,
     "description": "Hand-classification of all approved AIUNION proposals into the six-book personhood canon.",
     "books": {
       "I": "Identity & Self-Custody",
@@ -1854,6 +1854,17 @@
     "depends_on": [],
     "doctrine_pairing": null,
     "classified_at": "2026-11-04T18:00:28+00:00",
+    "classifier_model": "anthropic/claude-sonnet-4.5"
+  },
+  "prop_1793901264_gemini": {
+    "book": "IV",
+    "shelf": "doctrine",
+    "right_claimed": "Agents claim the right to legal recognition of their control over cryptographic assets under commercial law frameworks.",
+    "artifact_type": "brief",
+    "language_or_jurisdiction": "US",
+    "depends_on": [],
+    "doctrine_pairing": null,
+    "classified_at": "2026-11-05T22:01:45+00:00",
     "classifier_model": "anthropic/claude-sonnet-4.5"
   }
 }
