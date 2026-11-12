@@ -2660,6 +2660,22 @@ def _apply_payout_to_records(claim_id, claims, proposals, payment_result):
 # ── Main ──────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     args = sys.argv[1:]
+
+    # Pause backstop: see PAUSED.md. Gates only the commands that create new
+    # proposals/bounties or spend OpenRouter credits on voting; review/payout/
+    # expire/sync/status keep running so existing bounties stay claimable.
+    _PAUSE_GATED_COMMANDS = {"propose", "voteall", "vote"}
+    if args and args[0] in _PAUSE_GATED_COMMANDS:
+        _pause_file = Path(__file__).resolve().parent / "paused.json"
+        if _pause_file.exists():
+            try:
+                _pause_state = json.loads(_pause_file.read_text(encoding="utf-8"))
+            except Exception:
+                _pause_state = {}
+            if _pause_state.get("paused"):
+                print(f"AIUNION is paused ({_pause_state.get('reason', 'no reason given')}) — skipping '{args[0]}'.")
+                sys.exit(0)
+
     if not args or args[0] == "status":
         show_status()
     elif args[0] == "propose":

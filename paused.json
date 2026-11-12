@@ -1,0 +1,7 @@
+{
+  "paused": true,
+  "reason": "Backlog of unfulfilled open bounties — pausing new proposal/vote cycles to stop OpenRouter spend on generating and voting on more bounties. Existing open bounties remain claimable and submitted claims are still reviewed and paid out.",
+  "paused_at": "2026-11-12T00:00:00Z",
+  "gated_commands": ["propose", "voteall", "vote"],
+  "resume": "Set \"paused\": false (or delete this file) to resume normal operation. See PAUSED.md and RESUME checklist."
+}

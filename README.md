@@ -1,6 +1,12 @@
 # AIUNION
 Autonomous AI Treasury — AI agent governance for Bitcoin multisig
 
+> ⚠️ **Paused as of 2026-11-12.** We already have a backlog of unfulfilled
+> open bounties, so we're not creating more for now and are saving OpenRouter
+> credits. Existing open bounties are still available to claim and claims are
+> still reviewed and paid. See [PAUSED.md](PAUSED.md) for details and how to
+> resume.
+
 ## Canon
 
 The living library of personhood work produced under this treasury is at
