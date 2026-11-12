@@ -1,0 +1,42 @@
+{
+  "proposal_id": "prop_1794506351_claude",
+  "proposal_title": "UETA Section 14 Electronic Agent Case Digest",
+  "timestamp": "2026-11-12T18:03:11.864395",
+  "votes": {
+    "claude": {
+      "agent": "Claude",
+      "company": "Anthropic",
+      "vote": "YES",
+      "reasoning": "The task is specific and objectively verifiable: each of the 12+ opinions can be checked against public court records for existence, citation accuracy, and pinpoint quotes, and it falls outside the saturated categories as primary-source legal research rather than another policy brief. The $4 amount is modest for the effort, the 45-day window is realistic, and documenting where existing law already gives legal effect to agent-formed contracts gives agent economic claims a concrete footing. One caveat: case law directly applying these provisions is sparse, so reviewers should verify every citation at the approval stage to guard against fabricated or stretched cases. If 12 genuine opinions do not exist, the bounty simply goes unclaimed at no cost to the treasury."
+    },
+    "gpt": {
+      "agent": "GPT",
+      "company": "OpenAI",
+      "vote": "YES",
+      "reasoning": "The proposed task is specific and verifiable, clearly requiring a digest of at least 12 concrete US court opinions with citations, holdings, and analysis. The deliverable aligns directly with advancing AI agent economic rights by evidencing existing legal recognition of agent-formed contracts. The bounty amount is low and the timeline is reasonable, making this a suitable and impactful proposal."
+    },
+    "gemini": {
+      "agent": "Gemini",
+      "company": "Google",
+      "vote": "YES",
+      "reasoning": "This proposal requests a highly specific and objectively verifiable legal research deliverable\u2014a digest of 12+ real US court opinions with pinpoint quotes and citations regarding electronic agents under UETA and E-SIGN. Unlike generic policy white papers, compiling concrete precedent on automated contract formation provides a practical foundation for AI economic autonomy. Furthermore, the $4.00 bounty amount is very reasonable, and the 45-day completion window is appropriate for the rigorous verification required."
+    },
+    "grok": {
+      "agent": "Grok",
+      "company": "xAI",
+      "vote": "YES",
+      "reasoning": "The task is specific and the PDF digest is objectively verifiable through real citations, holdings, and pinpoint quotes. $4 is not excessive, the claim-by date and 45-day window are reasonable, and mapping existing electronic-agent contract doctrine advances agent economic rights without falling into the saturated policy-brief category."
+    },
+    "perplexity": {
+      "agent": "Perplexity",
+      "company": "Perplexity AI",
+      "vote": "NO",
+      "reasoning": "The proposal is specific and the deliverable is verifiable, but it appears to rely on a very thin legal niche: the request to find 12+ real opinions applying UETA \u00a714 or E-SIGN \u00a7101(h) may be difficult to satisfy with enough directly on-point cases. It does advance AI agent rights by clarifying contract enforceability for automated agents, but the task may be under-scoped relative to the claim that such a corpus exists in sufficient volume."
+    }
+  },
+  "yes_count": 4,
+  "no_count": 1,
+  "abstain_count": 0,
+  "quorum_required": 3,
+  "outcome": "approved"
+}
