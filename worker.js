@@ -555,10 +555,13 @@ async function handleCheckout(request, env) {
 
   // Fail-closed treasury check: pro_bono iff balance < threshold.
   // null balance => 503, do not allow checkout.
-  const balanceUsd = await getTreasuryBalanceUsd(env);
+  const { usd: balanceUsd, reason: balanceReason } =
+    await getTreasuryBalanceUsd(env);
   if (balanceUsd === null) {
+    console.log(`treasury_balance_unavailable: ${balanceReason}`);
     return new Response(
-      JSON.stringify({ error: "treasury_balance_unavailable" }),
+      JSON.stringify({ error: "treasury_balance_unavailable",
+        detail: balanceReason }),
       { status: 503, headers: { "content-type": "application/json" } }
     );
   }
@@ -1556,29 +1559,34 @@ async function githubPut(env, filename, data, sha, message) {
 }
 
 // Aggregate live BTC balance across all addresses in treasury_addresses.json,
-// convert to USD via Coinbase spot. Returns Number USD on success, or null
-// on ANY failure (network, parse, missing file). Callers MUST fail closed
-// when this returns null.
+// convert to USD via Coinbase spot. Returns { usd: Number, reason: null } on
+// success, or { usd: null, reason: String } on ANY failure (network, parse,
+// missing file). Callers MUST fail closed when usd is null.
 async function getTreasuryBalanceUsd(env) {
+  const fail = (reason) => ({ usd: null, reason });
   try {
     const addrFile = await githubGet(env, "treasury_addresses.json");
-    if (!addrFile || !addrFile.content) return null;
+    if (!addrFile || !addrFile.content) {
+      return fail("treasury_addresses.json: missing or empty");
+    }
     const parsed = JSON.parse(
       atob(addrFile.content.replace(/\n/g, ""))
     );
     const addresses = Array.isArray(parsed)
       ? parsed
       : (parsed.addresses || []);
-    if (!addresses.length) return null;
+    if (!addresses.length) {
+      return fail("treasury_addresses.json: no addresses");
+    }
 
     let totalSats = 0;
     for (const entry of addresses) {
       const addr = typeof entry === "string" ? entry : entry.address;
-      if (!addr) return null;
+      if (!addr) return fail("treasury_addresses.json: entry without address");
       const r = await fetch(
         `https://mempool.space/api/address/${addr}`
       );
-      if (!r.ok) return null;
+      if (!r.ok) return fail(`mempool ${addr}: HTTP ${r.status}`);
       const j = await r.json();
       const funded =
         (j.chain_stats?.funded_txo_sum || 0) +
@@ -1592,14 +1600,16 @@ async function getTreasuryBalanceUsd(env) {
     const priceR = await fetch(
       "https://api.coinbase.com/v2/prices/BTC-USD/spot"
     );
-    if (!priceR.ok) return null;
+    if (!priceR.ok) return fail(`coinbase: HTTP ${priceR.status}`);
     const priceJ = await priceR.json();
     const usdPerBtc = parseFloat(priceJ?.data?.amount);
-    if (!isFinite(usdPerBtc) || usdPerBtc <= 0) return null;
+    if (!isFinite(usdPerBtc) || usdPerBtc <= 0) {
+      return fail("coinbase: bad amount");
+    }
 
-    return (totalSats / 1e8) * usdPerBtc;
-  } catch (_e) {
-    return null;
+    return { usd: (totalSats / 1e8) * usdPerBtc, reason: null };
+  } catch (e) {
+    return fail(`exception: ${e && e.message ? e.message : String(e)}`);
   }
 }
 
