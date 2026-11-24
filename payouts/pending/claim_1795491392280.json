@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "claim_id": "claim_1795491392280",
+  "proposal_id": "prop_1774260026_claude",
+  "recipient_address": "bc1pjjmjypmzqgqkjxrhx0hpmaetlk75k04gh9hvkexmmfqyl5g7sjfsk4cge7",
+  "amount_usd": 0.0,
+  "approved_at": "2026-11-24T03:37:33.371506",
+  "signer_ids": [
+    "gpt",
+    "gemini",
+    "claude"
+  ],
+  "queued_at": "2026-11-24T03:37:33.371619Z",
+  "attempts": [],
+  "pro_bono": true,
+  "frozen_amount_usd": 0.0
+}
