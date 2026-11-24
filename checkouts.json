@@ -1,3 +1,12 @@
 {
-    "checkouts": []
+  "checkouts": [
+    {
+      "proposal_id": "prop_1774260026_claude",
+      "btc_address": "bc1pjjmjypmzqgqkjxrhx0hpmaetlk75k04gh9hvkexmmfqyl5g7sjfsk4cge7",
+      "checked_out_at": "2026-11-24T03:36:29.349Z",
+      "expires_at": "2026-11-26T03:36:29.349Z",
+      "frozen_amount_usd": 0,
+      "pro_bono": true
+    }
+  ]
 }
