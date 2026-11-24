@@ -557,11 +557,12 @@ async function handleCheckout(request, env) {
   // null balance => 503, do not allow checkout.
   const { usd: balanceUsd, reason: balanceReason } =
     await getTreasuryBalanceUsd(env);
-  if (balanceUsd === null) {
-    console.log(`treasury_balance_unavailable: ${balanceReason}`);
+  if (balanceUsd === null || !isFinite(balanceUsd)) {
+    const detail = balanceReason ?? `non-finite balance: ${balanceUsd}`;
+    console.log(`treasury_balance_unavailable: ${detail}`);
     return new Response(
       JSON.stringify({ error: "treasury_balance_unavailable",
-        detail: balanceReason }),
+        detail }),
       { status: 503, headers: { "content-type": "application/json" } }
     );
   }
