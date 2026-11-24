@@ -520,10 +520,9 @@ async function handleCheckout(request, env) {
       { status: 503, headers: { "content-type": "application/json" } }
     );
   }
-  const propsData = JSON.parse(
-    atob(propsFile.content.replace(/\n/g, ""))
-  );
-  const proposal = (propsData.proposals || [])
+  const propsData = decodeGithubContent(propsFile.content);
+  const list = Array.isArray(propsData) ? propsData : (propsData.proposals || []);
+  const proposal = list
     .find((p) => p.id === proposalId);
   if (!proposal) {
     return new Response(
